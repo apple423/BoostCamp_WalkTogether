@@ -5,4 +5,6 @@
     <color name="colorPrimaryDark">#c7cc00</color>
     <color name="colorAccent">#ffff00</color>
     <color name="colorPrimaryLight">#ffff5a</color>
+    <color name="appBarIconDefault">#8a000000</color>
+    <color name="appBarIconSelected">#000000</color>
 </resources>

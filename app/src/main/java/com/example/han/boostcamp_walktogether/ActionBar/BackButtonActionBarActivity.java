@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.R;
@@ -19,6 +20,7 @@ public class BackButtonActionBarActivity  extends AppCompatActivity{
     protected Toolbar mToolbar;
     protected FrameLayout mFrameLayout;
     protected TextView mTextView;
+    protected ImageView mImageView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class BackButtonActionBarActivity  extends AppCompatActivity{
 
         mFrameLayout = (FrameLayout) findViewById(R.id.frame_content);
         mTextView = (TextView)findViewById(R.id.toolbar_textView);
+        mImageView = (ImageView)findViewById(R.id.toolbar_heart_imageView);
 
     }
 

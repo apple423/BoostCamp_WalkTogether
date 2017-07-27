@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.R;
@@ -14,7 +15,11 @@ import com.example.han.boostcamp_walktogether.R;
 
 public class LocationCommentAdapter extends RecyclerView.Adapter<LocationCommentAdapter.LocationCommentViewHolder> {
 
-    private TextView mLocationTitleTextview;
+    private ImageView mLocationUserImageView;
+    private TextView mLocationUserNameTextView;
+    private TextView mLocationContentTextView;
+    private TextView mLocationHeartTextView;
+    private TextView mLocationPetTextView;
 
 
     @Override
@@ -30,11 +35,12 @@ public class LocationCommentAdapter extends RecyclerView.Adapter<LocationComment
     public void onBindViewHolder(LocationCommentViewHolder holder, int position) {
 
 
+
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return 4;
     }
 
     public class LocationCommentViewHolder extends RecyclerView.ViewHolder{
@@ -42,6 +48,11 @@ public class LocationCommentAdapter extends RecyclerView.Adapter<LocationComment
 
         public LocationCommentViewHolder(View itemView) {
             super(itemView);
+            mLocationUserImageView = (ImageView)itemView.findViewById(R.id.location_comment_user);
+            mLocationUserNameTextView = (TextView) itemView.findViewById(R.id.location_commnet_user_name);
+            mLocationContentTextView = (TextView) itemView.findViewById(R.id.location_comment_content);
+            mLocationHeartTextView = (TextView) itemView.findViewById(R.id.location_comment_heart_textView);
+            mLocationPetTextView = (TextView) itemView.findViewById(R.id.location_comment_pet_textView);
 
         }
     }

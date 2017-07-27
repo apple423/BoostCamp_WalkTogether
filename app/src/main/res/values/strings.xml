@@ -23,4 +23,8 @@
     <string name="location_freeboard">장소 게시판</string>
     <string name="location_title">Location</string>
     <string name="user_name">유저 이름</string>
+    <string name="title">제목</string>
+    <string name="content">내용</string>
+    <string name="zero_to_500">0/500</string>
+    <string name="add_picture">사진추가</string>
 </resources>
