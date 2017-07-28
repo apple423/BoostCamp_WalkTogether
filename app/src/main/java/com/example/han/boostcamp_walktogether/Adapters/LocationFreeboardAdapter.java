@@ -1,5 +1,7 @@
 package com.example.han.boostcamp_walktogether.Adapters;
 
+import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +16,21 @@ import com.example.han.boostcamp_walktogether.R;
 public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeboardAdapter.LocationFreeboardViewHolder> {
 
 
+    CardView mLocationFreeboardCardView;
+    OnClickLocationFreeboard mOnClickLocationFreeboard;
+
+    public LocationFreeboardAdapter(OnClickLocationFreeboard onClickLocationFreeboard){
+
+       mOnClickLocationFreeboard = onClickLocationFreeboard;
+
+    }
+
     @Override
     public LocationFreeboardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.location_freeboard_recycler,parent,false);
+
 
         return new LocationFreeboardViewHolder(view);
     }
@@ -33,11 +45,25 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         return 8;
     }
 
+
     public class LocationFreeboardViewHolder extends RecyclerView.ViewHolder{
 
 
         public LocationFreeboardViewHolder(View itemView) {
             super(itemView);
+            mLocationFreeboardCardView = (CardView)itemView.findViewById(R.id.location_freeboard_cardView);
+
+            View.OnClickListener onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnClickLocationFreeboard.onClickBoard();
+                }
+            };
+
+            mLocationFreeboardCardView.setOnClickListener(onClickListener);
+
         }
     }
+
+
 }
