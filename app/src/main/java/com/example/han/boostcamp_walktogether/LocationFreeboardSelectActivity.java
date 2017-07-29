@@ -17,8 +17,8 @@ import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardViewPage
 public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity{
 
 
-    ViewPager mLocationPicutreViewPager;
-    LocationFreeboardViewPagerAdapter locationFreeboardViewPagerAdapter;
+    private ViewPager mLocationPicutreViewPager;
+    private LocationFreeboardViewPagerAdapter locationFreeboardViewPagerAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

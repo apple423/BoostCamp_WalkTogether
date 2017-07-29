@@ -18,12 +18,12 @@ import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 
 public class LocationActivity extends BackButtonActionBarActivity {
 
-    Button mLocationComment;
-    Button mLocationFreeboard;
-    Button.OnClickListener onClickListener;
+    private Button mLocationComment;
+    private Button mLocationFreeboard;
+    private Button.OnClickListener onClickListener;
 
-    Intent intentLocationComment;
-    Intent intentLocationFreeboard;
+    private Intent intentLocationComment;
+    private Intent intentLocationFreeboard;
 
 
     @Override

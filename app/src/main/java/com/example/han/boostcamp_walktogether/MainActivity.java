@@ -18,7 +18,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    Button signInButton;
+    private Button signInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

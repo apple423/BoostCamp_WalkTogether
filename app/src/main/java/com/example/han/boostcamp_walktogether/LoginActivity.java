@@ -16,7 +16,7 @@ import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 
 public class LoginActivity extends DrawerBaseActivity {
 
-    Button signInButton;
+    private Button signInButton;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

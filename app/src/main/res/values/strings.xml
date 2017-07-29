@@ -16,8 +16,7 @@
     <string name="pet_favorite">반려동물 자랑하기</string>
     <string name="location_recommend">산책장소 추천하기</string>
     <string name="pet_diary">산책일지</string>
-    <string name="zero_to_five">0/5</string>
-    <string name="location_open_time">개방시간 : </string>
+        <string name="location_open_time">개방시간 : </string>
     <string name="location_address">주소 : </string>
     <string name="location_comment">장소 평가하기</string>
     <string name="location_freeboard">장소 게시판</string>
@@ -32,4 +31,6 @@
     <string name="location_freeboard_time_detail">time</string>
     <string name="location_freeboard_posted_time">작성시간 : </string>
     <string name="viewPager_picture_count">%1$d / %2$d</string>
+    <string name="zero_to_five">%1$.1f / 5</string>
+    <string name="zero_to_five_default">0 / 5</string>
 </resources>

@@ -17,9 +17,9 @@ import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardAddPictu
 
 public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
-    RecyclerView pictureRecyclerView;
-    LinearLayoutManager linearLayoutManager;
-    LocationFreeboardAddPictureAdapter locationFreeboardAddPictureAdapter;
+    private RecyclerView pictureRecyclerView;
+    private LinearLayoutManager linearLayoutManager;
+    private LocationFreeboardAddPictureAdapter locationFreeboardAddPictureAdapter;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

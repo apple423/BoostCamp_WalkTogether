@@ -35,6 +35,7 @@
         <activity android:name=".LocationFreeboardActivity"/>
         <activity android:name=".LocationFreeboardAddActivity"/>
         <activity android:name=".LocationFreeboardSelectActivity"/>
+        <activity android:name=".LocationCommentAddActivity"/>
 
 
         <meta-data
