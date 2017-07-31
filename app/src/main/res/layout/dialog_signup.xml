@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
+
+   <android.support.constraint.ConstraintLayout
+       android:layout_width="350dp"
+       android:layout_height="match_parent"
+       android:layout_gravity="center_horizontal">
+
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/sign_up"
+           app:layout_constraintTop_toTopOf="parent"
+           android:layout_marginTop="8dp"
+           android:layout_marginRight="8dp"
+           app:layout_constraintRight_toRightOf="parent"
+           android:layout_marginLeft="8dp"
+           app:layout_constraintLeft_toLeftOf="parent"
+           android:textSize="20sp"
+           android:id="@+id/textView"
+           android:inputType="textEmailAddress"/>
+
+       <TextView
+           android:id="@+id/sign_up_email_textView"
+           android:layout_width="60dp"
+           android:layout_height="wrap_content"
+           android:text="@string/email"
+           android:layout_marginLeft="16dp"
+           app:layout_constraintLeft_toLeftOf="parent"
+           android:layout_marginTop="40dp"
+           app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+       <EditText
+           android:id="@+id/sign_up_email_editText"
+           android:layout_width="250dp"
+           android:layout_height="50dp"
+           app:layout_constraintLeft_toRightOf="@+id/sign_up_email_textView"
+           android:layout_marginLeft="14dp"
+           android:layout_marginTop="8dp"
+           app:layout_constraintTop_toBottomOf="@+id/textView"
+           android:inputType="textEmailAddress"/>
+
+
+       <TextView
+           android:id="@+id/sign_up_password_textView"
+           android:layout_width="60dp"
+           android:layout_height="wrap_content"
+           android:text="@string/password"
+           android:layout_marginTop="36dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_email_textView"
+           android:layout_marginLeft="16dp"
+           app:layout_constraintLeft_toLeftOf="parent" />
+
+       <EditText
+           android:id="@+id/sign_up_password_editText"
+           android:layout_width="250dp"
+           android:layout_height="50dp"
+           app:layout_constraintLeft_toRightOf="@+id/sign_up_password_textView"
+           android:layout_marginLeft="14dp"
+           android:layout_marginTop="8dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_email_editText"
+           android:inputType="textPassword"/>
+
+       <TextView
+           android:id="@+id/sign_up_nickname_textView"
+           android:layout_width="60dp"
+           android:layout_height="wrap_content"
+           android:text="@string/nickname"
+           android:layout_marginLeft="16dp"
+           app:layout_constraintLeft_toLeftOf="parent"
+           android:layout_marginTop="36dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_password_textView" />
+
+
+       <EditText
+           android:id="@+id/sign_up_nickname_editText"
+           android:layout_width="250dp"
+           android:layout_height="50dp"
+           android:layout_marginTop="8dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_password_editText"
+           app:layout_constraintLeft_toRightOf="@+id/sign_up_nickname_textView"
+           android:layout_marginLeft="14dp" />
+
+       <TextView
+           android:id="@+id/sign_up_profile_photo_textView"
+           android:layout_width="50dp"
+           android:layout_height="wrap_content"
+           android:text="@string/picture"
+           android:layout_marginTop="36dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_textView"
+           android:layout_marginLeft="16dp"
+           app:layout_constraintLeft_toLeftOf="parent" />
+
+       <ImageView
+           android:id="@+id/sign_up_add_profile_picutre_imageView"
+           android:layout_width="20dp"
+           android:layout_height="20dp"
+           android:src="@mipmap/ic_add"
+           app:layout_constraintLeft_toRightOf="@+id/sign_up_profile_photo_textView"
+           android:layout_marginLeft="0dp"
+           android:layout_marginTop="36dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_textView" />
+
+
+
+       <ImageView
+
+           android:layout_width="60dp"
+           android:layout_height="60dp"
+           android:src="@drawable/park"
+           android:scaleType="fitXY"
+           app:layout_constraintLeft_toRightOf="@+id/sign_up_add_profile_picutre_imageView"
+           android:layout_marginLeft="16dp"
+           android:layout_marginTop="36dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_textView"
+           android:id="@+id/sign_up_profile_picture_imageView" />
+
+       <Button
+           android:id="@+id/sign_up_request_button"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="등록"
+           android:layout_marginRight="8dp"
+           app:layout_constraintRight_toRightOf="parent"
+           android:layout_marginLeft="8dp"
+           app:layout_constraintLeft_toLeftOf="parent"
+           android:layout_marginTop="24dp"
+           app:layout_constraintTop_toBottomOf="@+id/sign_up_profile_picture_imageView"
+           app:layout_constraintBottom_toBottomOf="parent"
+           android:layout_marginBottom="8dp" />
+
+       <ProgressBar
+           android:id="@+id/sign_up_request_progressBar"
+           android:layout_width="40dp"
+           android:layout_height="40dp"
+           android:layout_marginRight="8dp"
+           app:layout_constraintRight_toRightOf="parent"
+           app:layout_constraintBottom_toBottomOf="parent"
+           android:layout_marginBottom="8dp"
+           android:layout_marginLeft="8dp"
+           app:layout_constraintLeft_toLeftOf="parent"
+           app:layout_constraintTop_toTopOf="parent"
+           android:layout_marginTop="8dp" />
+
+
+   </android.support.constraint.ConstraintLayout>
+
+
+</LinearLayout>
