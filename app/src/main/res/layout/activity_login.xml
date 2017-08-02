@@ -9,7 +9,7 @@
     >
 
     <EditText
-        android:id="@+id/email_editText"
+        android:id="@+id/sign_in_email_editText"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
@@ -22,13 +22,13 @@
         app:layout_constraintRight_toRightOf="parent" />
 
     <EditText
-        android:id="@+id/password_editText"
+        android:id="@+id/sign_in_password_editText"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
+        android:inputType="textPassword"
         android:hint="@string/password"
         android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/email_editText"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_email_editText"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
@@ -48,7 +48,7 @@
         app:layout_constraintRight_toLeftOf="@+id/guideline"
         android:layout_marginRight="8dp"
         android:layout_marginTop="15dp"
-        app:layout_constraintTop_toBottomOf="@+id/password_editText"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_password_editText"
         android:text="@string/sign_up"
         />
 
@@ -59,7 +59,7 @@
         app:layout_constraintLeft_toRightOf="@+id/guideline"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="15dp"
-        app:layout_constraintTop_toBottomOf="@+id/password_editText"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_password_editText"
         android:text="@string/sign_in"
          />
 
@@ -74,23 +74,27 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/password_editText"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_password_editText"
         app:layout_constraintVertical_bias="0.4"
         android:id="@+id/textView2" />
 
-    <Button
+    <ImageButton
         android:id="@+id/facebook_sign_in_button"
         android:layout_width="250dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginTop="30dp"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:src="@drawable/fb_login"
+        android:scaleType="fitXY"
+        android:backgroundTint="@color/faceBookSignInButtonBackground"
+        />
 
-    <Button
-        android:id="@+id/google_sign_in_button"
+    <com.example.han.boostcamp_walktogether.widget.KakaoSignInButton
+        android:id="@+id/kakao_sign_in_button"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -99,6 +103,20 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/sign_in_progressBar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"/>
 
 
 

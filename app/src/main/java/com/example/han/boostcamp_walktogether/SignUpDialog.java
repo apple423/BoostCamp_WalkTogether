@@ -23,9 +23,13 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.UploadTask;
 
 import static android.content.ContentValues.TAG;
 
@@ -43,8 +47,10 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialog{
     private ImageView mAddProfilePicutreImageView;
     private ImageView mProfilePictureImageView;
     private OnClickProfileImageButtonClick onClickProfileImageButtonClick;
+    private String mEmail,mPassword,mNickName,mImageURL,mAnimalType,mKind;
+    private boolean isProfileImageSelected = false;
 
-    
+
 
 
     public SignUpDialog(@NonNull Context context, OnClickProfileImageButtonClick onClickProfileImageButtonClick) {
@@ -72,7 +78,8 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialog{
         mAddProfilePicutreImageView = (ImageView) findViewById(R.id.sign_up_add_profile_picutre_imageView);
         mProfilePictureImageView = (ImageView)findViewById(R.id.sign_up_profile_picture_imageView);
 
-
+        mSignUpRequestButton.setEnabled(true);
+        mProfilePictureImageView.setVisibility(View.INVISIBLE);
         mAuth = FirebaseHelper.getAuth();
 
         mSignUpRequestButton.setOnClickListener(onClickListener);
@@ -91,25 +98,87 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialog{
 
                 case R.id.sign_up_request_button:
                     mProgressBar.setVisibility(ProgressBar.VISIBLE);
-                    String email = mEmailEditText.getText().toString();
-                    String password = mPasswordEditText.getText().toString();
-                    mSignUpRequestButton.setEnabled(false);
-                    String nickName = mNickNameEditText.getText().toString();
-                    BitmapDrawable drawable = (BitmapDrawable) mProfilePictureImageView.getDrawable();
-                    Bitmap bitmap = drawable.getBitmap();
+                    mEmail = mEmailEditText.getText().toString();
+                    mPassword = mPasswordEditText.getText().toString();
+                    if(mEmail.length()!=0 && mPassword.length()!=0) {
+                        FirebaseHelper.signUpWithEmail(mEmail, mPassword)
+                                .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        //mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+                                        if (!task.isSuccessful()) {
+                                            Toast.makeText(context, "회원가입 실패",
+                                                    Toast.LENGTH_SHORT).show();
+
+                                        } else {
+
+                                            mNickName = mNickNameEditText.getText().toString();
+
+                                            isProfileImageSelected = onClickProfileImageButtonClick.sendIsImageSelected();
+
+
+                                            if(!isProfileImageSelected){
+
+                                                mProfilePictureImageView.setImageResource(R.mipmap.ic_launcher);
+                                               // mProfilePictureImageView.setVisibility(View.VISIBLE);
+                                                Log.d("From Default","asgsggsd");
+                                            }else{
+
+                                                mProfilePictureImageView = onClickProfileImageButtonClick.sendSettedImageView();
+                                                Log.d("From Gallery","sadggdssag");
+                                            }
+                                            mImageURL = "";
+                                            UploadTask uploadTask= FirebaseHelper.uploadProfilePicture(mProfilePictureImageView);
+                                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    // Handle unsuccessful uploads
+                                                }
+                                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                                    mImageURL = taskSnapshot.getDownloadUrl().toString();
+                                                    Log.d("ImageURL in Listener : ",mImageURL);
+                                                    FirebaseHelper.sendUserData(mEmail,mNickName,mImageURL,"","");
+                                                }
+                                            });
+                                            Log.d("ImageURL : ",mImageURL);
+                                            mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                                            Toast.makeText(context, "회원가입 성공", Toast.LENGTH_LONG).show();
+
+                                        }
+
+                                    }
+                                });
+                    }
                     dismiss();
+                    FirebaseUser user = FirebaseHelper.signInState();
+                    if(user!=null){
+                        Intent i = new Intent(context, MapActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                        context.startActivity(i);
+
+                    }
+
                     break;
 
 
                 case R.id.sign_up_add_profile_picutre_imageView:
 
                     onClickProfileImageButtonClick.onClickPlusButton();
+                    break;
 
             }
 
         }
     };
 
+    public void setmProfilePictureImageView(ImageView mProfilePictureImageView) {
+        this.mProfilePictureImageView = mProfilePictureImageView;
+    }
 
     @Override
     public ImageView sendImageView() {

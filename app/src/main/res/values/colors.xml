@@ -7,4 +7,6 @@
     <color name="colorPrimaryLight">#ffff5a</color>
     <color name="appBarIconDefault">#8a000000</color>
     <color name="appBarIconSelected">#000000</color>
+    <color name="faceBookSignInButtonBackground">#48629B</color>
+    <color name="kakaoSignInButtonBackground">#FFEB00</color>
 </resources>
