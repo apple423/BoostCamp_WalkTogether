@@ -6,7 +6,7 @@ import android.widget.ImageView;
  * Created by Han on 2017-07-31.
  */
 
-public interface SendImageViewToDialog {
+public interface SendImageViewToDialogInterface {
 
     ImageView sendImageView();
 

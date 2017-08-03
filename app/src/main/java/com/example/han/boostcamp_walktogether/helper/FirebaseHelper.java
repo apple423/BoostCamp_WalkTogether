@@ -14,6 +14,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.han.boostcamp_walktogether.MapActivity;
+import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
+import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
+import com.example.han.boostcamp_walktogether.data.ParkSungNamDTO;
 import com.example.han.boostcamp_walktogether.data.UserData;
 import com.facebook.AccessToken;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,16 +30,34 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import com.kakao.auth.Session;
 import com.kakao.usermgmt.response.model.UserProfile;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static android.content.ContentValues.TAG;
@@ -184,6 +205,7 @@ public class FirebaseHelper {
         String email = userProfile.getEmail();
         String photoUrl = userProfile.getThumbnailImagePath();
 
+
         Log.d("chkKaKaoSendUserData",email + " "+ name + " " + photoUrl + " " + uid);
 
         mDatabase.child("users").push();
@@ -192,6 +214,117 @@ public class FirebaseHelper {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/users/"+ uid, userDataMap);
         mDatabase.updateChildren(childUpdates);
+    }
+
+    public static void sendParkDataInSeoul(ParkRowDTO parkRowDTO){
+
+        String uid = "seoul_"+ parkRowDTO.getP_IDX();
+        String name = parkRowDTO.getP_PARK();
+        String address = parkRowDTO.getP_ADDR();
+        String photoUrl = parkRowDTO.getP_IMG();
+        float latitude = parkRowDTO.getLATITUDE();
+        float longitude = parkRowDTO.getLONGITUDE();
+
+        mDatabase.child("parks/seoul").push();
+        //UserData userData = new UserData(email,name, photoUrl,"","", uid);
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("uid",uid);
+        result.put("name",name);
+        result.put("imageURL", photoUrl);
+        result.put("address",address);
+        result.put("latitude",latitude);
+        result.put("longitude",longitude);
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/parks/seoul/"+ uid, result);
+        mDatabase.updateChildren(childUpdates);
+    }
+
+    public static void sendParkDataInSungNam(Context context) {
+        InputStream inputStream = null;
+        try {
+            inputStream = context.getAssets().open("parkSungNam.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Gson gson = new Gson();
+        BufferedReader br = null;
+        br = new BufferedReader(new InputStreamReader(inputStream));
+        Type listType = new TypeToken<List<ParkSungNamDTO>>(){}.getType();
+        List<ParkSungNamDTO> parkSungNamDTOList = gson.fromJson(br, listType);
+
+        for (ParkSungNamDTO parkSungNamDTOIndex:parkSungNamDTOList) {
+
+            String uid = "sungnam_" + parkSungNamDTOIndex.getP_IDX();
+            String name = parkSungNamDTOIndex.getP_PARK();
+            String address = parkSungNamDTOIndex.getP_ADDR();
+            parkSungNamDTOIndex.setP_IMG("https://firebasestorage.googleapis.com/v0/b/boostcampwalktogether.appspot.com/o/images%2Fprofile%2FaF4n4Nz8RnNPiqFqRxe0lDqoNIm1%2Fprofile.jpg?alt=media&token=ec11dba3-e7a1-4c2f-8290-0260b2a10aab");
+            String photoUrl = parkSungNamDTOIndex.getP_IMG();
+            float latitude = parkSungNamDTOIndex.getLATITUDE();
+            float longitude = parkSungNamDTOIndex.getLONGITUDE();
+
+            mDatabase.child("parks/sungnam").push();
+            HashMap<String, Object> result = new HashMap<>();
+            result.put("uid",uid);
+            result.put("name",name);
+            result.put("address",address);
+            result.put("imageURL", photoUrl);
+            result.put("latitude",latitude);
+            result.put("longitude",longitude);
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/parks/sungnam/"+ uid, result);
+            mDatabase.updateChildren(childUpdates);
+        }
+    }
+
+    public static ArrayList<ParkDataFromFirebaseDTO> getAllSeoulParkData(){
+
+        final ArrayList<ParkDataFromFirebaseDTO> seoulParkDataFromFirebaseDTOArrayList = new ArrayList<ParkDataFromFirebaseDTO>();
+        mDatabase.child("parks").child("seoul").addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                        for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                            ParkDataFromFirebaseDTO c = snapshot.getValue(ParkDataFromFirebaseDTO.class);
+                            Log.d("Categories Seoul: ", c.getName() + " " +c.getAddress());
+                            seoulParkDataFromFirebaseDTOArrayList.add(c);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+                    }
+                });
+
+        return seoulParkDataFromFirebaseDTOArrayList;
+    }
+
+    public static ArrayList<ParkDataFromFirebaseDTO> getAllSungnamParkData() {
+
+        final ArrayList<ParkDataFromFirebaseDTO> sungnamParkDataFromFirebaseDTOArrayList = new ArrayList<ParkDataFromFirebaseDTO>();
+
+        mDatabase.child("parks").child("sungnam").addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                        for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                            ParkDataFromFirebaseDTO c = snapshot.getValue(ParkDataFromFirebaseDTO.class);
+                            Log.d("Categories Sungnam: ", c.getName() + " " +c.getAddress());
+                            sungnamParkDataFromFirebaseDTOArrayList.add(c);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+                    }
+                });
+        return sungnamParkDataFromFirebaseDTOArrayList;
     }
 
 }

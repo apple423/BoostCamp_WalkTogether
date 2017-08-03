@@ -4,13 +4,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,7 +31,7 @@ import static android.content.ContentValues.TAG;
  * Created by Han on 2017-07-31.
  */
 
-public class SignUpDialog extends Dialog implements SendImageViewToDialog{
+public class SignUpDialogInterface extends Dialog implements SendImageViewToDialogInterface {
 
     private FirebaseAuth mAuth;
     private Context context;
@@ -46,17 +40,17 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialog{
     private ProgressBar mProgressBar;
     private ImageView mAddProfilePicutreImageView;
     private ImageView mProfilePictureImageView;
-    private OnClickProfileImageButtonClick onClickProfileImageButtonClick;
+    private OnClickProfileImageButtonClickInterface onClickProfileImageButtonClickInterface;
     private String mEmail,mPassword,mNickName,mImageURL,mAnimalType,mKind;
     private boolean isProfileImageSelected = false;
 
 
 
 
-    public SignUpDialog(@NonNull Context context, OnClickProfileImageButtonClick onClickProfileImageButtonClick) {
+    public SignUpDialogInterface(@NonNull Context context, OnClickProfileImageButtonClickInterface onClickProfileImageButtonClickInterface) {
         super(context);
         this.context = context;
-        this.onClickProfileImageButtonClick = onClickProfileImageButtonClick;
+        this.onClickProfileImageButtonClickInterface = onClickProfileImageButtonClickInterface;
     }
 
     @Override
@@ -115,7 +109,7 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialog{
 
                                             mNickName = mNickNameEditText.getText().toString();
 
-                                            isProfileImageSelected = onClickProfileImageButtonClick.sendIsImageSelected();
+                                            isProfileImageSelected = onClickProfileImageButtonClickInterface.sendIsImageSelected();
 
 
                                             if(!isProfileImageSelected){
@@ -125,7 +119,7 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialog{
                                                 Log.d("From Default","asgsggsd");
                                             }else{
 
-                                                mProfilePictureImageView = onClickProfileImageButtonClick.sendSettedImageView();
+                                                mProfilePictureImageView = onClickProfileImageButtonClickInterface.sendSettedImageView();
                                                 Log.d("From Gallery","sadggdssag");
                                             }
                                             mImageURL = "";
@@ -168,7 +162,7 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialog{
 
                 case R.id.sign_up_add_profile_picutre_imageView:
 
-                    onClickProfileImageButtonClick.onClickPlusButton();
+                    onClickProfileImageButtonClickInterface.onClickPlusButton();
                     break;
 
             }

@@ -23,6 +23,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
+import com.example.han.boostcamp_walktogether.data.GetParkAPIData;
+import com.example.han.boostcamp_walktogether.data.ParkAPIDTO;
+import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.helper.KaKaoSessionCallback;
 import com.example.han.boostcamp_walktogether.helper.RequestKakaoMeAndSignUpInterface;
@@ -45,21 +48,26 @@ import com.kakao.util.helper.log.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Han on 2017-07-25.
  */
 
-public class LoginActivity extends DrawerBaseActivity implements OnClickProfileImageButtonClick, RequestKakaoMeAndSignUpInterface {
+public class LoginActivity extends DrawerBaseActivity implements OnClickProfileImageButtonClickInterface, RequestKakaoMeAndSignUpInterface {
 
     private static final int PICK_FROM_GALLERY = 100;
 
     private Button mSignInButton;
     private Button mSignUpButton;
     private ImageButton mFacebookSignInButton;
-    private SignUpDialog mSignUpDialog;
-    private SendImageViewToDialog mSendImageViewToDialog;
+    private SignUpDialogInterface mSignUpDialog;
+    private SendImageViewToDialogInterface mSendImageViewToDialogInterface;
     private ImageView mProfilePictureFromDialog;
     private EditText mEmailEditText, mPasswordEditText;
     private ProgressBar mProgressBar;
@@ -90,8 +98,8 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         mPasswordEditText = (EditText) findViewById(R.id.sign_in_password_editText);
         mProgressBar = (ProgressBar) findViewById(R.id.sign_in_progressBar);
 
-        mSignUpDialog = new SignUpDialog(this, this);
-        mSendImageViewToDialog = mSignUpDialog;
+        mSignUpDialog = new SignUpDialogInterface(this, this);
+        mSendImageViewToDialogInterface = mSignUpDialog;
 
         mFacebookLoginManager = LoginManager.getInstance();
         mContext = this;
@@ -211,6 +219,35 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         mSignInButton.setOnClickListener(mOnClickListener);
         mSignUpButton.setOnClickListener(mOnClickListener);
         mFacebookSignInButton.setOnClickListener(mOnClickListener);
+        //getParkDataInSeoulAndSend();
+        //FirebaseHelper.sendParkDataInSungNam(this);
+
+    }
+
+    public void getParkDataInSeoulAndSend() {
+        GetParkAPIData getParkAPIData = GetParkAPIData.retrofit.create(GetParkAPIData.class);
+
+        Call<ParkAPIDTO> call = getParkAPIData.getAllParkData();
+        call.enqueue(new Callback<ParkAPIDTO>() {
+            @Override
+            public void onResponse(Call<ParkAPIDTO> call, Response<ParkAPIDTO> response) {
+
+                if(response.isSuccessful()){
+                    ParkAPIDTO parkAPIDTO = response.body();
+                    List<ParkRowDTO> listParkRowDTO = parkAPIDTO.getSearchParkInfoService().getRow();
+                    for(ParkRowDTO listParkRowDTOIndex : listParkRowDTO){
+                        FirebaseHelper.sendParkDataInSeoul(listParkRowDTOIndex);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ParkAPIDTO> call, Throwable t) {
+
+            }
+        });
+
     }
 
     @Override
@@ -259,7 +296,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
         if (requestCode == PICK_FROM_GALLERY && resultCode == RESULT_OK) {
 
-            mProfilePictureFromDialog = mSendImageViewToDialog.sendImageView();
+            mProfilePictureFromDialog = mSendImageViewToDialogInterface.sendImageView();
             Glide.with(this).load(data.getData()).into(mProfilePictureFromDialog);
             mProfilePictureFromDialog.setVisibility(View.VISIBLE);
             isProfileImageSelected = true;
