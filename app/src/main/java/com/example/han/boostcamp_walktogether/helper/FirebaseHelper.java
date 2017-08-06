@@ -15,10 +15,15 @@ import android.widget.Toast;
 
 import com.example.han.boostcamp_walktogether.MapActivity;
 import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
+import com.example.han.boostcamp_walktogether.data.ParkFreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.data.ParkSungNamDTO;
 import com.example.han.boostcamp_walktogether.data.UserData;
 import com.facebook.AccessToken;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -73,6 +78,9 @@ public class FirebaseHelper {
     private static final FirebaseStorage mStorage = FirebaseStorage.getInstance();
     private static final StorageReference storageRef = mStorage.getReferenceFromUrl("gs://boostcampwalktogether.appspot.com/");
     private Intent mMapIntent;
+    ArrayList<ParkDataFromFirebaseDTO> mSeoulParkDataFromFirebaseDTOArrayList;
+    ArrayList<ParkDataFromFirebaseDTO> mSungNamParkDataFromFirebaseDTOArrayList;
+
 
     public static FirebaseAuth getAuth(){
 
@@ -161,6 +169,14 @@ public class FirebaseHelper {
         UploadTask uploadTask = imagesRef.putBytes(data);
 
 
+        return uploadTask;
+    }
+
+    public static UploadTask uploadFreeboardPictures(Uri uri,String locationID){
+
+        StorageReference pictureRef = storageRef.child("images/freeboard/" + locationID + uri + "picuture.jpg");
+        Log.d("chkURIFromArraylist", uri.toString());
+        UploadTask uploadTask = pictureRef.putFile(uri);
         return uploadTask;
     }
 
@@ -276,7 +292,7 @@ public class FirebaseHelper {
         }
     }
 
-    public static ArrayList<ParkDataFromFirebaseDTO> getAllSeoulParkData(){
+    public static ArrayList<ParkDataFromFirebaseDTO> getAllSeoulParkDataAndSetMarker(final GoogleMap googleMap){
 
         final ArrayList<ParkDataFromFirebaseDTO> seoulParkDataFromFirebaseDTOArrayList = new ArrayList<ParkDataFromFirebaseDTO>();
         mDatabase.child("parks").child("seoul").addValueEventListener(
@@ -287,8 +303,12 @@ public class FirebaseHelper {
 
                         for (DataSnapshot snapshot: dataSnapshot.getChildren()){
                             ParkDataFromFirebaseDTO c = snapshot.getValue(ParkDataFromFirebaseDTO.class);
-                            Log.d("Categories Seoul: ", c.getName() + " " +c.getAddress());
+                            //Log.d("Categories Seoul: ", c.getName() + " " +c.getAddress());
                             seoulParkDataFromFirebaseDTOArrayList.add(c);
+                            LatLng latLng = new LatLng(c.getLatitude(),c.getLongitude());
+                            Marker marker = googleMap.addMarker(new MarkerOptions().title(c.getName())
+                                    .position(latLng));
+                            marker.setTag(c);
                         }
 
                     }
@@ -302,7 +322,7 @@ public class FirebaseHelper {
         return seoulParkDataFromFirebaseDTOArrayList;
     }
 
-    public static ArrayList<ParkDataFromFirebaseDTO> getAllSungnamParkData() {
+    public static ArrayList<ParkDataFromFirebaseDTO> getAllSungnamParkDataAndSetMarker(final GoogleMap googleMap) {
 
         final ArrayList<ParkDataFromFirebaseDTO> sungnamParkDataFromFirebaseDTOArrayList = new ArrayList<ParkDataFromFirebaseDTO>();
 
@@ -314,8 +334,15 @@ public class FirebaseHelper {
 
                         for (DataSnapshot snapshot: dataSnapshot.getChildren()){
                             ParkDataFromFirebaseDTO c = snapshot.getValue(ParkDataFromFirebaseDTO.class);
-                            Log.d("Categories Sungnam: ", c.getName() + " " +c.getAddress());
+                            //Log.d("Categories Sungnam: ", c.getName() + " " +c.getAddress());
                             sungnamParkDataFromFirebaseDTOArrayList.add(c);
+
+                            LatLng latLng = new LatLng(c.getLatitude(),c.getLongitude());
+                            Marker marker =googleMap.addMarker(new MarkerOptions().title(c.getName())
+                                    .position(latLng)
+                                    );
+                            marker.setTag(c);
+
                         }
                     }
 
@@ -325,6 +352,47 @@ public class FirebaseHelper {
                     }
                 });
         return sungnamParkDataFromFirebaseDTOArrayList;
+    }
+
+    public static void sendFreeboardwithKaKao(UserProfile userProfile, String locationID,String title,String content,ArrayList<String> imageArrayList){
+        String userName = userProfile.getNickname();
+        String profileImageUrl = userProfile.getThumbnailImagePath();
+        long userID = userProfile.getId();
+
+
+        String key = mDatabase.child("parks/freeboard").push().getKey();
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("uid",userID);
+        result.put("name",userName);
+        result.put("profileImageURL", profileImageUrl);
+        result.put("title",title);
+        result.put("content",content);
+        result.put("locationID",locationID);
+        if(imageArrayList.size()==0){
+
+            result.put("imageArrayList",
+                    "https://firebasestorage.googleapis.com/v0/b/boostcampwalktogether.appspot.com/o/default%2F10941806-silhouette-of-man-holding" +
+                            "-dog-Stock-Vector.jpg?alt=media&token=ac1277c7-1503-4ac4-a9c4-070588745dd4");
+
+        }else{
+
+
+            result.put("imageArrayList",imageArrayList);
+        }
+        result.put("key",key);
+//        Log.d("sendFreeboardData",userName + content + imageArrayList.get(0));
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/parks/freeboard/"+ locationID +"/"+key, result);
+        mDatabase.updateChildren(childUpdates);
+    }
+
+    public static DatabaseReference getParkFreeboardDataReferences(String locationID){
+
+
+        DatabaseReference dataReferences = mDatabase.child("parks").child("freeboard").child(locationID);
+
+
+        return dataReferences;
     }
 
 }

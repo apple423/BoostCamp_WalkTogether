@@ -27,7 +27,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_location_freeboard_select,mFrameLayout,false);
         mFrameLayout.addView(contentView, 0);
-        mTextView.setText("장소 게시판");
+        mTextView.setText(getResources().getString(R.string.location_freeboard_select_activity_title));
 
         mLocationPicutreViewPager = (ViewPager)findViewById(R.id.location_freeboard_viewPager);
         locationFreeboardViewPagerAdapter = new LocationFreeboardViewPagerAdapter(getLayoutInflater(),getResources());

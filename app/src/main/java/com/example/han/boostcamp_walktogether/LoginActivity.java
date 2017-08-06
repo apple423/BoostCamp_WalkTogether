@@ -29,6 +29,8 @@ import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.helper.KaKaoSessionCallback;
 import com.example.han.boostcamp_walktogether.helper.RequestKakaoMeAndSignUpInterface;
+import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
+import com.example.han.boostcamp_walktogether.util.StringKeys;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -55,6 +57,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_DATA_SEND_CHECK;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_SHARED_PREFERENCES;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_DATA_SEND_CHECK;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_SHARED_PREFERENCES;
+
 /**
  * Created by Han on 2017-07-25.
  */
@@ -66,7 +73,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
     private Button mSignInButton;
     private Button mSignUpButton;
     private ImageButton mFacebookSignInButton;
-    private SignUpDialogInterface mSignUpDialog;
+    private SignUpDialog mSignUpDialog;
     private SendImageViewToDialogInterface mSendImageViewToDialogInterface;
     private ImageView mProfilePictureFromDialog;
     private EditText mEmailEditText, mPasswordEditText;
@@ -74,7 +81,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
     private boolean isProfileImageSelected = false;
     private String mEmail, mPassword;
     private LoginManager mFacebookLoginManager;
-    private View.OnClickListener mOnClickListener;
+   // private View.OnClickListener mOnClickListener;
     private ArrayList<String> mFacebookLoginArrayList;
     private Context mContext;
     private CallbackManager mCallbackManager;
@@ -90,6 +97,10 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         View contentView = inflater.inflate(R.layout.activity_login, mFrameLayout, false);
         mDrawerLayout.addView(contentView, 0);
 
+/*        facebookSharedPreferences= getResources().getString(R.string.facebookSharedPreferences);
+        kakaoSharedPreferences= getResources().getString(R.string.kakakoSharedPreferences);
+        faceBookDataSendCheck= getResources().getString(R.string.facebookDataSendCheck);
+        kakaoDataSendCheck=getResources().getString(R.string.kakaoDataSendCheck);*/
 
         mSignInButton = (Button) findViewById(R.id.sign_in_button);
         mSignUpButton = (Button) findViewById(R.id.sign_up_button);
@@ -98,129 +109,28 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         mPasswordEditText = (EditText) findViewById(R.id.sign_in_password_editText);
         mProgressBar = (ProgressBar) findViewById(R.id.sign_in_progressBar);
 
-        mSignUpDialog = new SignUpDialogInterface(this, this);
+        mSignUpDialog = new SignUpDialog(this, this);
         mSendImageViewToDialogInterface = mSignUpDialog;
+
 
         mFacebookLoginManager = LoginManager.getInstance();
         mContext = this;
         mKaKaoSessionCallback = new KaKaoSessionCallback(this,this);
         Session.getCurrentSession().addCallback(mKaKaoSessionCallback);
-        //Session.getCurrentSession().checkAndImplicitOpen();
 
         mFacebookLoginArrayList = new ArrayList<String>();
         mFacebookLoginArrayList.add(getResources().getString(R.string.facebook_login_permission_email));
         mFacebookLoginArrayList.add(getResources().getString(R.string.facebook_login_permission_public_profile));
 
-        mSharedPreferences = getSharedPreferences("FacebookUserDataCheck",MODE_PRIVATE);
-        mSharedPreferencesEditor = mSharedPreferences.edit();
-        mSharedPreferencesEditor.putBoolean("FacebookDataSendCheck",false);
-        mSharedPreferencesEditor.apply();
+        SharedPreferenceUtil.setFaceBookCheckSharedPreference(this, StringKeys.FACEBOOK_SHARED_PREFERENCES,MODE_PRIVATE);
+        SharedPreferenceUtil.editFaceBookCheckSharedPreference(FACEBOOK_DATA_SEND_CHECK,false);
 
-        mSharedPreferences = getSharedPreferences("KaKaoUserDataCheck",MODE_PRIVATE);
-        mSharedPreferencesEditor = mSharedPreferences.edit();
-        mSharedPreferencesEditor.putBoolean("KaKaoDataSendCheck",false);
-        mSharedPreferencesEditor.apply();
-
-
-        mOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                int id = v.getId();
-
-                switch (id) {
-
-                    case R.id.sign_in_button:
-                        mEmail = mEmailEditText.getText().toString();
-                        mPassword = mPasswordEditText.getText().toString();
-
-                        if (mEmail.length() != 0 && mPassword.length() != 0) {
-                            mProgressBar.setVisibility(View.VISIBLE);
-                            FirebaseHelper.signInWithEmail(mEmail, mPassword
-                            ).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                    mProgressBar.setVisibility(View.INVISIBLE);
-                                    if (!task.isSuccessful()) {
-
-                                        Toast.makeText(LoginActivity.this, "로그인 실패",
-                                                Toast.LENGTH_SHORT).show();
-                                    } else {
-
-                                        redirectMapActivity();
-
-                                    }
-
-                                }
-                            });
-
-                        }
-                        break;
-
-                    case R.id.sign_up_button:
-                        mSignUpDialog.show();
-                        break;
-
-                    case R.id.facebook_sign_in_button :
-                        mCallbackManager = CallbackManager.Factory.create();
-                        mFacebookLoginManager.logInWithReadPermissions((Activity) mContext, mFacebookLoginArrayList);
-                        mFacebookLoginManager.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-                            @Override
-                            public void onSuccess(LoginResult loginResult) {
-                                FirebaseHelper.handleFacebookAccessToken(loginResult.getAccessToken(),mContext)
-                                        .addOnCompleteListener((Activity) mContext, new OnCompleteListener<AuthResult>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                                if (task.isSuccessful()) {
-                                                    // Sign in success, update UI with the signed-in user's information
-                                                    mSharedPreferences = getSharedPreferences("FacebookUserDataCheck",MODE_PRIVATE);
-                                                    boolean isDataSent = mSharedPreferences.getBoolean("FacebookDataSendCheck",false);
-                                                    if(!isDataSent){
-                                                        FirebaseHelper.sendFacebookUserData();
-                                                        mSharedPreferencesEditor.putBoolean("FacebookDataSendCheck",true);
-                                                        mSharedPreferencesEditor.apply();
-                                                    }
-
-
-                                                    Log.d("FacebookSignIn", "signInWithCredential:success");
-                                                    Toast.makeText(mContext, "Authentication sucess.",
-                                                            Toast.LENGTH_SHORT).show();
-                                                    redirectMapActivity();
-
-                                                } else {
-                                                    // If sign in fails, display a message to the user.
-                                                    Log.w("FacebookSignIn", "signInWithCredential:failure", task.getException());
-                                                    Toast.makeText(mContext, "Authentication failed.",
-                                                            Toast.LENGTH_SHORT).show();
-
-                                                }
-                                            }
-                                        });
-                            }
-
-                            @Override
-                            public void onCancel() {
-
-                            }
-
-                            @Override
-                            public void onError(FacebookException error) {
-
-                            }
-                        });
-
-                }
-
-
-            }
-        };
+        SharedPreferenceUtil.setFaceBookCheckSharedPreference(this,KAKAO_SHARED_PREFERENCES,MODE_PRIVATE);
+        SharedPreferenceUtil.editFaceBookCheckSharedPreference(KAKAO_DATA_SEND_CHECK,false);
 
         mSignInButton.setOnClickListener(mOnClickListener);
         mSignUpButton.setOnClickListener(mOnClickListener);
         mFacebookSignInButton.setOnClickListener(mOnClickListener);
-        //getParkDataInSeoulAndSend();
-        //FirebaseHelper.sendParkDataInSungNam(this);
 
     }
 
@@ -318,14 +228,14 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
     public void onBackPressed() {
 
         AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
-                .setTitle("종료하시겠습니까?")
-                .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                .setTitle(getResources().getString(R.string.finish_prefer))
+                .setPositiveButton(getResources().getString(R.string.finish_yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
                     }
                 })
-                .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getResources().getString(R.string.finish_no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -348,49 +258,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
     @Override
     public void requestMe() {
-        UserManagement.requestMe(new MeResponseCallback() {
-            @Override
-            public void onFailure(ErrorResult errorResult) {
-                String message = "failed to get user info. msg=" + errorResult;
-                Logger.d(message);
-
-                ErrorCode result = ErrorCode.valueOf(errorResult.getErrorCode());
-                if (result == ErrorCode.CLIENT_ERROR_CODE) {
-                    Toast.makeText(mContext, "정보가져오기 실패", Toast.LENGTH_SHORT).show();
-                    //finish();
-                } else {
-                    // redirectLoginActivity();
-                }
-            }
-
-            @Override
-            public void onSessionClosed(ErrorResult errorResult) {
-//                redirectLoginActivity();
-            }
-
-            @Override
-            public void onSuccess(UserProfile userProfile) {
-               // Logger.d("UserProfile : " + userProfile);
-                Log.d("UserProfile :" , userProfile.toString());
-                //Toast.makeText(mContext,userProfile.toString(),Toast.LENGTH_LONG).show();
-                mSharedPreferences = getSharedPreferences("KaKaoUserDataCheck",MODE_PRIVATE);
-                boolean isDataSent = mSharedPreferences.getBoolean("KaKaoDataSendCheck",false);
-                Log.d("chkKaKaoBoolean",Boolean.toString(isDataSent));
-
-                if(!isDataSent){
-                    FirebaseHelper.sendKakaoUserData(userProfile);
-                    mSharedPreferencesEditor.putBoolean("KaKaoDataSendCheck",false);
-                    mSharedPreferencesEditor.apply();
-                }
-
-                redirectMapActivity();
-            }
-
-            @Override
-            public void onNotSignedUp() {
-                requestSignUp();
-            }
-        });
+        UserManagement.requestMe(kakaoMeResponseCallback);
     }
 
     @Override
@@ -399,30 +267,175 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         properties.put("animalType","");
         properties.put("kind","");
 
-        UserManagement.requestSignup(new ApiResponseCallback<Long>() {
-            @Override
-            public void onNotSignedUp() {
-            }
-
-            @Override
-            public void onSuccess(Long result) {
-                requestMe();
-
-            }
-
-            @Override
-            public void onFailure(ErrorResult errorResult) {
-                final String message = "UsermgmtResponseCallback : failure : " + errorResult;
-                com.kakao.util.helper.log.Logger.w(message);
-                Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
-                // finish();
-            }
-
-            @Override
-            public void onSessionClosed(ErrorResult errorResult) {
-            }
-        }, properties);
+        UserManagement.requestSignup(kakaoApiResponseCallback, properties);
     }
 
+    View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            int id = v.getId();
+
+            switch (id) {
+
+                case R.id.sign_in_button:
+                    mEmail = mEmailEditText.getText().toString();
+                    mPassword = mPasswordEditText.getText().toString();
+
+                    if (mEmail.length() != 0 && mPassword.length() != 0) {
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        FirebaseHelper.signInWithEmail(mEmail, mPassword
+                        ).addOnCompleteListener(LoginActivity.this, onCompleteSignInListener);
+                    }
+                    break;
+
+                case R.id.sign_up_button:
+                    mSignUpDialog.show();
+                    break;
+
+                case R.id.facebook_sign_in_button :
+                    mCallbackManager = CallbackManager.Factory.create();
+                    mFacebookLoginManager.logInWithReadPermissions((Activity) mContext, mFacebookLoginArrayList);
+                    mFacebookLoginManager.registerCallback(mCallbackManager,facebookCallback);
+
+            }
+
+        }
+    };
+
+    OnCompleteListener<AuthResult> onCompleteSignInListener = new OnCompleteListener<AuthResult>() {
+        @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
+
+            mProgressBar.setVisibility(View.INVISIBLE);
+            if (!task.isSuccessful()) {
+
+                Toast.makeText(LoginActivity.this, "로그인 실패",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+
+                redirectMapActivity();
+
+            }
+
+        }
+    };
+
+    OnCompleteListener<AuthResult> onCompleteFaceBookSignInListener = new OnCompleteListener<AuthResult>() {
+        @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
+            if (task.isSuccessful()) {
+                // Sign in success, update UI with the signed-in user's information
+                SharedPreferenceUtil.setFaceBookCheckSharedPreference(mContext,
+                        FACEBOOK_SHARED_PREFERENCES,MODE_PRIVATE);
+                boolean isDataSent = SharedPreferenceUtil.getFaceBookStoredValue(FACEBOOK_DATA_SEND_CHECK);
+
+
+                if(!isDataSent){
+                    FirebaseHelper.sendFacebookUserData();
+                    SharedPreferenceUtil.editKaKaoCheckSharedPreference(FACEBOOK_DATA_SEND_CHECK,true);
+
+                }
+
+
+                Log.d("FacebookSignIn", "signInWithCredential:success");
+                Toast.makeText(mContext, "Authentication sucess.",
+                        Toast.LENGTH_SHORT).show();
+                redirectMapActivity();
+
+            } else {
+                // If sign in fails, display a message to the user.
+                Log.w("FacebookSignIn", "signInWithCredential:failure", task.getException());
+                Toast.makeText(mContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    };
+
+    FacebookCallback<LoginResult> facebookCallback = new FacebookCallback<LoginResult>() {
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+            FirebaseHelper.handleFacebookAccessToken(loginResult.getAccessToken(),mContext)
+                    .addOnCompleteListener((Activity) mContext, onCompleteFaceBookSignInListener);
+        }
+
+        @Override
+        public void onCancel() {
+
+        }
+
+        @Override
+        public void onError(FacebookException error) {
+
+        }
+    };
+
+    ApiResponseCallback<Long> kakaoApiResponseCallback = new ApiResponseCallback<Long>() {
+        @Override
+        public void onNotSignedUp() {
+        }
+
+        @Override
+        public void onSuccess(Long result) {
+            requestMe();
+
+        }
+
+        @Override
+        public void onFailure(ErrorResult errorResult) {
+            final String message = "UsermgmtResponseCallback : failure : " + errorResult;
+            com.kakao.util.helper.log.Logger.w(message);
+            Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onSessionClosed(ErrorResult errorResult) {
+        }
+    };
+
+
+    MeResponseCallback kakaoMeResponseCallback = new MeResponseCallback() {
+        @Override
+        public void onFailure(ErrorResult errorResult) {
+            String message = "failed to get user info. msg=" + errorResult;
+            Logger.d(message);
+
+            ErrorCode result = ErrorCode.valueOf(errorResult.getErrorCode());
+            if (result == ErrorCode.CLIENT_ERROR_CODE) {
+                Toast.makeText(mContext, "정보가져오기 실패", Toast.LENGTH_SHORT).show();
+
+            } else {
+
+            }
+        }
+
+        @Override
+        public void onSessionClosed(ErrorResult errorResult) {
+//                redirectLoginActivity();
+        }
+
+        @Override
+        public void onSuccess(UserProfile userProfile) {
+
+            Log.d("UserProfile :" , userProfile.toString());
+            SharedPreferenceUtil.setKaKaoCheckSharedPreference(mContext,KAKAO_SHARED_PREFERENCES,MODE_PRIVATE);
+            boolean isDataSent =  SharedPreferenceUtil.getKaKaoStoredValue(KAKAO_DATA_SEND_CHECK);
+            Log.d("chkKaKaoBoolean",Boolean.toString(isDataSent));
+
+            if(!isDataSent){
+                FirebaseHelper.sendKakaoUserData(userProfile);
+                SharedPreferenceUtil.editKaKaoCheckSharedPreference(KAKAO_DATA_SEND_CHECK,true);
+
+            }
+
+            redirectMapActivity();
+        }
+
+        @Override
+        public void onNotSignedUp() {
+            requestSignUp();
+        }
+    };
 
 }

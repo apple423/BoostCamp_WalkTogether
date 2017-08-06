@@ -41,8 +41,52 @@
     <string name="fb_login_protocol_scheme">fb455350401493587</string>
     <string name="facebook_login_permission_email">email</string>
     <string name="facebook_login_permission_public_profile">public_profile</string>
+
+    <!--KaKao String-->
     <string name="kakao_app_key">c2bcdcf45c06c8b540f478de64736a39</string>
     <string name="kakao_sign_in">카카오톡으로 로그인</string>
     <string name="kakao_sign_up">가입하기</string>
+
+   <!-- SharedPreference keys-->
+    <string name="facebookSharedPreferences">FacebookUserDataCheck</string>
+    <string name="facebookDataSendCheck">FacebookDataSendCheck</string>
+    <string name="kakakoSharedPreferences">KaKaoUserDataCheck</string>
+    <string name="kakaoDataSendCheck">KaKaoDataSendCheck</string>
+
+    <!--LocationActivity-->
+    <string name="location_activity_title">장소</string>
+
+
+    <!--LocationCommentActivity-->
+    <string name="location_comment_activity_title">유저평가</string>
+
+
+    <!--LocationCommentAddActivity-->
+    <string name="location_comment_add_activity_title">유저평가등록</string>
+
+
+    <!--LocationFreeboardActivity-->
+    <string name="location_freeboard_activity_title">장소 게시판</string>
+
+
+    <!--LocationFreeboardAddActivity-->
+    <string name="location_freeboard_add_activity_title">장소 게시판 글작성</string>
+
+    <!--LocationFreeboardSelectActivity-->
+    <string name="location_freeboard_select_activity_title">장소 게시판</string>
+
+    <!--OnBackPressedDialog-->
+    <string name="finish_prefer">종료하시겠습니까?</string>
+    <string name="finish_yes">예</string>
+    <string name="finish_no">아니요</string>
+
+    <!--optionItemLogout-->
+    <string name="logout_prefer">로그아웃 하시겠습니까?</string>
+    <string name="logout_yes">예</string>
+    <string name="logout_no">아니요</string>
+
+    <!--MapActivity-->
+    <string name="location_intent_key">locationData</string>
+
 
 </resources>

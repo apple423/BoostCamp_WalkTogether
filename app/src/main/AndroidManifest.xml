@@ -27,7 +27,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity"/>
         <activity android:name=".LoginActivity"
             />
         <activity android:name=".MapActivity"/>
@@ -45,16 +44,7 @@
         <activity android:name=".LocationCommentAddActivity"/>
 
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"/>
 
-        <meta-data
-            android:name="com.kakao.sdk.AppKey"
-            android:value="@string/kakao_app_key" />
-
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
 
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=
@@ -71,6 +61,17 @@
             </intent-filter>
         </activity>
         <activity android:name=".helper.RedirectActivity"/>
+
+        <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="@string/google_maps_key"/>
+
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
     </application>
 
 

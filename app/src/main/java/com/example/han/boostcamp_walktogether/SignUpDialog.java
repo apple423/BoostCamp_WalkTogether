@@ -31,7 +31,7 @@ import static android.content.ContentValues.TAG;
  * Created by Han on 2017-07-31.
  */
 
-public class SignUpDialogInterface extends Dialog implements SendImageViewToDialogInterface {
+public class SignUpDialog extends Dialog implements SendImageViewToDialogInterface {
 
     private FirebaseAuth mAuth;
     private Context context;
@@ -47,7 +47,7 @@ public class SignUpDialogInterface extends Dialog implements SendImageViewToDial
 
 
 
-    public SignUpDialogInterface(@NonNull Context context, OnClickProfileImageButtonClickInterface onClickProfileImageButtonClickInterface) {
+    public SignUpDialog(@NonNull Context context, OnClickProfileImageButtonClickInterface onClickProfileImageButtonClickInterface) {
         super(context);
         this.context = context;
         this.onClickProfileImageButtonClickInterface = onClickProfileImageButtonClickInterface;
@@ -96,56 +96,7 @@ public class SignUpDialogInterface extends Dialog implements SendImageViewToDial
                     mPassword = mPasswordEditText.getText().toString();
                     if(mEmail.length()!=0 && mPassword.length()!=0) {
                         FirebaseHelper.signUpWithEmail(mEmail, mPassword)
-                                .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        //mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
-                                        if (!task.isSuccessful()) {
-                                            Toast.makeText(context, "회원가입 실패",
-                                                    Toast.LENGTH_SHORT).show();
-
-                                        } else {
-
-                                            mNickName = mNickNameEditText.getText().toString();
-
-                                            isProfileImageSelected = onClickProfileImageButtonClickInterface.sendIsImageSelected();
-
-
-                                            if(!isProfileImageSelected){
-
-                                                mProfilePictureImageView.setImageResource(R.mipmap.ic_launcher);
-                                               // mProfilePictureImageView.setVisibility(View.VISIBLE);
-                                                Log.d("From Default","asgsggsd");
-                                            }else{
-
-                                                mProfilePictureImageView = onClickProfileImageButtonClickInterface.sendSettedImageView();
-                                                Log.d("From Gallery","sadggdssag");
-                                            }
-                                            mImageURL = "";
-                                            UploadTask uploadTask= FirebaseHelper.uploadProfilePicture(mProfilePictureImageView);
-                                            uploadTask.addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception exception) {
-                                                    // Handle unsuccessful uploads
-                                                }
-                                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                @Override
-                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                                                    mImageURL = taskSnapshot.getDownloadUrl().toString();
-                                                    Log.d("ImageURL in Listener : ",mImageURL);
-                                                    FirebaseHelper.sendUserData(mEmail,mNickName,mImageURL,"","");
-                                                }
-                                            });
-                                            Log.d("ImageURL : ",mImageURL);
-                                            mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                                            Toast.makeText(context, "회원가입 성공", Toast.LENGTH_LONG).show();
-
-                                        }
-
-                                    }
-                                });
+                                .addOnCompleteListener((Activity) context, onCompleteListener);
                     }
                     dismiss();
                     FirebaseUser user = FirebaseHelper.signInState();
@@ -178,4 +129,58 @@ public class SignUpDialogInterface extends Dialog implements SendImageViewToDial
     public ImageView sendImageView() {
         return mProfilePictureImageView;
     }
+
+
+    OnCompleteListener<AuthResult> onCompleteListener = new OnCompleteListener<AuthResult>() {
+        @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
+            //mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+            Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+            if (!task.isSuccessful()) {
+                Toast.makeText(context, "회원가입 실패",
+                        Toast.LENGTH_SHORT).show();
+
+            } else {
+
+                mNickName = mNickNameEditText.getText().toString();
+
+                isProfileImageSelected = onClickProfileImageButtonClickInterface.sendIsImageSelected();
+
+
+                if(!isProfileImageSelected){
+
+                    mProfilePictureImageView.setImageResource(R.mipmap.ic_launcher);
+                    // mProfilePictureImageView.setVisibility(View.VISIBLE);
+                    Log.d("From Default","asgsggsd");
+                }else{
+
+                    mProfilePictureImageView = onClickProfileImageButtonClickInterface.sendSettedImageView();
+                    Log.d("From Gallery","sadggdssag");
+                }
+                mImageURL = "";
+                UploadTask uploadTask= FirebaseHelper.uploadProfilePicture(mProfilePictureImageView);
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                    }
+                }).addOnSuccessListener(onSuccessListener);
+                Log.d("ImageURL : ",mImageURL);
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                Toast.makeText(context, "회원가입 성공", Toast.LENGTH_LONG).show();
+
+            }
+
+        }
+    };
+
+    OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener = new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        @Override
+        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+            mImageURL = taskSnapshot.getDownloadUrl().toString();
+            Log.d("ImageURL in Listener : ",mImageURL);
+            FirebaseHelper.sendUserData(mEmail,mNickName,mImageURL,"","");
+        }
+    };
 }

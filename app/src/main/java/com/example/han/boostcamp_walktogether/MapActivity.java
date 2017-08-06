@@ -1,12 +1,12 @@
 package com.example.han.boostcamp_walktogether;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +20,7 @@ import android.view.View;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
@@ -30,10 +31,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.kakao.auth.Session;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -41,10 +43,13 @@ import java.util.ArrayList;
  * Created by Han on 2017-07-25.
  */
 
-public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener{
-
+public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnInfoWindowClickListener {
+    private static final String TAG = MapActivity.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private final LatLng mDefaultLocation = new LatLng(37.405666, 127.114268);
     private static final int DEFAULT_ZOOM = 15;
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
@@ -52,13 +57,17 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     private Intent mLoginIntent;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastKnownLocation;
-    ArrayList<ParkDataFromFirebaseDTO> seoulParkArrayList, sungnamParkArrayList;
+    ArrayList<ParkDataFromFirebaseDTO> seoulParkArrayList;
+    ArrayList<ParkDataFromFirebaseDTO> sungnamParkArrayList;
+
     private boolean mLocationPermissionGranted;
     private CameraPosition mCameraPosition;
+    private boolean isFisrtMapLoad = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -69,22 +78,16 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         View contentView = inflater.inflate(R.layout.activity_map, mFrameLayout, false);
         mDrawerLayout.addView(contentView, 0);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        mLoginIntent = new Intent(this,LoginActivity.class);
-        mLoginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        seoulParkArrayList = FirebaseHelper.getAllSeoulParkData();
-        sungnamParkArrayList = FirebaseHelper.getAllSungnamParkData();
-
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */,
-                        null)
+                .enableAutoManage(this,
+                        this)
+                .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 .build();
+        mGoogleApiClient.connect();
+
     }
 
     @Override
@@ -96,52 +99,68 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         }
     }
 
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        // Build the map.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
+    /**
+     * Handles failure to connect to the Google Play services client.
+     */
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
+        // Refer to the reference doc for ConnectionResult to see what error codes might
+        // be returned in onConnectionFailed.
+        Log.d(TAG, "Play services connection failed: ConnectionResult.getErrorCode() = "
+                + result.getErrorCode());
+    }
+
+    /**
+     * Handles suspension of the connection to the Google Play services client.
+     */
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.d(TAG, "Play services connection suspended");
+    }
+
     public void onMapReady(GoogleMap googleMap) {
 
-
         mMap = googleMap;
-     /*   LatLng sydney = new LatLng(-33.852, 151.211);
-        Marker marker = googleMap.addMarker(new MarkerOptions().position(sydney)
-                .title("Marker in Sydney"));*/
 
 
-        for(ParkDataFromFirebaseDTO data : seoulParkArrayList){
-            LatLng latLng = new LatLng(data.getLatitude(),data.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title(data.getName()));
-        }
-        for(ParkDataFromFirebaseDTO data : sungnamParkArrayList){
-            LatLng latLng = new LatLng(data.getLatitude(),data.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title(data.getName()));
-            
-        }
-
-        mMap.setOnMarkerClickListener(this);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        seoulParkArrayList = FirebaseHelper.getAllSeoulParkDataAndSetMarker(mMap);
+        sungnamParkArrayList = FirebaseHelper.getAllSungnamParkDataAndSetMarker(mMap);
+        //mMap.setOnMarkerClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
+        Log.d("PermissionGranted Ready", Boolean.toString(mLocationPermissionGranted));
         updateLocationUI();
-        getDeviceLocation();
+
+        if(isFisrtMapLoad) {
+            getDeviceLocation();
+            isFisrtMapLoad = false;
+        }
+
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
 
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-
-       Intent intent  = new Intent(this,LocationActivity.class);
-        startActivity(intent);
-        return false;
-    }
 
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
         AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
-                .setTitle("종료하시겠습니까?")
-                .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                .setTitle(getResources().getString(R.string.finish_prefer))
+                .setPositiveButton(getResources().getString(R.string.finish_yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
                     }
                 })
-                .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getResources().getString(R.string.finish_no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -157,37 +176,12 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id){
-            case R.id.action_sign_out :
+        switch (id) {
+            case R.id.action_sign_out:
                 AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
-                        .setTitle("로그아웃 하시겠습니까?")
-                        .setPositiveButton("예", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if(FirebaseHelper.signInState()!=null) {
-                                    FirebaseHelper.signOut();
-                                    startActivity(mLoginIntent);
-                                }
-
-                                else if(Session.getCurrentSession().isOpened()){
-
-                                    UserManagement.requestLogout(new LogoutResponseCallback() {
-                                        @Override
-                                        public void onCompleteLogout() {
-                                            startActivity(mLoginIntent);
-                                        }
-                                    });
-                                }
-                                //startActivity(mLoginIntent);
-
-                            }
-                        })
-                        .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
+                        .setTitle(getResources().getString(R.string.logout_prefer))
+                        .setPositiveButton(getResources().getString(R.string.logout_yes), onClickSignOutYes)
+                        .setNegativeButton(getResources().getString(R.string.logout_no), onClickSignOutNo);
 
                 AlertDialog alertDialog = alterDialogBuilder.create();
                 alertDialog.show();
@@ -204,28 +198,26 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
 
     private void updateLocationUI() {
         if (mMap == null) {
+
             return;
         }
-
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
+        Log.d("PermissionGranted in UI", Boolean.toString(mLocationPermissionGranted));
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-
+        Log.d("PermissionGranted CHK", Boolean.toString(mLocationPermissionGranted));
         if (mLocationPermissionGranted) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
         } else {
+
             mMap.setMyLocationEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
             mLastKnownLocation = null;
@@ -233,11 +225,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     }
 
     private void getDeviceLocation() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
+
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -247,16 +235,14 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
+
         if (mLocationPermissionGranted) {
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
+            // Log.d("myLocation",mLastKnownLocation.toString());
         }
 
-        // Set the map's camera position to the current location of the device.
+
         if (mCameraPosition != null) {
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
         } else if (mLastKnownLocation != null) {
@@ -287,4 +273,50 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         updateLocationUI();
     }
 
+    DialogInterface.OnClickListener onClickSignOutYes = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (FirebaseHelper.signInState() != null) {
+                FirebaseHelper.signOut();
+                redirectLoginActivity();
+            } else if (Session.getCurrentSession().isOpened()) {
+
+                UserManagement.requestLogout(new LogoutResponseCallback() {
+                    @Override
+                    public void onCompleteLogout() {
+                        redirectLoginActivity();
+                    }
+
+
+                });
+            }
+            //startActivity(mLoginIntent);
+
+        }
+    };
+
+    public void redirectLoginActivity() {
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(loginIntent);
+    }
+
+    DialogInterface.OnClickListener onClickSignOutNo = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.cancel();
+        }
+    };
+
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+        ParkDataFromFirebaseDTO data = (ParkDataFromFirebaseDTO) marker.getTag();
+        Parcels.wrap(data);
+        Intent intent = new Intent(this, LocationActivity.class);
+        intent.putExtra(getResources().getString(R.string.location_intent_key),Parcels.wrap(data));
+        startActivity(intent);
+
+    }
 }

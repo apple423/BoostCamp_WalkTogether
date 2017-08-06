@@ -1,9 +1,11 @@
 package com.example.han.boostcamp_walktogether.data;
 
+import org.parceler.Parcel;
+
 /**
  * Created by Han on 2017-08-03.
  */
-
+@Parcel
 public class ParkDataFromFirebaseDTO {
 
     String address;

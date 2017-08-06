@@ -19,6 +19,8 @@
         android:hint="Enter for searching Address"
         android:layout_marginTop="?attr/actionBarSize"
         android:textColor="@android:color/white"
+        android:layout_gravity="bottom"
+        android:background="@color/searchLocationEditTextBackground"
 
         />
 

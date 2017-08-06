@@ -34,7 +34,7 @@ public class LocationCommentAddActivity extends BackButtonActionBarActivity impl
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_location_comment_add, null, false);
         mFrameLayout.addView(contentView, 0);
-        mTextView.setText("유저평가등록");
+        mTextView.setText(getResources().getString(R.string.location_comment_add_activity_title));
 
 
         mLocationCommentStarScoreTextView = (TextView)findViewById(R.id.location_comment_add_star_score);
