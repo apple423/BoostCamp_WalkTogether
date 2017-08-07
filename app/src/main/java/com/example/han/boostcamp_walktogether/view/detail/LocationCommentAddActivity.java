@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.view.detail;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
+import com.example.han.boostcamp_walktogether.R;
 
 /**
  * Created by Han on 2017-07-29.

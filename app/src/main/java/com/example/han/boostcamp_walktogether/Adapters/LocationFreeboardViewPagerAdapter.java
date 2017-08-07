@@ -12,7 +12,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
+
+import java.util.ArrayList;
 
 /**
  * Created by Han on 2017-07-28.
@@ -20,15 +23,25 @@ import com.example.han.boostcamp_walktogether.R;
 
 public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
 
-    ImageView imageView;
-    TextView textView;
-    LayoutInflater mLayoutInflater;
-    Resources mResources;
+    private Context mContext;
+    private ImageView imageView;
+    private TextView textView;
+    private LayoutInflater mLayoutInflater;
+    private Resources mResources;
+    private ArrayList<String> imageArrayList;
 
-    public LocationFreeboardViewPagerAdapter(LayoutInflater layoutInflater, Resources resources){
 
+    public LocationFreeboardViewPagerAdapter(Context context, LayoutInflater layoutInflater, Resources resources){
+
+        mContext = context;
         mLayoutInflater = layoutInflater;
         mResources = resources;
+    }
+
+    public void setImageArrayList(ArrayList<String> list){
+        imageArrayList = list;
+        notifyDataSetChanged();
+
     }
 
     @Override
@@ -37,8 +50,17 @@ public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
         View view = mLayoutInflater
                 .inflate(R.layout.location_freeboard_picture_viewpager,container,false);
 
+        String imageURL = imageArrayList.get(position);
+
+        if(imageURL.equals("https://firebasestorage.googleapis.com/v0/b/boostcampwalktogether.appspot.com/o/default%2F10941806-silhouette-of-man-holding" +
+                "-dog-Stock-Vector.jpg?alt=media&token=ac1277c7-1503-4ac4-a9c4-070588745dd4")){
+            view.setVisibility(View.GONE);
+        }
+
         imageView = (ImageView)view.findViewById(R.id.location_freeboard_picture_imageView_viewPager);
-        imageView.setImageResource(R.mipmap.ic_launcher);
+        //imageView.setImageResource(R.mipmap.ic_launcher);
+
+        Glide.with(mContext).load(imageURL).into(imageView);
         textView = (TextView) view.findViewById(R.id.location_freeboard_picture_textView_viewPager);
 
         String count = mResources.getString(R.string.viewPager_picture_count);
@@ -55,7 +77,9 @@ public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+
+        if(imageArrayList==null) return 0;
+        return imageArrayList.size();
     }
 
     @Override

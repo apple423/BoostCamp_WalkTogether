@@ -8,7 +8,7 @@
 
 
     <application
-        android:name=".KaKaoGlobalApplication"
+        android:name=".util.KaKaoGlobalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -27,21 +27,21 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity"
+        <activity android:name=".view.LoginActivity"
             />
-        <activity android:name=".MapActivity"/>
-        <activity android:name=".LocationActivity"
-            android:parentActivityName=".MapActivity">
+        <activity android:name=".view.MapActivity"/>
+        <activity android:name=".view.LocationActivity"
+            android:parentActivityName=".view.MapActivity">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MapActivity"/>
+                android:value=".view.MapActivity"/>
         </activity>
-        <activity android:name=".LocationCommentActivity"/>
-        <activity android:name=".LocationFreeboardActivity"/>
-        <activity android:name=".LocationFreeboardAddActivity"/>
-        <activity android:name=".LocationFreeboardSelectActivity"/>
-        <activity android:name=".LocationCommentAddActivity"/>
+        <activity android:name=".view.LocationCommentActivity"/>
+        <activity android:name=".view.LocationFreeboardActivity"/>
+        <activity android:name=".view.detail.LocationFreeboardAddActivity"/>
+        <activity android:name=".view.detail.LocationFreeboardSelectActivity"/>
+        <activity android:name=".view.detail.LocationCommentAddActivity"/>
 
 
 

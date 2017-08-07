@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.view;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,14 +23,18 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
+import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.GetParkAPIData;
 import com.example.han.boostcamp_walktogether.data.ParkAPIDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.helper.KaKaoSessionCallback;
 import com.example.han.boostcamp_walktogether.helper.RequestKakaoMeAndSignUpInterface;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickProfileImageButtonClickInterface;
+import com.example.han.boostcamp_walktogether.interfaces.SendImageViewToDialogInterface;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
+import com.example.han.boostcamp_walktogether.widget.SignUpDialog;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -39,6 +43,7 @@ import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
 import com.kakao.auth.ApiResponseCallback;
 import com.kakao.auth.ErrorCode;
 import com.kakao.auth.Session;
@@ -61,6 +66,10 @@ import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_DA
 import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_SHARED_PREFERENCES;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_DATA_SEND_CHECK;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_SHARED_PREFERENCES;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_ID;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_NICK_NAME;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFILE;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFILE_PICTURE;
 
 /**
  * Created by Han on 2017-07-25.
@@ -314,6 +323,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
                         Toast.LENGTH_SHORT).show();
             } else {
 
+                SetUserProfileToSharedPreferences();
                 redirectMapActivity();
 
             }
@@ -333,9 +343,10 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
                 if(!isDataSent){
                     FirebaseHelper.sendFacebookUserData();
-                    SharedPreferenceUtil.editKaKaoCheckSharedPreference(FACEBOOK_DATA_SEND_CHECK,true);
+                    SharedPreferenceUtil.editFaceBookCheckSharedPreference(FACEBOOK_DATA_SEND_CHECK,true);
 
                 }
+                SetUserProfileToSharedPreferences();
 
 
                 Log.d("FacebookSignIn", "signInWithCredential:success");
@@ -352,6 +363,14 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
             }
         }
     };
+
+    private void SetUserProfileToSharedPreferences() {
+        FirebaseUser user = FirebaseHelper.signInState();
+        SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
+        SharedPreferenceUtil.editUserProfileSharedPreference(USER_ID,user.getEmail());
+        SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,user.getPhotoUrl().toString());
+        SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,user.getDisplayName());
+    }
 
     FacebookCallback<LoginResult> facebookCallback = new FacebookCallback<LoginResult>() {
         @Override
@@ -425,9 +444,14 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
             if(!isDataSent){
                 FirebaseHelper.sendKakaoUserData(userProfile);
+
                 SharedPreferenceUtil.editKaKaoCheckSharedPreference(KAKAO_DATA_SEND_CHECK,true);
 
             }
+            SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
+            SharedPreferenceUtil.editUserProfileSharedPreference(USER_ID,userProfile.getEmail());
+            SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,userProfile.getThumbnailImagePath());
+            SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,userProfile.getNickname());
 
             redirectMapActivity();
         }

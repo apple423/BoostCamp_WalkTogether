@@ -1,21 +1,15 @@
 package com.example.han.boostcamp_walktogether.helper;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.example.han.boostcamp_walktogether.MapActivity;
+import com.example.han.boostcamp_walktogether.data.FreeboardData;
 import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
-import com.example.han.boostcamp_walktogether.data.ParkFreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.data.ParkSungNamDTO;
 import com.example.han.boostcamp_walktogether.data.UserData;
@@ -25,8 +19,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -45,22 +37,17 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.kakao.auth.Session;
 import com.kakao.usermgmt.response.model.UserProfile;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -354,13 +341,19 @@ public class FirebaseHelper {
         return sungnamParkDataFromFirebaseDTOArrayList;
     }
 
-    public static void sendFreeboardwithKaKao(UserProfile userProfile, String locationID,String title,String content,ArrayList<String> imageArrayList){
-        String userName = userProfile.getNickname();
-        String profileImageUrl = userProfile.getThumbnailImagePath();
-        long userID = userProfile.getId();
-
-
+    public static void sendFreeboard(FreeboardData data,String locationID){
+        String userName = data.getUserNickName();
+        String profileImageUrl = data.getUserProfilePictureURL();
+        String userID = data.getUserID();
+        String title = data.getTitle();
+        String content = data.getContent();
+        ArrayList<String> imageArrayList = data.getImageArrayList();
         String key = mDatabase.child("parks/freeboard").push().getKey();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+
+
+
         HashMap<String, Object> result = new HashMap<>();
         result.put("uid",userID);
         result.put("name",userName);
@@ -368,7 +361,7 @@ public class FirebaseHelper {
         result.put("title",title);
         result.put("content",content);
         result.put("locationID",locationID);
-        if(imageArrayList.size()==0){
+        if(imageArrayList==null){
 
             result.put("imageArrayList",
                     "https://firebasestorage.googleapis.com/v0/b/boostcampwalktogether.appspot.com/o/default%2F10941806-silhouette-of-man-holding" +
@@ -380,6 +373,7 @@ public class FirebaseHelper {
             result.put("imageArrayList",imageArrayList);
         }
         result.put("key",key);
+        result.put("time",currentDateandTime);
 //        Log.d("sendFreeboardData",userName + content + imageArrayList.get(0));
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/parks/freeboard/"+ locationID +"/"+key, result);
@@ -391,6 +385,13 @@ public class FirebaseHelper {
 
         DatabaseReference dataReferences = mDatabase.child("parks").child("freeboard").child(locationID);
 
+
+        return dataReferences;
+    }
+
+    public static DatabaseReference getParkFreeboardSelectedDataReferences(String locationID,String locationFreeboardKey){
+
+        DatabaseReference dataReferences = mDatabase.child("parks").child("freeboard").child(locationID).child(locationFreeboardKey);
 
         return dataReferences;
     }

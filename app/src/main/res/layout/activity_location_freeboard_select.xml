@@ -33,15 +33,48 @@
         app:layout_constraintTop_toBottomOf="@+id/view" />
 
     <TextView
+        android:id="@+id/location_freeboard_select_title_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/title"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@+id/location_freeboard_select_title"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <TextView
+        android:id="@+id/location_freeboard_select_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/user_name"
+        android:textSize="20sp"
+        android:layout_marginLeft="30dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_title"
+        android:layout_marginTop="8dp" />
+    <TextView
+        android:id="@+id/location_freeboard_select_user_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/user_name"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@+id/location_freeboard_select_user"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_title_detail" />
+
+    <TextView
         android:id="@+id/location_freeboard_select_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/location_freeboard_posted_time"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_title"
+        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_user"
         android:layout_marginLeft="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="30dp" />
+
     <TextView
         android:id="@+id/location_freeboard_select_time_detail"
         android:layout_width="wrap_content"
@@ -49,27 +82,27 @@
         android:text="@string/location_freeboard_time_detail"
         app:layout_constraintLeft_toRightOf="@+id/location_freeboard_select_time"
         android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_title"
-        android:layout_marginStart="10dp" />
+        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_user_detail" />
 
     <View
         android:layout_width="0dp"
         android:layout_height="5dp"
-        android:layout_marginTop="8dp"
         android:background="@android:color/darker_gray"
         android:layout_marginLeft="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="30dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_time_detail"
         android:id="@+id/view2"
         android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp" />
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_time_detail" />
 
     <android.support.v4.view.ViewPager
         android:layout_width="0dp"
-        android:layout_height="250dp"
+        android:layout_height="200dp"
         android:layout_marginRight="30dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view2"
@@ -84,6 +117,7 @@
     </android.support.v4.view.ViewPager>
 
     <TextView
+        android:id="@+id/location_freeboard_select_content"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"

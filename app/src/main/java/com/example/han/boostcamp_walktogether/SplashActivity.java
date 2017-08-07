@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
+import com.example.han.boostcamp_walktogether.view.LoginActivity;
+import com.example.han.boostcamp_walktogether.view.MapActivity;
 import com.google.firebase.auth.FirebaseUser;
 import com.kakao.auth.Session;
 

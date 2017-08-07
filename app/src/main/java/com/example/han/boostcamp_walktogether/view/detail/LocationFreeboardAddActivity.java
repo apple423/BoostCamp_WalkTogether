@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.view.detail;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardAddPictureAdapter;
+import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.data.FreeboardData;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
@@ -44,6 +46,10 @@ import java.util.ArrayList;
 
 import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_DATA_SEND_CHECK;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_SHARED_PREFERENCES;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_ID;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_NICK_NAME;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFILE;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFILE_PICTURE;
 
 /**
  * Created by Han on 2017-07-28.
@@ -128,8 +134,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK) {
 
-            if(data.getClipData()!=null) {
 
+            if(data.getClipData()!=null) {
 
                 ClipData mClipData = data.getClipData();
 
@@ -141,7 +147,6 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                     Log.d("chkUri", uri.toString());
 
                 }
-                locationFreeboardAddPictureAdapter.setImageUriArrayList(mArrayUri);
 
 
             }else if(data.getData()!=null){
@@ -149,13 +154,17 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                 Uri uri = data.getData();
                 mArrayUri.add(uri);
             }
+
+            locationFreeboardAddPictureAdapter.setImageUriArrayList(mArrayUri);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     View.OnClickListener onClickAddButton = new View.OnClickListener() {
+
         @Override
         public void onClick(View v) {
+            showProgressBar();
 
             if(mArrayUri.size()!=0) {
                 for (int i = 0; i<mArrayUri.size(); i++){
@@ -164,8 +173,6 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
                 }
             }
-
-
 
         }
     };
@@ -194,7 +201,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
                 String title = mLocationFreeboardAddTitleEditText.getText().toString();
                 String content = mLocationFreeboardAddContentEditText.getText().toString();
-                FirebaseHelper.sendFreeboardwithKaKao(userProfile,mLocationID,title,content,mDownLoadUrlPicture);
+               // FirebaseHelper.sendFreeboardwithKaKao(userProfile,mLocationID,title,content,mDownLoadUrlPicture);
 
         }
 
@@ -207,25 +214,48 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
     OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener = new OnSuccessListener<UploadTask.TaskSnapshot>() {
         @Override
         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+           // 파이어베이스, 페이스북 혹은 카카오톡에 따라 따로 게시물 등록을 처리
             mDownLoadUrlPicture.add(taskSnapshot.getDownloadUrl().toString());
             if(mArrayUri.size() == mDownLoadUrlPicture.size()){
 
+                postFreeboard();
+                hideProgressBar();
+                finish();
 
-                FirebaseUser user = FirebaseHelper.signInState();
+                /*FirebaseUser user = FirebaseHelper.signInState();
                 if(user!=null){
                     String userName = user.getDisplayName();
-
+                    String
 
                 }
+
                 else if(Session.getCurrentSession().isOpened()){
                     UserManagement.requestMe(kakaoMeResponseCallback);
+                    hideProgressBar();
                     finish();
 
-                }
+                }*/
 
             }
 
         }
     };
+
+    private void postFreeboard() {
+        SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
+        String userDI = SharedPreferenceUtil.getUserProfile(USER_ID);
+        String userProfileImageURL = SharedPreferenceUtil.getUserProfile(USER_PROFILE_PICTURE);
+        String userNickName = SharedPreferenceUtil.getUserProfile(USER_NICK_NAME);
+        String title = mLocationFreeboardAddTitleEditText.getText().toString();
+        String content = mLocationFreeboardAddContentEditText.getText().toString();
+
+        FreeboardData freeboardData = new FreeboardData();
+        freeboardData.setUserID(userDI);
+        freeboardData.setUserProfilePictureURL(userProfileImageURL);
+        freeboardData.setUserNickName(userNickName);
+        freeboardData.setTitle(title);
+        freeboardData.setContent(content);
+        freeboardData.setImageArrayList(mDownLoadUrlPicture);
+        FirebaseHelper.sendFreeboard(freeboardData,mLocationID);
+    }
 }

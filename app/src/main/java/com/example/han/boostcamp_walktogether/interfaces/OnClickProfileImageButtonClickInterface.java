@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.interfaces;
 
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;

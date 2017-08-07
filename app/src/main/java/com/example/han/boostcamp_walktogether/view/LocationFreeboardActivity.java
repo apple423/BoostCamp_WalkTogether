@@ -1,26 +1,25 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.view;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
-import com.example.han.boostcamp_walktogether.Adapters.LocationCommentAdapter;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardAdapter;
 import com.example.han.boostcamp_walktogether.Adapters.OnClickLocationFreeboard;
+import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.ParkFreeboardDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
+import com.example.han.boostcamp_walktogether.view.detail.LocationFreeboardAddActivity;
+import com.example.han.boostcamp_walktogether.view.detail.LocationFreeboardSelectActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,7 +56,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         mGridlayoutManager = new GridLayoutManager(this,2,GridLayoutManager.VERTICAL,false);
 
 
-        mLocationFreeboardAdapter = new LocationFreeboardAdapter(this,this,mParkFreeboardArrayList);
+        mLocationFreeboardAdapter = new LocationFreeboardAdapter(this,this);
         mLocationFreeboardRecycelerView.setLayoutManager(mGridlayoutManager);
         mLocationFreeboardRecycelerView.setAdapter(mLocationFreeboardAdapter);
 
@@ -65,9 +64,9 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         mParkFreeboardArrayList = new ArrayList<>();
 
         databaseReference = FirebaseHelper.getParkFreeboardDataReferences(mLocationID);
-        Log.d("Location ID",mLocationID);
+      // Log.d("Location ID",mLocationID);
         databaseReference.addValueEventListener(valueEventListener);
-
+        showProgressBar();
 
     }
 
@@ -100,22 +99,21 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
     }
 
     @Override
-    public void onClickBoard() {
+    public void onClickBoard(int position) {
         Intent locationFreeboardSelectIntent = new Intent(this,LocationFreeboardSelectActivity.class);
+        locationFreeboardSelectIntent.putExtra(StringKeys.LOCATION_ID_KEY,mLocationID);
+        locationFreeboardSelectIntent.putExtra(StringKeys.LOCATION_FREEBOARD_KEY,mParkFreeboardArrayList.get(position).getKey());
         startActivity(locationFreeboardSelectIntent);
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mLocationFreeboardAdapter.setParkArrayList(mParkFreeboardArrayList);
-    }
 
     ValueEventListener valueEventListener = new ValueEventListener(){
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            mParkFreeboardArrayList.clear();
+
 
             for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                 ParkFreeboardDTO parkFreeboard = snapshot.getValue(ParkFreeboardDTO.class);
@@ -125,6 +123,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
             }
 
             mLocationFreeboardAdapter.setParkArrayList(mParkFreeboardArrayList);
+            hideProgressBar();
         }
 
         @Override

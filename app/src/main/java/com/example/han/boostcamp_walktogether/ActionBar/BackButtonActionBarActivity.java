@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.R;
@@ -21,6 +23,7 @@ public class BackButtonActionBarActivity  extends AppCompatActivity{
     protected FrameLayout mFrameLayout;
     protected TextView mTextView;
     protected ImageView mImageView;
+    protected ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,7 +39,18 @@ public class BackButtonActionBarActivity  extends AppCompatActivity{
         mFrameLayout = (FrameLayout) findViewById(R.id.frame_content);
         mTextView = (TextView)findViewById(R.id.toolbar_textView);
         mImageView = (ImageView)findViewById(R.id.toolbar_heart_imageView);
+        mProgressBar = (ProgressBar) findViewById(R.id.base_progress_bar);
 
+    }
+
+    protected void showProgressBar(){
+        mProgressBar.setVisibility(View.VISIBLE);
+
+    }
+
+    protected void hideProgressBar(){
+
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
 

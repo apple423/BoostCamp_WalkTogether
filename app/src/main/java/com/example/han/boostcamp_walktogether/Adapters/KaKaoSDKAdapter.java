@@ -2,7 +2,7 @@ package com.example.han.boostcamp_walktogether.Adapters;
 
 import android.content.Context;
 
-import com.example.han.boostcamp_walktogether.KaKaoGlobalApplication;
+import com.example.han.boostcamp_walktogether.util.KaKaoGlobalApplication;
 import com.kakao.auth.ApprovalType;
 import com.kakao.auth.AuthType;
 import com.kakao.auth.IApplicationConfig;

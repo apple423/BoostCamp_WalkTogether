@@ -32,11 +32,11 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
     private ArrayList<ParkFreeboardDTO> mParkFreeboardArrayList;
     private Context mContext;
 
-    public LocationFreeboardAdapter(Context context,OnClickLocationFreeboard onClickLocationFreeboard, ArrayList<ParkFreeboardDTO> parkFreeboardArrayList){
+    public LocationFreeboardAdapter(Context context,OnClickLocationFreeboard onClickLocationFreeboard){
 
         mContext = context;
        mOnClickLocationFreeboard = onClickLocationFreeboard;
-        mParkFreeboardArrayList = parkFreeboardArrayList;
+
 
     }
 
@@ -68,7 +68,7 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
     @Override
     public int getItemCount() {
-        if(mParkFreeboardArrayList.size() == 0) return 0;
+        if(mParkFreeboardArrayList == null) return 0;
 
         return mParkFreeboardArrayList.size();
     }
@@ -88,7 +88,7 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
             View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnClickLocationFreeboard.onClickBoard();
+                    mOnClickLocationFreeboard.onClickBoard(getAdapterPosition());
                 }
             };
 

@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -18,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
+import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.google.android.gms.common.ConnectionResult;

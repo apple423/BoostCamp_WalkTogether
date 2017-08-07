@@ -1,6 +1,5 @@
 package com.example.han.boostcamp_walktogether.Adapters;
 
-import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.han.boostcamp_walktogether.LocationFreeboardAddInterface;
+import com.example.han.boostcamp_walktogether.interfaces.LocationFreeboardAddInterface;
 import com.example.han.boostcamp_walktogether.R;
 
 import java.util.ArrayList;

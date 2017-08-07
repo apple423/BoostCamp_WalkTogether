@@ -1,29 +1,19 @@
 package com.example.han.boostcamp_walktogether.data;
 
-import android.net.Uri;
-
-import java.sql.Time;
 import java.util.ArrayList;
 
 /**
- * Created by Han on 2017-08-06.
+ * Created by Han on 2017-08-07.
  */
 
-public class ParkFreeboardDTO {
+public class FreeboardSelectedDTO {
 
-    public String name;
-    public String title;
-    public String profileImageURL;
-    public ArrayList<String> imageArrayList;
-    public String key;
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
+    String name;
+    String time;
+    String title;
+    String content;
+    ArrayList<String> imageArrayList;
 
     public String getName() {
         return name;
@@ -31,6 +21,14 @@ public class ParkFreeboardDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getTitle() {
@@ -41,12 +39,12 @@ public class ParkFreeboardDTO {
         this.title = title;
     }
 
-    public String getProfileImageURL() {
-        return profileImageURL;
+    public String getContent() {
+        return content;
     }
 
-    public void setProfileImageURL(String profileImageURLL) {
-        this.profileImageURL = profileImageURLL;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public ArrayList<String> getImageArrayList() {

@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.widget;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -15,7 +15,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.han.boostcamp_walktogether.view.MapActivity;
+import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickProfileImageButtonClickInterface;
+import com.example.han.boostcamp_walktogether.interfaces.SendImageViewToDialogInterface;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

@@ -5,12 +5,13 @@
     android:background="@color/kakaoSignInButtonBackground">
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
 
-        android:src="@drawable/kakao_login"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/com_kakao_login_image_tts"
         android:scaleType="fitXY"
-        android:contentDescription="@string/com_kakao_login_image_tts"/>
+        android:src="@drawable/kakao_login" />
 
 </LinearLayout>

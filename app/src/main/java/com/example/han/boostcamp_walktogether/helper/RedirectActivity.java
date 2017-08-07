@@ -3,8 +3,8 @@ package com.example.han.boostcamp_walktogether.helper;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.han.boostcamp_walktogether.LoginActivity;
-import com.example.han.boostcamp_walktogether.MapActivity;
+import com.example.han.boostcamp_walktogether.view.LoginActivity;
+import com.example.han.boostcamp_walktogether.view.MapActivity;
 
 /**
  * Created by Han on 2017-08-02.

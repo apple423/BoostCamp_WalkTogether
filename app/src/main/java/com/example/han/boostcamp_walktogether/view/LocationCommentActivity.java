@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.widget.Button;
 
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationCommentAdapter;
+import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.view.detail.LocationCommentAddActivity;
 
 /**
  * Created by Han on 2017-07-27.

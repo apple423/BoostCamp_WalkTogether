@@ -6,5 +6,5 @@ package com.example.han.boostcamp_walktogether.Adapters;
 
 public interface OnClickLocationFreeboard {
 
-    void onClickBoard();
+    void onClickBoard(int position);
 }

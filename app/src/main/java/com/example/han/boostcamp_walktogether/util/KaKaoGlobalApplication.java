@@ -1,14 +1,8 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.util;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.example.han.boostcamp_walktogether.Adapters.KaKaoSDKAdapter;
-import com.kakao.auth.ApprovalType;
-import com.kakao.auth.AuthType;
-import com.kakao.auth.IApplicationConfig;
-import com.kakao.auth.ISessionConfig;
-import com.kakao.auth.KakaoAdapter;
 import com.kakao.auth.KakaoSDK;
 
 /**
