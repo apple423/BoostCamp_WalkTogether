@@ -20,7 +20,7 @@ import java.util.ArrayList;
 /**
  * Created by Han on 2017-07-28.
  */
-
+// 장소별 게시판의 게시글을 선택한 후 게시글의 사진들을 보여주기 위한 ViewPager의 어댑터
 public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
 
     private Context mContext;

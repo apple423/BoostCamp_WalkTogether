@@ -17,12 +17,11 @@ import java.util.ArrayList;
 /**
  * Created by Han on 2017-07-28.
  */
-
+// 장소별 게시판의 게시물 등록시 추가한 사진들을 보여주기 위한 RecyclerView 어댑터
 public class LocationFreeboardAddPictureAdapter extends RecyclerView.Adapter {
 
     private LocationFreeboardAddInterface locationFreeboardAddInterface;
     private ArrayList<Uri> mImageUriArrayList;
-    private String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
     ImageView mLocationFreeboardAddPicutreImageView;
     @Override

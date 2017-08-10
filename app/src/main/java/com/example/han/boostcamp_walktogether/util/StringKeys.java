@@ -3,7 +3,7 @@ package com.example.han.boostcamp_walktogether.util;
 /**
  * Created by Han on 2017-08-04.
  */
-
+// 여러 String 키들을 저장한 Util
 public class StringKeys {
 
     //Login Activity의 sharedPreferences 상수
@@ -22,8 +22,9 @@ public class StringKeys {
     public static final String USER_PROFILE="userProfile";
     public static final String USER_NICK_NAME = "nickName";
     public static final String USER_PROFILE_PICTURE = "userProfilePicture";
-    public static final String USER_ID = "userID";
+    public static final String USER_EMAIL= "userEmail";
 
+    public static final String LOCATION_INTENT_KEY = "locationData";
 
 
 

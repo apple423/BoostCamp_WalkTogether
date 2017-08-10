@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by Han on 2017-08-01.
  */
-
+// 파이어베이스 회원가입을 위한 UserData
 public class UserData {
 
     private String email;

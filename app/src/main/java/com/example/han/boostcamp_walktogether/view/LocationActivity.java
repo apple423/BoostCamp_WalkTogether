@@ -17,6 +17,8 @@ import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
+import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
+import com.example.han.boostcamp_walktogether.util.StringKeys;
 
 import org.parceler.Parcels;
 
@@ -32,7 +34,7 @@ public class LocationActivity extends BackButtonActionBarActivity {
     private ImageView mLocationImageView;
     private TextView mLocationTextView;
     private TextView mLocationAddressTextView;
-    private String mLocationID;
+    private int mParkKey;
     private final String LOCATION_ID_KEY ="LOCATION_ID";
 
 
@@ -55,15 +57,22 @@ public class LocationActivity extends BackButtonActionBarActivity {
         mLocationComment.setOnClickListener(onClickListener);
         mLocationFreeboard.setOnClickListener(onClickListener);
         Parcelable passedParcelLocationData = getIntent()
-                .getParcelableExtra(getResources().getString(R.string.location_intent_key));
+                .getParcelableExtra(StringKeys.LOCATION_INTENT_KEY);
 
-        ParkDataFromFirebaseDTO data = Parcels.unwrap(passedParcelLocationData);
+        ParkRowDTO data = Parcels.unwrap(passedParcelLocationData);
 
         Log.d("chkPassedData",data.getName() + " "+data.getAddress());
         mLocationTextView.setText(data.getName());
-        Glide.with(this).load(data.getImageURL()).into(mLocationImageView);
+
+        if(data.getImage_url().length()==0){
+            mLocationImageView.setImageResource(R.drawable.park_default_picture);
+        }else{
+            Glide.with(this).load(data.getImage_url()).into(mLocationImageView);
+        }
+
         mLocationAddressTextView.setText(data.getAddress());
-        mLocationID = data.getUid();
+
+        mParkKey = data.getPark_key();
 
     }
 
@@ -77,13 +86,13 @@ public class LocationActivity extends BackButtonActionBarActivity {
                 case R.id.location_button_location_comment :
 
                     Intent intentLocationComment = new Intent(mContext,LocationCommentActivity.class);
-                    intentLocationComment.putExtra(LOCATION_ID_KEY,mLocationID);
+                    intentLocationComment.putExtra(LOCATION_ID_KEY,mParkKey);
                     startActivity(intentLocationComment);
                     break;
 
                 case R.id.location_button_location_freeboard :
                     Intent intentLocationFreeboard = new Intent(mContext,LocationFreeboardActivity.class);
-                    intentLocationFreeboard.putExtra(LOCATION_ID_KEY,mLocationID);
+                    intentLocationFreeboard.putExtra(LOCATION_ID_KEY,mParkKey);
                     startActivity(intentLocationFreeboard);
                     break;
 

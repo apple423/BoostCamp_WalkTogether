@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 
 public class SharedPreferenceUtil {
 
-
+    // TODO 6. 같은 파라메터 같은 기능인데 함수명만 다르게 해두었다. 따라서 하나로 합치는 편이 좋을 것 같다.
     private static SharedPreferences mSharedPreferences;
 
     public static void setFaceBookCheckSharedPreference(Context context, String key,int mode){

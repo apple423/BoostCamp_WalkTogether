@@ -10,7 +10,7 @@ import com.kakao.util.exception.KakaoException;
  * Created by Han on 2017-08-02.
  */
 
-public class KaKaoSessionCallback extends RedirectActivity implements ISessionCallback {
+public class KaKaoSessionCallback implements ISessionCallback {
 
 
     private Context mContext;

@@ -15,6 +15,7 @@ public class FreeboardSelectedDTO {
     String content;
     ArrayList<String> imageArrayList;
 
+
     public String getName() {
         return name;
     }

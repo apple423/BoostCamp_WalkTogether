@@ -8,10 +8,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.example.han.boostcamp_walktogether.data.FreeboardData;
+import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
-import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
-import com.example.han.boostcamp_walktogether.data.ParkSungNamDTO;
 import com.example.han.boostcamp_walktogether.data.UserData;
 import com.facebook.AccessToken;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,21 +33,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.kakao.usermgmt.response.model.UserProfile;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static android.content.ContentValues.TAG;
@@ -57,16 +47,14 @@ import static android.content.ContentValues.TAG;
 /**
  * Created by Han on 2017-07-31.
  */
-
+// 파이어베이스 관련 Helper클래스
+    // TODO 4. 서버 구현을 인하여 안 쓰는 것들을 정리해야 한다.
 public class FirebaseHelper {
 
     private static final FirebaseAuth mAuth = FirebaseAuth.getInstance();;
     private static final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
     private static final FirebaseStorage mStorage = FirebaseStorage.getInstance();
     private static final StorageReference storageRef = mStorage.getReferenceFromUrl("gs://boostcampwalktogether.appspot.com/");
-    private Intent mMapIntent;
-    ArrayList<ParkDataFromFirebaseDTO> mSeoulParkDataFromFirebaseDTOArrayList;
-    ArrayList<ParkDataFromFirebaseDTO> mSungNamParkDataFromFirebaseDTOArrayList;
 
 
     public static FirebaseAuth getAuth(){
@@ -74,24 +62,14 @@ public class FirebaseHelper {
         return mAuth;
     }
 
-    public static DatabaseReference getDatabaseReference(){
-
-        return mDatabase;
-    }
-
-    public static FirebaseStorage getFirebaseStorage(){
-
-        return mStorage;
-    }
-
-
+    // 파이어베이스를 통해 이메일 패스워드 회원가입
     public static Task<AuthResult> signUpWithEmail(String email, String password){
 
 
         return mAuth.createUserWithEmailAndPassword(email, password);
 
     }
-
+    // 파이어베이스를 통해 이메일로 로그인
     public static Task<AuthResult> signInWithEmail(String email, String password){
 
         return mAuth.signInWithEmailAndPassword(email, password);
@@ -111,7 +89,7 @@ public class FirebaseHelper {
 
 
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setPhotoUri(Uri.parse(imageURL))
+                .setPhotoUri(Uri.parse(imageURL)) // 프로필 사진 파이어베이스 user에 추가
                 .build();
 
         user.updateProfile(profileUpdates)
@@ -124,7 +102,7 @@ public class FirebaseHelper {
                     }
                 });
     }
-
+  // 로그인 상태 체크
     public static FirebaseUser signInState(){
 
         FirebaseUser user = mAuth.getCurrentUser();
@@ -132,13 +110,13 @@ public class FirebaseHelper {
             return user;
 
     }
-
+    // 로그아웃
     public static void signOut(){
 
         mAuth.signOut();
 
     }
-
+    // 프로필 사진 업로드
     public static UploadTask uploadProfilePicture(ImageView imageView){
 
         final Uri[] downloadUrl = new Uri[1];
@@ -159,14 +137,7 @@ public class FirebaseHelper {
         return uploadTask;
     }
 
-    public static UploadTask uploadFreeboardPictures(Uri uri,String locationID){
-
-        StorageReference pictureRef = storageRef.child("images/freeboard/" + locationID + uri + "picuture.jpg");
-        Log.d("chkURIFromArraylist", uri.toString());
-        UploadTask uploadTask = pictureRef.putFile(uri);
-        return uploadTask;
-    }
-
+    // 페이스북 토큰 이용해서 파이어베이스에 유저로 등록
     public static Task<AuthResult> handleFacebookAccessToken(AccessToken token, final Context context) {
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
@@ -174,6 +145,8 @@ public class FirebaseHelper {
 
     }
 
+    // 페이스북으로 로그인한 사용자의 데이터를 파이어베이스에 저장
+    // 쓸때 없는거 같기 때문에 삭제를 고려하고 있다.
     public static void sendFacebookUserData(){
 
         FirebaseUser user =mAuth.getCurrentUser();
@@ -219,181 +192,5 @@ public class FirebaseHelper {
         mDatabase.updateChildren(childUpdates);
     }
 
-    public static void sendParkDataInSeoul(ParkRowDTO parkRowDTO){
-
-        String uid = "seoul_"+ parkRowDTO.getP_IDX();
-        String name = parkRowDTO.getP_PARK();
-        String address = parkRowDTO.getP_ADDR();
-        String photoUrl = parkRowDTO.getP_IMG();
-        float latitude = parkRowDTO.getLATITUDE();
-        float longitude = parkRowDTO.getLONGITUDE();
-
-        mDatabase.child("parks/seoul").push();
-        //UserData userData = new UserData(email,name, photoUrl,"","", uid);
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("uid",uid);
-        result.put("name",name);
-        result.put("imageURL", photoUrl);
-        result.put("address",address);
-        result.put("latitude",latitude);
-        result.put("longitude",longitude);
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/parks/seoul/"+ uid, result);
-        mDatabase.updateChildren(childUpdates);
-    }
-
-    public static void sendParkDataInSungNam(Context context) {
-        InputStream inputStream = null;
-        try {
-            inputStream = context.getAssets().open("parkSungNam.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Gson gson = new Gson();
-        BufferedReader br = null;
-        br = new BufferedReader(new InputStreamReader(inputStream));
-        Type listType = new TypeToken<List<ParkSungNamDTO>>(){}.getType();
-        List<ParkSungNamDTO> parkSungNamDTOList = gson.fromJson(br, listType);
-
-        for (ParkSungNamDTO parkSungNamDTOIndex:parkSungNamDTOList) {
-
-            String uid = "sungnam_" + parkSungNamDTOIndex.getP_IDX();
-            String name = parkSungNamDTOIndex.getP_PARK();
-            String address = parkSungNamDTOIndex.getP_ADDR();
-            parkSungNamDTOIndex.setP_IMG("https://firebasestorage.googleapis.com/v0/b/boostcampwalktogether.appspot.com/o/images%2Fprofile%2FaF4n4Nz8RnNPiqFqRxe0lDqoNIm1%2Fprofile.jpg?alt=media&token=ec11dba3-e7a1-4c2f-8290-0260b2a10aab");
-            String photoUrl = parkSungNamDTOIndex.getP_IMG();
-            float latitude = parkSungNamDTOIndex.getLATITUDE();
-            float longitude = parkSungNamDTOIndex.getLONGITUDE();
-
-            mDatabase.child("parks/sungnam").push();
-            HashMap<String, Object> result = new HashMap<>();
-            result.put("uid",uid);
-            result.put("name",name);
-            result.put("address",address);
-            result.put("imageURL", photoUrl);
-            result.put("latitude",latitude);
-            result.put("longitude",longitude);
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/parks/sungnam/"+ uid, result);
-            mDatabase.updateChildren(childUpdates);
-        }
-    }
-
-    public static ArrayList<ParkDataFromFirebaseDTO> getAllSeoulParkDataAndSetMarker(final GoogleMap googleMap){
-
-        final ArrayList<ParkDataFromFirebaseDTO> seoulParkDataFromFirebaseDTOArrayList = new ArrayList<ParkDataFromFirebaseDTO>();
-        mDatabase.child("parks").child("seoul").addValueEventListener(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-
-                        for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                            ParkDataFromFirebaseDTO c = snapshot.getValue(ParkDataFromFirebaseDTO.class);
-                            //Log.d("Categories Seoul: ", c.getName() + " " +c.getAddress());
-                            seoulParkDataFromFirebaseDTOArrayList.add(c);
-                            LatLng latLng = new LatLng(c.getLatitude(),c.getLongitude());
-                            Marker marker = googleMap.addMarker(new MarkerOptions().title(c.getName())
-                                    .position(latLng));
-                            marker.setTag(c);
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
-                    }
-                });
-
-        return seoulParkDataFromFirebaseDTOArrayList;
-    }
-
-    public static ArrayList<ParkDataFromFirebaseDTO> getAllSungnamParkDataAndSetMarker(final GoogleMap googleMap) {
-
-        final ArrayList<ParkDataFromFirebaseDTO> sungnamParkDataFromFirebaseDTOArrayList = new ArrayList<ParkDataFromFirebaseDTO>();
-
-        mDatabase.child("parks").child("sungnam").addValueEventListener(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-
-                        for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                            ParkDataFromFirebaseDTO c = snapshot.getValue(ParkDataFromFirebaseDTO.class);
-                            //Log.d("Categories Sungnam: ", c.getName() + " " +c.getAddress());
-                            sungnamParkDataFromFirebaseDTOArrayList.add(c);
-
-                            LatLng latLng = new LatLng(c.getLatitude(),c.getLongitude());
-                            Marker marker =googleMap.addMarker(new MarkerOptions().title(c.getName())
-                                    .position(latLng)
-                                    );
-                            marker.setTag(c);
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
-                    }
-                });
-        return sungnamParkDataFromFirebaseDTOArrayList;
-    }
-
-    public static void sendFreeboard(FreeboardData data,String locationID){
-        String userName = data.getUserNickName();
-        String profileImageUrl = data.getUserProfilePictureURL();
-        String userID = data.getUserID();
-        String title = data.getTitle();
-        String content = data.getContent();
-        ArrayList<String> imageArrayList = data.getImageArrayList();
-        String key = mDatabase.child("parks/freeboard").push().getKey();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String currentDateandTime = sdf.format(new Date());
-
-
-
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("uid",userID);
-        result.put("name",userName);
-        result.put("profileImageURL", profileImageUrl);
-        result.put("title",title);
-        result.put("content",content);
-        result.put("locationID",locationID);
-        if(imageArrayList==null){
-
-            result.put("imageArrayList",
-                    "https://firebasestorage.googleapis.com/v0/b/boostcampwalktogether.appspot.com/o/default%2F10941806-silhouette-of-man-holding" +
-                            "-dog-Stock-Vector.jpg?alt=media&token=ac1277c7-1503-4ac4-a9c4-070588745dd4");
-
-        }else{
-
-
-            result.put("imageArrayList",imageArrayList);
-        }
-        result.put("key",key);
-        result.put("time",currentDateandTime);
-//        Log.d("sendFreeboardData",userName + content + imageArrayList.get(0));
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/parks/freeboard/"+ locationID +"/"+key, result);
-        mDatabase.updateChildren(childUpdates);
-    }
-
-    public static DatabaseReference getParkFreeboardDataReferences(String locationID){
-
-
-        DatabaseReference dataReferences = mDatabase.child("parks").child("freeboard").child(locationID);
-
-
-        return dataReferences;
-    }
-
-    public static DatabaseReference getParkFreeboardSelectedDataReferences(String locationID,String locationFreeboardKey){
-
-        DatabaseReference dataReferences = mDatabase.child("parks").child("freeboard").child(locationID).child(locationFreeboardKey);
-
-        return dataReferences;
-    }
 
 }

@@ -5,6 +5,8 @@ import org.parceler.Parcel;
 /**
  * Created by Han on 2017-08-03.
  */
+// 파이어베이스에서 공원 정보를 얻어오기 위한 DTO 하지만 지금은 안쓰기 때문에
+    // 코드 리펙토링을 진행하면서 삭제해야한다.
 @Parcel
 public class ParkDataFromFirebaseDTO {
 

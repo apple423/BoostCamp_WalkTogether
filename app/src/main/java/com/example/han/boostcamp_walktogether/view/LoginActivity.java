@@ -24,9 +24,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.R;
-import com.example.han.boostcamp_walktogether.data.GetParkAPIData;
-import com.example.han.boostcamp_walktogether.data.ParkAPIDTO;
-import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.helper.KaKaoSessionCallback;
 import com.example.han.boostcamp_walktogether.helper.RequestKakaoMeAndSignUpInterface;
@@ -55,18 +52,13 @@ import com.kakao.util.helper.log.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_DATA_SEND_CHECK;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_SHARED_PREFERENCES;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_DATA_SEND_CHECK;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_SHARED_PREFERENCES;
-import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_ID;
+import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_EMAIL;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_NICK_NAME;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFILE;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFILE_PICTURE;
@@ -90,12 +82,9 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
     private boolean isProfileImageSelected = false;
     private String mEmail, mPassword;
     private LoginManager mFacebookLoginManager;
-   // private View.OnClickListener mOnClickListener;
     private ArrayList<String> mFacebookLoginArrayList;
     private Context mContext;
     private CallbackManager mCallbackManager;
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor mSharedPreferencesEditor;
     private KaKaoSessionCallback mKaKaoSessionCallback;
 
     @Override
@@ -106,11 +95,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         View contentView = inflater.inflate(R.layout.activity_login, mFrameLayout, false);
         mDrawerLayout.addView(contentView, 0);
 
-/*        facebookSharedPreferences= getResources().getString(R.string.facebookSharedPreferences);
-        kakaoSharedPreferences= getResources().getString(R.string.kakakoSharedPreferences);
-        faceBookDataSendCheck= getResources().getString(R.string.facebookDataSendCheck);
-        kakaoDataSendCheck=getResources().getString(R.string.kakaoDataSendCheck);*/
-
+        mContext = this;
         mSignInButton = (Button) findViewById(R.id.sign_in_button);
         mSignUpButton = (Button) findViewById(R.id.sign_up_button);
         mFacebookSignInButton = (ImageButton) findViewById(R.id.facebook_sign_in_button);
@@ -123,51 +108,25 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
 
         mFacebookLoginManager = LoginManager.getInstance();
-        mContext = this;
         mKaKaoSessionCallback = new KaKaoSessionCallback(this,this);
         Session.getCurrentSession().addCallback(mKaKaoSessionCallback);
 
+        // 페이스북 로그인 퍼미션 추가
         mFacebookLoginArrayList = new ArrayList<String>();
         mFacebookLoginArrayList.add(getResources().getString(R.string.facebook_login_permission_email));
         mFacebookLoginArrayList.add(getResources().getString(R.string.facebook_login_permission_public_profile));
 
+        // 로그인 후 사용자 데이터 유지를 위하여 사용합니다.
         SharedPreferenceUtil.setFaceBookCheckSharedPreference(this, StringKeys.FACEBOOK_SHARED_PREFERENCES,MODE_PRIVATE);
         SharedPreferenceUtil.editFaceBookCheckSharedPreference(FACEBOOK_DATA_SEND_CHECK,false);
-
         SharedPreferenceUtil.setFaceBookCheckSharedPreference(this,KAKAO_SHARED_PREFERENCES,MODE_PRIVATE);
         SharedPreferenceUtil.editFaceBookCheckSharedPreference(KAKAO_DATA_SEND_CHECK,false);
 
         mSignInButton.setOnClickListener(mOnClickListener);
         mSignUpButton.setOnClickListener(mOnClickListener);
         mFacebookSignInButton.setOnClickListener(mOnClickListener);
-
     }
 
-    public void getParkDataInSeoulAndSend() {
-        GetParkAPIData getParkAPIData = GetParkAPIData.retrofit.create(GetParkAPIData.class);
-
-        Call<ParkAPIDTO> call = getParkAPIData.getAllParkData();
-        call.enqueue(new Callback<ParkAPIDTO>() {
-            @Override
-            public void onResponse(Call<ParkAPIDTO> call, Response<ParkAPIDTO> response) {
-
-                if(response.isSuccessful()){
-                    ParkAPIDTO parkAPIDTO = response.body();
-                    List<ParkRowDTO> listParkRowDTO = parkAPIDTO.getSearchParkInfoService().getRow();
-                    for(ParkRowDTO listParkRowDTOIndex : listParkRowDTO){
-                        FirebaseHelper.sendParkDataInSeoul(listParkRowDTOIndex);
-
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ParkAPIDTO> call, Throwable t) {
-
-            }
-        });
-
-    }
 
     @Override
     protected void onDestroy() {
@@ -175,6 +134,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         Session.getCurrentSession().removeCallback(mKaKaoSessionCallback);
     }
 
+    // 다이얼로그에서 +버튼 누를시 갤러리 실행
     @Override
     public void onClickPlusButton() {
 
@@ -198,6 +158,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
     }
 
+    // 다이얼로그에 갤러리에서 선택한 이미지의 이미지뷰 반영을 위하여
     @Override
     public ImageView sendSettedImageView() {
         return mProfilePictureFromDialog;
@@ -264,12 +225,14 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         startActivity(intent);
     }
 
+    // 카카오톡 로그인시 사용자 정보를 요청하기 위한 함수
 
     @Override
     public void requestMe() {
         UserManagement.requestMe(kakaoMeResponseCallback);
     }
 
+    // 카카오톡 로그인 후 앱 연결을 위한 함수
     @Override
     public void requestSignUp() {
         final Map<String, String> properties = new HashMap<String, String>();
@@ -278,6 +241,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
         UserManagement.requestSignup(kakaoApiResponseCallback, properties);
     }
+
 
     View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -312,6 +276,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         }
     };
 
+    // 파이어베이스 이메일/패스워드 로그인 후 콜백 리스너
     OnCompleteListener<AuthResult> onCompleteSignInListener = new OnCompleteListener<AuthResult>() {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -331,11 +296,13 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         }
     };
 
+    // 페이스북 계정이 파이어베이스에 계정 추가 성공 여부를 위한 콜백 리스너
     OnCompleteListener<AuthResult> onCompleteFaceBookSignInListener = new OnCompleteListener<AuthResult>() {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
             if (task.isSuccessful()) {
                 // Sign in success, update UI with the signed-in user's information
+
                 SharedPreferenceUtil.setFaceBookCheckSharedPreference(mContext,
                         FACEBOOK_SHARED_PREFERENCES,MODE_PRIVATE);
                 boolean isDataSent = SharedPreferenceUtil.getFaceBookStoredValue(FACEBOOK_DATA_SEND_CHECK);
@@ -346,6 +313,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
                     SharedPreferenceUtil.editFaceBookCheckSharedPreference(FACEBOOK_DATA_SEND_CHECK,true);
 
                 }
+
                 SetUserProfileToSharedPreferences();
 
 
@@ -367,14 +335,18 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
     private void SetUserProfileToSharedPreferences() {
         FirebaseUser user = FirebaseHelper.signInState();
         SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
-        SharedPreferenceUtil.editUserProfileSharedPreference(USER_ID,user.getEmail());
+        SharedPreferenceUtil.editUserProfileSharedPreference(USER_EMAIL,user.getEmail());
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,user.getPhotoUrl().toString());
+        //TODO 1. 프로필 사진 부분을 수정해야 한다. 각 소셜 계정별,파이어베이스 이메일/패스워드 계정 별 처리 필요
+        // 현재는 NULL이 들어가게 되있다.
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,user.getDisplayName());
     }
 
+    // 페이스북 로그인 성공 여부를 위한 콜백리스너
     FacebookCallback<LoginResult> facebookCallback = new FacebookCallback<LoginResult>() {
         @Override
         public void onSuccess(LoginResult loginResult) {
+
             FirebaseHelper.handleFacebookAccessToken(loginResult.getAccessToken(),mContext)
                     .addOnCompleteListener((Activity) mContext, onCompleteFaceBookSignInListener);
         }
@@ -413,7 +385,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         }
     };
 
-
+    // 카카오톡 유저 정보 가져오기 성공여부의 리스너
     MeResponseCallback kakaoMeResponseCallback = new MeResponseCallback() {
         @Override
         public void onFailure(ErrorResult errorResult) {
@@ -449,7 +421,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
             }
             SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
-            SharedPreferenceUtil.editUserProfileSharedPreference(USER_ID,userProfile.getEmail());
+            SharedPreferenceUtil.editUserProfileSharedPreference(USER_EMAIL, userProfile.getEmail());
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,userProfile.getThumbnailImagePath());
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,userProfile.getNickname());
 

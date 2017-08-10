@@ -57,8 +57,8 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         mLocationPicutreViewPager.setAdapter(locationFreeboardViewPagerAdapter);
         mLocationID = getIntent().getStringExtra(StringKeys.LOCATION_ID_KEY);
         mLocationFreeboardKey=getIntent().getStringExtra(StringKeys.LOCATION_FREEBOARD_KEY);
-        databaseReference = FirebaseHelper.getParkFreeboardSelectedDataReferences(mLocationID,mLocationFreeboardKey);
-        databaseReference.addValueEventListener(valueEventListener);
+       // databaseReference = FirebaseHelper.getParkFreeboardSelectedDataReferences(mLocationID,mLocationFreeboardKey);
+        //databaseReference.addValueEventListener(valueEventListener);
     }
 
     ValueEventListener valueEventListener = new ValueEventListener(){

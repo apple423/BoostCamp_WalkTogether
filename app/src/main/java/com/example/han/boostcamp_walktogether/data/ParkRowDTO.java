@@ -1,67 +1,75 @@
 package com.example.han.boostcamp_walktogether.data;
 
+import org.parceler.Parcel;
+
 /**
  * Created by Han on 2017-08-03.
  */
-
+// 서버로부터 공원 정보를 가져오기 위한 DTO
+@Parcel
 public class ParkRowDTO {
 
-    String P_IDX;
-    String P_PARK;
-    String P_ADDR;
-    String P_IMG;
-    float LONGITUDE;
-    float LATITUDE;
+    int park_key;
+    String name;
+    String address;
+    String image_url;
+    double latitude;
+    double longitude;
+    double distance;
 
-
-    public String getP_IDX() {
-        return P_IDX;
+    public int getPark_key() {
+        return park_key;
     }
 
-    public void setP_IDX(String p_IDX) {
-        P_IDX = p_IDX;
+    public void setPark_key(int park_key) {
+        this.park_key = park_key;
     }
 
-    public String getP_PARK() {
-        return P_PARK;
+    public String getName() {
+        return name;
     }
 
-    public void setP_PARK(String p_PARK) {
-        P_PARK = p_PARK;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getP_ADDR() {
-        return P_ADDR;
+    public String getAddress() {
+        return address;
     }
 
-    public void setP_ADDR(String p_ADDR) {
-        P_ADDR = p_ADDR;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-
-    public String getP_IMG() {
-        return P_IMG;
+    public String getImage_url() {
+        return image_url;
     }
 
-    public void setP_IMG(String p_IMG) {
-        P_IMG = p_IMG;
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
-
-    public float getLONGITUDE() {
-        return LONGITUDE;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setLONGITUDE(float LONGITUDE) {
-        this.LONGITUDE = LONGITUDE;
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
     }
 
-    public float getLATITUDE() {
-        return LATITUDE;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setLATITUDE(float LATITUDE) {
-        this.LATITUDE = LATITUDE;
+    public void setLongitude(float longtitude) {
+        this.longitude = longitude;
     }
 
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
+    }
 }

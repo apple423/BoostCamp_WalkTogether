@@ -19,7 +19,10 @@ import android.view.View;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
+import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
+import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
+import com.example.han.boostcamp_walktogether.util.StringKeys;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -31,6 +34,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.kakao.auth.Session;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
@@ -38,6 +42,11 @@ import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Han on 2017-07-25.
@@ -53,16 +62,16 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     private static final int DEFAULT_ZOOM = 15;
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+    private RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
     private GoogleMap mMap;
-    private Intent mLoginIntent;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastKnownLocation;
-    ArrayList<ParkDataFromFirebaseDTO> seoulParkArrayList;
-    ArrayList<ParkDataFromFirebaseDTO> sungnamParkArrayList;
 
     private boolean mLocationPermissionGranted;
     private CameraPosition mCameraPosition;
+    // 처음 맵을 불렀을때만 현재 위치로 이동하고 다시 부를땐 그 자리에 있도록 하기 위함
     private boolean isFisrtMapLoad = true;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,20 +116,13 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
-    /**
-     * Handles failure to connect to the Google Play services client.
-     */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
-        // Refer to the reference doc for ConnectionResult to see what error codes might
-        // be returned in onConnectionFailed.
+
         Log.d(TAG, "Play services connection failed: ConnectionResult.getErrorCode() = "
                 + result.getErrorCode());
     }
 
-    /**
-     * Handles suspension of the connection to the Google Play services client.
-     */
     @Override
     public void onConnectionSuspended(int cause) {
         Log.d(TAG, "Play services connection suspended");
@@ -129,29 +131,22 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-
-
-        seoulParkArrayList = FirebaseHelper.getAllSeoulParkDataAndSetMarker(mMap);
-        sungnamParkArrayList = FirebaseHelper.getAllSungnamParkDataAndSetMarker(mMap);
-        //mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
+
         Log.d("PermissionGranted Ready", Boolean.toString(mLocationPermissionGranted));
         updateLocationUI();
 
         if(isFisrtMapLoad) {
-            getDeviceLocation();
+            getDeviceLocation(); // 현재 위치 알아오고 이동
             isFisrtMapLoad = false;
         }
-
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
 
     }
 
 
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
+
         AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
                 .setTitle(getResources().getString(R.string.finish_prefer))
                 .setPositiveButton(getResources().getString(R.string.finish_yes), new DialogInterface.OnClickListener() {
@@ -186,16 +181,14 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
                 AlertDialog alertDialog = alterDialogBuilder.create();
                 alertDialog.show();
 
-                //startActivity(mLoginIntent);
 
         }
 
         return super.onOptionsItemSelected(item);
 
-
     }
 
-
+    // 맵의 우측 상단에 현재 위치로 이동하는 버튼을 보여주기 위한 함수
     private void updateLocationUI() {
         if (mMap == null) {
 
@@ -214,6 +207,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         }
         Log.d("PermissionGranted CHK", Boolean.toString(mLocationPermissionGranted));
         if (mLocationPermissionGranted) {
+            // 이 버튼을 true로 하기 위해 상단과 같은 퍼미션 체크를 해야한다.
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
         } else {
@@ -224,6 +218,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         }
     }
 
+    // 현재 위치를 알아오고 카메라를 이동하는 함수
     private void getDeviceLocation() {
 
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
@@ -237,9 +232,9 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         }
 
         if (mLocationPermissionGranted) {
+            // LoactionService를 통해 현재 위치를 얻어온다.
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
-            // Log.d("myLocation",mLastKnownLocation.toString());
         }
 
 
@@ -249,6 +244,18 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(mLastKnownLocation.getLatitude(),
                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+            Log.d("my Location lat",Double.toString(mLastKnownLocation.getLatitude()));
+            Log.d("my Location lng",Double.toString(mLastKnownLocation.getLongitude()));
+
+
+           // RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
+
+            // 현재 위치를 기반으로 서버에 주변 공원정보들을 요청한다.
+            Call<List<ParkRowDTO>> parkRowDTOListCall =
+            retrofitUtil.getNearestPark(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+            parkRowDTOListCall.enqueue(parkRowDataListCallback);
+
+
         } else {
             Log.d("CurrentLocation is null", "Current location is null. Using defaults.");
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
@@ -256,6 +263,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         }
     }
 
+    // Location Permission 퍼미션을 얻은 후에
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
@@ -272,14 +280,18 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         }
         updateLocationUI();
     }
-
+    // 로그아웃 확인을 눌렀을 시
     DialogInterface.OnClickListener onClickSignOutYes = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
+
+            // 페이스북과 파이어베이스의 경우
             if (FirebaseHelper.signInState() != null) {
                 FirebaseHelper.signOut();
                 redirectLoginActivity();
-            } else if (Session.getCurrentSession().isOpened()) {
+            }
+            // 카카오톡의 경우
+            else if (Session.getCurrentSession().isOpened()) {
 
                 UserManagement.requestLogout(new LogoutResponseCallback() {
                     @Override
@@ -290,7 +302,6 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
 
                 });
             }
-            //startActivity(mLoginIntent);
 
         }
     };
@@ -309,14 +320,44 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     };
 
 
+    // 마커 선택 후에 title을 클릭시
     @Override
     public void onInfoWindowClick(Marker marker) {
 
-        ParkDataFromFirebaseDTO data = (ParkDataFromFirebaseDTO) marker.getTag();
+        ParkRowDTO data = (ParkRowDTO) marker.getTag();
         Parcels.wrap(data);
         Intent intent = new Intent(this, LocationActivity.class);
-        intent.putExtra(getResources().getString(R.string.location_intent_key),Parcels.wrap(data));
+        intent.putExtra(StringKeys.LOCATION_INTENT_KEY,Parcels.wrap(data));
         startActivity(intent);
 
     }
+    // 주변 정보를 얻어 온 후에 처리를 위한 콜백 리스너
+    Callback<List<ParkRowDTO>> parkRowDataListCallback = new Callback<List<ParkRowDTO>>() {
+        @Override
+        public void onResponse(Call<List<ParkRowDTO>> call, Response<List<ParkRowDTO>> response) {
+            if(response.isSuccessful()){
+
+                // 정보를 받아서 리스트에 저장
+                List<ParkRowDTO> parkRowDTOList = response.body();
+               // Log.d("checkList",parkRowDTOList.size());
+                for(ParkRowDTO parkRowData : parkRowDTOList){
+                    LatLng latLng = new LatLng(parkRowData.getLatitude(),parkRowData.getLongitude());
+                    Log.d("checklocation1km", String.valueOf(parkRowData.getLatitude()) + parkRowData.getLongitude());
+                    // 맵에 마커를 추가하고 마커에 해당 공원정보에 대한 객체를 넣어준다.
+                    mMap.addMarker(new MarkerOptions().title(parkRowData.getName()).position(latLng))
+                            .setTag(parkRowData);
+
+                }
+
+            }else{
+                Log.d("ErroringetNearest",response.errorBody().toString());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<List<ParkRowDTO>> call, Throwable t) {
+
+        }
+    };
+
 }

@@ -17,6 +17,7 @@ import com.kakao.auth.Session;
 
 public class SplashActivity extends AppCompatActivity{
 
+    //TODO 2. 스플래쉬를 runnable 과 같이 다시 처리해야한다. 현재 깜빡임 현상이 있다.
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

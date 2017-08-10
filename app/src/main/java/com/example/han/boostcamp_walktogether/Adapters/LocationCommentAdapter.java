@@ -12,7 +12,7 @@ import com.example.han.boostcamp_walktogether.R;
 /**
  * Created by Han on 2017-07-27.
  */
-
+// 장소별 코멘트들을 보여주기 위한 RecyclerView 어댑터
 public class LocationCommentAdapter extends RecyclerView.Adapter<LocationCommentAdapter.LocationCommentViewHolder> {
 
     private ImageView mLocationUserImageView;

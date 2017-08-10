@@ -8,7 +8,7 @@ import com.kakao.auth.KakaoSDK;
 /**
  * Created by Han on 2017-08-02.
  */
-
+//
 public class KaKaoGlobalApplication  extends Application{
     private static volatile KaKaoGlobalApplication instance = null;
 

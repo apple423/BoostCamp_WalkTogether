@@ -103,6 +103,7 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialogInterfa
                                 .addOnCompleteListener((Activity) context, onCompleteListener);
                     }
                     dismiss();
+                    // 계정 추가 완료후 자동 로그인이 되기 때문에 유저로그인 상태를 체크하고 바로 MapActivity로 전환
                     FirebaseUser user = FirebaseHelper.signInState();
                     if(user!=null){
                         Intent i = new Intent(context, MapActivity.class);
@@ -150,18 +151,20 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialogInterfa
 
                 isProfileImageSelected = onClickProfileImageButtonClickInterface.sendIsImageSelected();
 
-
+                // 프로필 이미지가 선택 여부에 따라 다르게
                 if(!isProfileImageSelected){
-
+                // 디폴트 사진을 이미지 뷰에 넣음
                     mProfilePictureImageView.setImageResource(R.mipmap.ic_launcher);
                     // mProfilePictureImageView.setVisibility(View.VISIBLE);
                     Log.d("From Default","asgsggsd");
                 }else{
-
+                // 갤러리에서 가져온 사진을 이미지뷰에 넣는다.
                     mProfilePictureImageView = onClickProfileImageButtonClickInterface.sendSettedImageView();
                     Log.d("From Gallery","sadggdssag");
                 }
                 mImageURL = "";
+                //TODO 3. 사용자의 프로필 사진을 Node에 올리도록 수정해야 한다.
+
                 UploadTask uploadTask= FirebaseHelper.uploadProfilePicture(mProfilePictureImageView);
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -184,6 +187,9 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialogInterfa
             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
             mImageURL = taskSnapshot.getDownloadUrl().toString();
             Log.d("ImageURL in Listener : ",mImageURL);
+
+            // FirebaseUser를 통해 프로필 사진 URL을 넣어 줄 수 있기 때문에 파이어베이스 DB 저장할 필요가 없어서
+            // 계속 사용할지 고려 해봐야 한다.
             FirebaseHelper.sendUserData(mEmail,mNickName,mImageURL,"","");
         }
     };

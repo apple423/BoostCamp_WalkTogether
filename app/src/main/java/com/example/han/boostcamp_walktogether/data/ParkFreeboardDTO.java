@@ -8,6 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by Han on 2017-08-06.
  */
+// 삭제해야 한다. 다른 사용처들을 보면서...
 
 public class ParkFreeboardDTO {
 

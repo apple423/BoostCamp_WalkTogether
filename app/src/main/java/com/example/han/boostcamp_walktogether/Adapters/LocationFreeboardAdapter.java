@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,17 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
+import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.data.ParkFreeboardDTO;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Han on 2017-07-27.
  */
-
+// 장소별 게시판의 게시글들을 보여주기 위한 RecyclerView의 어댑터
 public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeboardAdapter.LocationFreeboardViewHolder> {
 
 
@@ -29,7 +33,8 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
     private TextView mUserNameTextView;
     private ImageView mPicutreImageView;
     private ImageView mProfileImageView;
-    private ArrayList<ParkFreeboardDTO> mParkFreeboardArrayList;
+    private List<FreeboardDTO> mParkFreeboardList;
+    private List<FreeboardImageDTO> mParkFreeboardImageList;
     private Context mContext;
 
     public LocationFreeboardAdapter(Context context,OnClickLocationFreeboard onClickLocationFreeboard){
@@ -40,8 +45,14 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
     }
 
-    public void setParkArrayList(ArrayList<ParkFreeboardDTO> list){
-        mParkFreeboardArrayList = list;
+    public void setParkList(List<FreeboardDTO> list){
+        mParkFreeboardList = list;
+        //notifyDataSetChanged();
+
+    }
+
+    public void setParkImageList(List<FreeboardImageDTO> listimage){
+        mParkFreeboardImageList = listimage;
         notifyDataSetChanged();
 
     }
@@ -58,19 +69,32 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
     @Override
     public void onBindViewHolder(LocationFreeboardViewHolder holder, int position) {
-        ParkFreeboardDTO data = mParkFreeboardArrayList.get(position);
-        mUserNameTextView.setText(data.getName());
-        mTitleTextview.setText(data.getTitle());
-        Glide.with(mContext).load(data.getProfileImageURL()).into(mProfileImageView);
-        Glide.with(mContext).load(data.getImageArrayList().get(0)).into(mPicutreImageView);
 
-    }
+        FreeboardDTO data = mParkFreeboardList.get(position);
+        FreeboardImageDTO imageData = mParkFreeboardImageList.get(position);
+
+        mUserNameTextView.setText(data.getUser_name());
+        mTitleTextview.setText(data.getTitle());
+
+
+            //TODO 9. null 처리
+           // Glide.with(mContext).load(data.getUser_profie()).into(mProfileImageView);
+
+
+
+            mProfileImageView.setImageResource(R.mipmap.ic_launcher);
+
+
+         Glide.with(mContext).load(imageData.getImage()).into(mPicutreImageView);
+
+
+        }
 
     @Override
     public int getItemCount() {
-        if(mParkFreeboardArrayList == null) return 0;
+        if(mParkFreeboardImageList == null) return 0;
 
-        return mParkFreeboardArrayList.size();
+        return mParkFreeboardImageList.size();
     }
 
 
