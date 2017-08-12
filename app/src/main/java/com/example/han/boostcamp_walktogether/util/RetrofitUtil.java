@@ -1,14 +1,16 @@
 package com.example.han.boostcamp_walktogether.util;
 
+import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
+import com.example.han.boostcamp_walktogether.data.CommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.kakao.network.response.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -34,7 +36,7 @@ public interface RetrofitUtil {
 
     // 현재 사용자의 위도 경도를 받아 반경 1km이내에 공원들을 가져올 수 있다.
     @GET("/db/{myLatitude}/{myLongitude}")
-    Call<List<ParkRowDTO>> getNearestPark(@Path("myLatitude") double myLatitude, @Path("myLongitude") double myLongitude);
+    Call<ArrayList<ParkRowDTO>> getNearestPark(@Path("myLatitude") double myLatitude, @Path("myLongitude") double myLongitude);
 
     // 장소별 게시판에 게시물을 등록한다.
     @POST("/freeboard/add/{park_key}")
@@ -46,14 +48,32 @@ public interface RetrofitUtil {
     Call<ResponseBody> postFreeboardImgage(@Path("park_key") int park_key, @Path("freeboard_key") int freeboard_key,
     @Part MultipartBody.Part image, @Part("name") RequestBody name);
 
+    // 사용자가 사진을 추가하지 않았을시 빈 문자열을 테이블에 insert
+    @POST("/freeboard/add/image/empty")
+    Call<FreeboardImageDTO> postEmptyImage(@Body FreeboardImageDTO freeboardImageDTO);
+
+    // 장소별 게시판에 모든 등록 글을 가져오기 위함
     @GET("/freeboard/search/{park_key}")
-    Call<List<FreeboardDTO>> getAllFreeboard(@Path("park_key") int park_key);
+    Call<ArrayList<FreeboardDTO>> getAllFreeboard(@Path("park_key") int park_key);
 
-    @GET("/freeboard/search/images/{park_key}")
-    Call<List<FreeboardImageDTO>> getImagesFreeboard(@Path("park_key") int park_key);
+    // 장소별 게시판에 특정 게시물을 눌렀을때의 사진을 가져오기 위함
+    @GET("/freeboard/search/images/{park_key}/{freeboard_key}")
+    Call<ArrayList<FreeboardImageDTO>> getImagesFreeboard(@Path("park_key") int park_key, @Path("freeboard_key") int freeboard_key);
 
+    // 장소별 게시판에 목록에 사진을 보여주기 위함
     @GET("/freeboard/search/oneImage/{park_key}/{freeboard_key}")
     Call<FreeboardImageDTO> getOneImageFreeboard(@Path("park_key") int park_key,@Path("freeboard_key") int freeboard_key);
+
+    // 코멘트 등록
+    @POST("/comment/add/{park_key}")
+    Call<CommentDTO> postComment(@Path("park_key") int park_key, @Body CommentDTO commentDTO);
+
+    // 코멘트 겟겟
+   @GET("/comment/search/{park_key}")
+    Call<ArrayList<CommentDTO>> getAllComment(@Path("park_key") int park_key);
+
+   @GET("/comment/search/average/{park_key}")
+    Call<CommentAveragePointDTO> getAveragePoint(@Path("park_key") int park_key);
 
 
 }

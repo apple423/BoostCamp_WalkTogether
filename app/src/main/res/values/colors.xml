@@ -9,5 +9,5 @@
     <color name="appBarIconSelected">#000000</color>
     <color name="faceBookSignInButtonBackground">#48629B</color>
     <color name="kakaoSignInButtonBackground">#FFEB00</color>
-    <color name="searchLocationEditTextBackground">#6a000000</color>
+    <color name="searchLocationEditTextBackground">#8affffff</color>
 </resources>

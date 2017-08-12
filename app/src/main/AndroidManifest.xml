@@ -27,9 +27,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".view.MainActivity"/>
+
         <activity android:name=".view.LoginActivity"
             />
         <activity android:name=".view.MapActivity"/>
+        <activity android:name=".view.LocationListActivity"/>
         <activity android:name=".view.LocationActivity"
             android:parentActivityName=".view.MapActivity">
 

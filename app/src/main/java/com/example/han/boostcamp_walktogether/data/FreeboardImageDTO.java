@@ -1,9 +1,12 @@
 package com.example.han.boostcamp_walktogether.data;
 
+import org.parceler.Parcel;
+
 /**
  * Created by Han on 2017-08-09.
  */
 // 게시판 이미지 DTO
+@Parcel
 public class FreeboardImageDTO {
 
     int freeboard_key;

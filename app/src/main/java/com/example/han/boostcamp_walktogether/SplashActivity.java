@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.view.LoginActivity;
-import com.example.han.boostcamp_walktogether.view.MapActivity;
+import com.example.han.boostcamp_walktogether.view.MainActivity;
 import com.google.firebase.auth.FirebaseUser;
 import com.kakao.auth.Session;
 
@@ -25,11 +25,12 @@ public class SplashActivity extends AppCompatActivity{
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
+
         }
         FirebaseUser user = FirebaseHelper.signInState();
 
         if(user!=null | Session.getCurrentSession().isOpened()){
-            Intent i = new Intent(this, MapActivity.class);
+            Intent i = new Intent(this, MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
 

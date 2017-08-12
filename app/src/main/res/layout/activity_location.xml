@@ -55,6 +55,8 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="50dp"
                     android:layout_marginStart="50dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
                     android:scaleType="centerCrop"
                     android:src="@mipmap/ic_heart"
                     />
@@ -67,12 +69,22 @@
                     android:text="@string/zero_to_five_default"
                     />
 
+                <TextView
+                    android:id="@+id/location_favorite_score_base"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/zero_to_five_base"
+                    />
+
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="20dp"
                     android:layout_marginStart="20dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
                     android:scaleType="centerCrop"
                     android:src="@mipmap/ic_pet"
                   />
@@ -83,6 +95,13 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="@string/zero_to_five_default"
+                    />
+                <TextView
+                    android:id="@+id/location_pet_score_base"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/zero_to_five_base"
                     />
 
             </LinearLayout>

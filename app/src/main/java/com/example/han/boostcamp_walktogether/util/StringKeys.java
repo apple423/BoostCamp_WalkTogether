@@ -17,13 +17,14 @@ public class StringKeys {
     //Location Activity Location ID
     public static final String LOCATION_ID_KEY ="LOCATION_ID";
     public static final String LOCATION_FREEBOARD_KEY = "LOCATION_FREEBOARD_KEY";
+    public static final String LOCATION_FREEBOARD_PARCELABLE = "LOCATION_FREEBOARD_PARCELABLE";
+    public static final String LOCATION_NAME ="LOCATION_NAME";
 
     //User profile  SharedPreferences
     public static final String USER_PROFILE="userProfile";
     public static final String USER_NICK_NAME = "nickName";
     public static final String USER_PROFILE_PICTURE = "userProfilePicture";
     public static final String USER_EMAIL= "userEmail";
-
     public static final String LOCATION_INTENT_KEY = "locationData";
 
 

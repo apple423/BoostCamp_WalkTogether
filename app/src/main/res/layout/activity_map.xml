@@ -16,11 +16,13 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter for searching Address"
+        android:hint="@string/location_search"
         android:layout_marginTop="?attr/actionBarSize"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:layout_gravity="bottom"
         android:background="@color/searchLocationEditTextBackground"
+        android:enabled="false"
+        android:gravity="center"
 
         />
 

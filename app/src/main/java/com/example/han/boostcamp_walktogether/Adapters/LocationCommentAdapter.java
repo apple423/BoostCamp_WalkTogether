@@ -8,6 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.data.CommentDTO;
+
+import java.util.ArrayList;
 
 /**
  * Created by Han on 2017-07-27.
@@ -15,12 +18,13 @@ import com.example.han.boostcamp_walktogether.R;
 // 장소별 코멘트들을 보여주기 위한 RecyclerView 어댑터
 public class LocationCommentAdapter extends RecyclerView.Adapter<LocationCommentAdapter.LocationCommentViewHolder> {
 
-    private ImageView mLocationUserImageView;
-    private TextView mLocationUserNameTextView;
-    private TextView mLocationContentTextView;
-    private TextView mLocationHeartTextView;
-    private TextView mLocationPetTextView;
 
+    private ArrayList<CommentDTO> mCommentArrayList;
+
+    public void setmCommentArrayList(ArrayList<CommentDTO> mCommentArrayList) {
+        this.mCommentArrayList = mCommentArrayList;
+        notifyDataSetChanged();
+    }
 
     @Override
     public LocationCommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -34,17 +38,32 @@ public class LocationCommentAdapter extends RecyclerView.Adapter<LocationComment
     @Override
     public void onBindViewHolder(LocationCommentViewHolder holder, int position) {
 
+        CommentDTO commentDTO = mCommentArrayList.get(position);
+        holder.mLocationUserNameTextView.setText(commentDTO.getUser_name());
+        holder.mLocationHeartTextView.setText(String.valueOf(commentDTO.getStar_point()));
+        holder.mLocationPetTextView.setText(String.valueOf(commentDTO.getPet_point()));
+        holder.mLocationUserImageView.setImageResource(R.mipmap.ic_launcher);
+        holder.mLocationContentTextView.setText(commentDTO.getComment());
+
 
 
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+
+        if(mCommentArrayList==null) return 0;
+
+        return mCommentArrayList.size();
     }
 
     public class LocationCommentViewHolder extends RecyclerView.ViewHolder{
 
+        private ImageView mLocationUserImageView;
+        private TextView mLocationUserNameTextView;
+        private TextView mLocationContentTextView;
+        private TextView mLocationHeartTextView;
+        private TextView mLocationPetTextView;
 
         public LocationCommentViewHolder(View itemView) {
             super(itemView);

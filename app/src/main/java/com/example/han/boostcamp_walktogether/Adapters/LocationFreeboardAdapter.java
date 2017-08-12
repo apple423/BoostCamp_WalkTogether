@@ -1,10 +1,8 @@
 package com.example.han.boostcamp_walktogether.Adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +13,8 @@ import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
-import com.example.han.boostcamp_walktogether.data.ParkFreeboardDTO;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Han on 2017-07-27.
@@ -26,15 +22,9 @@ import java.util.List;
 // 장소별 게시판의 게시글들을 보여주기 위한 RecyclerView의 어댑터
 public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeboardAdapter.LocationFreeboardViewHolder> {
 
-
-    private CardView mLocationFreeboardCardView;
     private OnClickLocationFreeboard mOnClickLocationFreeboard;
-    private TextView mTitleTextview;
-    private TextView mUserNameTextView;
-    private ImageView mPicutreImageView;
-    private ImageView mProfileImageView;
-    private List<FreeboardDTO> mParkFreeboardList;
-    private List<FreeboardImageDTO> mParkFreeboardImageList;
+    private ArrayList<FreeboardDTO> mParkFreeboardList;
+    private ArrayList<FreeboardImageDTO> mParkFreeboardImageList;
     private Context mContext;
 
     public LocationFreeboardAdapter(Context context,OnClickLocationFreeboard onClickLocationFreeboard){
@@ -45,17 +35,18 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
     }
 
-    public void setParkList(List<FreeboardDTO> list){
+    public void setParkListAndImage(ArrayList<FreeboardDTO> list, ArrayList<FreeboardImageDTO> listImage){
         mParkFreeboardList = list;
-        //notifyDataSetChanged();
-
-    }
-
-    public void setParkImageList(List<FreeboardImageDTO> listimage){
-        mParkFreeboardImageList = listimage;
+        mParkFreeboardImageList = listImage;
         notifyDataSetChanged();
 
     }
+
+//    public void setParkImageList(ArrayList<FreeboardImageDTO> listimage){
+//        mParkFreeboardImageList = listimage;
+//        notifyDataSetChanged();
+//
+//    }
 
     @Override
     public LocationFreeboardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -73,19 +64,22 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         FreeboardDTO data = mParkFreeboardList.get(position);
         FreeboardImageDTO imageData = mParkFreeboardImageList.get(position);
 
-        mUserNameTextView.setText(data.getUser_name());
-        mTitleTextview.setText(data.getTitle());
+        holder.mUserNameTextView.setText(data.getUser_name());
+        holder.mTitleTextview.setText(data.getTitle());
 
+            //TODO 9. null 처리리
+          // Glide.with(mContext).load(data.getUser_profie()).into(mProfileImageView);
 
-            //TODO 9. null 처리
-           // Glide.with(mContext).load(data.getUser_profie()).into(mProfileImageView);
+            holder.mProfileImageView.setImageResource(R.mipmap.ic_launcher);
 
+            if(!imageData.getImage().equals("empty")) {
+                Glide.with(mContext).load("http://" + imageData.getImage()).into(holder.mPicutreImageView);
+            }
+            else{
 
+                holder.mPicutreImageView.setImageResource(R.drawable.park_default_picture);
 
-            mProfileImageView.setImageResource(R.mipmap.ic_launcher);
-
-
-         Glide.with(mContext).load(imageData.getImage()).into(mPicutreImageView);
+            }
 
 
         }
@@ -99,7 +93,11 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
 
     public class LocationFreeboardViewHolder extends RecyclerView.ViewHolder{
-
+        private TextView mTitleTextview;
+        private TextView mUserNameTextView;
+        private ImageView mPicutreImageView;
+        private ImageView mProfileImageView;
+        private CardView mLocationFreeboardCardView;
 
         public LocationFreeboardViewHolder(View itemView) {
             super(itemView);

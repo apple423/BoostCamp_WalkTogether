@@ -1,11 +1,15 @@
 package com.example.han.boostcamp_walktogether.data;
 
+import org.parceler.Parcel;
+
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Han on 2017-08-07.
  */
 // 게시판 DTO
+@Parcel
 public class FreeboardDTO {
 
     int park_key;
@@ -15,7 +19,7 @@ public class FreeboardDTO {
     String user_name;
     String title;
     String content;
-    String date;
+    Date date;
     int insertId;
 
     public String getUser_id() {
@@ -58,11 +62,11 @@ public class FreeboardDTO {
         this.content = content;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

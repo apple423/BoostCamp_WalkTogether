@@ -218,9 +218,9 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
 
 
-    public void redirectMapActivity(){
+    public void redirectMainActivity(){
 
-        final Intent intent = new Intent(this, MapActivity.class);
+        final Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -289,7 +289,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
             } else {
 
                 SetUserProfileToSharedPreferences();
-                redirectMapActivity();
+                redirectMainActivity();
 
             }
 
@@ -320,7 +320,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
                 Log.d("FacebookSignIn", "signInWithCredential:success");
                 Toast.makeText(mContext, "Authentication sucess.",
                         Toast.LENGTH_SHORT).show();
-                redirectMapActivity();
+                redirectMainActivity();
 
             } else {
                 // If sign in fails, display a message to the user.
@@ -425,7 +425,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,userProfile.getThumbnailImagePath());
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,userProfile.getNickname());
 
-            redirectMapActivity();
+            redirectMainActivity();
         }
 
         @Override

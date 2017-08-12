@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,7 @@ public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
     private TextView textView;
     private LayoutInflater mLayoutInflater;
     private Resources mResources;
-    private ArrayList<String> imageArrayList;
+    private ArrayList<FreeboardImageDTO> imageArrayList;
 
 
     public LocationFreeboardViewPagerAdapter(Context context, LayoutInflater layoutInflater, Resources resources){
@@ -38,7 +39,7 @@ public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
         mResources = resources;
     }
 
-    public void setImageArrayList(ArrayList<String> list){
+    public void setImageArrayList(ArrayList<FreeboardImageDTO> list){
         imageArrayList = list;
         notifyDataSetChanged();
 
@@ -50,17 +51,16 @@ public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
         View view = mLayoutInflater
                 .inflate(R.layout.location_freeboard_picture_viewpager,container,false);
 
-        String imageURL = imageArrayList.get(position);
-
-        if(imageURL.equals("https://firebasestorage.googleapis.com/v0/b/boostcampwalktogether.appspot.com/o/default%2F10941806-silhouette-of-man-holding" +
-                "-dog-Stock-Vector.jpg?alt=media&token=ac1277c7-1503-4ac4-a9c4-070588745dd4")){
+        FreeboardImageDTO freeboardImageDTO = imageArrayList.get(position);
+        String imageURL = freeboardImageDTO.getImage();
+        if(imageURL.equals("empty")){
             view.setVisibility(View.GONE);
         }
 
         imageView = (ImageView)view.findViewById(R.id.location_freeboard_picture_imageView_viewPager);
         //imageView.setImageResource(R.mipmap.ic_launcher);
 
-        Glide.with(mContext).load(imageURL).into(imageView);
+        Glide.with(mContext).load("http://"+imageURL).into(imageView);
         textView = (TextView) view.findViewById(R.id.location_freeboard_picture_textView_viewPager);
 
         String count = mResources.getString(R.string.viewPager_picture_count);

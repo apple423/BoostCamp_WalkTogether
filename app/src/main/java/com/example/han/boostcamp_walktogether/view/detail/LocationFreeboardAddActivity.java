@@ -9,7 +9,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
@@ -32,6 +34,7 @@ import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
+import com.example.han.boostcamp_walktogether.view.LocationFreeboardActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.UploadTask;
@@ -42,9 +45,12 @@ import com.kakao.usermgmt.callback.MeResponseCallback;
 import com.kakao.usermgmt.response.model.UserProfile;
 import com.kakao.util.helper.log.Logger;
 
+import org.parceler.Parcels;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -65,8 +71,10 @@ import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFIL
 public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
     private static final int PICK_IMAGE_MULTIPLE = 100;
+    private static final int PUSH_ADD_BUTTON = 101;
     RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
     private Context mContext;
+    private Activity mActivity;
     private RecyclerView pictureRecyclerView;
     private LinearLayoutManager linearLayoutManager;
     private LocationFreeboardAddPictureAdapter locationFreeboardAddPictureAdapter;
@@ -80,6 +88,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
     private ArrayList<String> mDownLoadUrlPicture;
     private File mFile;
     private int mFreeboardKey;
+    private ArrayList<FreeboardDTO> mParkFreeboardList;
+    private ArrayList<FreeboardImageDTO> mParkFreeboardImageList;
 
 
     @Override
@@ -92,7 +102,10 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
         mArrayUri = new ArrayList<Uri>();
         mDownLoadUrlPicture = new ArrayList<>();
+        mParkFreeboardImageList = new ArrayList<>();
         mContext = this;
+        mActivity = this;
+
         mLocationFreeboardAddTitleEditText = (EditText) findViewById(R.id.location_freeboard_add_title_editText);
         mLocationFreeboardAddContentEditText = (EditText) findViewById(R.id.location_freeboard_add_content_editText);
         mLocationFreeboardAddPicutreImageView = (ImageView)findViewById(R.id.location_freeboard_add_picture_imageView);
@@ -172,34 +185,43 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         public void onClick(View v) {
             showProgressBar();
             // freeboardDTO에 게시글 정보 추가
-            FreeboardDTO dto = new FreeboardDTO();
-            // TODO 9. 파이어베이스 user에서 정보를 가져올 수 있기 때문에 처음 로그인 시 shraedPreference에 저장해서 쓰는 방법을 구현할 예정
-            // 추후에 카카오톡 로그인을 파이어베이스 user에 추가하면 더 관리가 쉬워질 것이라 생각합니다.
-            SharedPreferenceUtil.setKaKaoCheckSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
-            String userID = SharedPreferenceUtil.getUserProfile(USER_EMAIL);
-            String userProfileImageURL = SharedPreferenceUtil.getUserProfile(USER_PROFILE_PICTURE);
-            String userNickName = SharedPreferenceUtil.getUserProfile(USER_NICK_NAME);
-            String title = mLocationFreeboardAddTitleEditText.getText().toString();
-            String content = mLocationFreeboardAddContentEditText.getText().toString();
-
-            dto.setUser_name(userNickName);
-            dto.setUser_id(userID);
-            dto.setUser_profie(userProfileImageURL);
-            dto.setTitle(title);
-            dto.setContent(content);
-
+            FreeboardDTO dto = getFreeboardDTO();
             Call<FreeboardDTO> freeboardAddCall  = retrofitUtil.postFreeboard(mParkKey,dto);
             freeboardAddCall.enqueue(addFreeboardCallback);
 
         }
     };
 
-Callback<ResponseBody> addPictureCallback = new Callback<ResponseBody>() {
+
+    private FreeboardDTO getFreeboardDTO() {
+        FreeboardDTO dto = new FreeboardDTO();
+        // TODO 9. 파이어베이스 user에서 정보를 가져올 수 있기 때문에 처음 로그인 시 shraedPreference에 저장해서 쓰는 방법을 구현할 예정
+        // 추후에 카카오톡 로그인을 파이어베이스 user에 추가하면 더 관리가 쉬워질 것이라 생각합니다.
+        SharedPreferenceUtil.setKaKaoCheckSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
+        String userID = SharedPreferenceUtil.getUserProfile(USER_EMAIL);
+        String userProfileImageURL = SharedPreferenceUtil.getUserProfile(USER_PROFILE_PICTURE);
+        String userNickName = SharedPreferenceUtil.getUserProfile(USER_NICK_NAME);
+        String title = mLocationFreeboardAddTitleEditText.getText().toString();
+        String content = mLocationFreeboardAddContentEditText.getText().toString();
+
+        dto.setUser_name(userNickName);
+        dto.setUser_id(userID);
+        dto.setUser_profie(userProfileImageURL);
+        dto.setTitle(title);
+        dto.setContent(content);
+        return dto;
+    }
+
+    Callback<ResponseBody> addPictureCallback = new Callback<ResponseBody>() {
         @Override
         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
             if(response.isSuccessful()){
-
+                hideProgressBar();
+                Call<ArrayList<FreeboardDTO>> getfreeboardInParkCall = retrofitUtil.getAllFreeboard(mParkKey);
+                getfreeboardInParkCall.enqueue(getFreeboardInParkCallback);
+                Log.d("imageUploadSuccess",response.message());
                 Log.d("imageUploadSuccess","yesman");
+
             }
             else{
 
@@ -211,6 +233,12 @@ Callback<ResponseBody> addPictureCallback = new Callback<ResponseBody>() {
         @Override
         public void onFailure(Call<ResponseBody> call, Throwable t) {
 
+            hideProgressBar();
+            Call<ArrayList<FreeboardDTO>> getfreeboardInParkCall = retrofitUtil.getAllFreeboard(mParkKey);
+            getfreeboardInParkCall.enqueue(getFreeboardInParkCallback);
+
+            Log.d("imageUploadFail",t.getMessage());
+
         }
     };
 
@@ -221,22 +249,40 @@ Callback<ResponseBody> addPictureCallback = new Callback<ResponseBody>() {
 
                 // 서버에서 응답을 가져와 사진추가의 파라메터로 사용하기 위해 넣은다.
                 mFreeboardKey = response.body().getInsertId();
-                if(mArrayUri!=null) {
+                if(mArrayUri.size()!=0) {
                     for (Uri uri : mArrayUri) {
 
-                        String imagePath = getPathFromURI(uri);
-                        mFile = new File(imagePath);
-                        Log.d("imagePath", imagePath);
-                        Log.d("mFileName", mFile.getName());
-                        RequestBody reqFile = RequestBody.create(MediaType.parse("image*//*"), mFile);
-                        MultipartBody.Part body = MultipartBody.Part.createFormData("upload", mFile.getName(), reqFile);
-                        //Log.d("bodyPart",body.toString());
-                        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), mFile.getName());
-                        Call<ResponseBody> addPicutreResult = retrofitUtil.postFreeboardImgage(mParkKey, mFreeboardKey, body, name);
-                        addPicutreResult.enqueue(addPictureCallback);
+                        addPicture(uri);
 
                     }
+
                 }else{
+
+                    FreeboardImageDTO freeboardImageDTO = new FreeboardImageDTO();
+                    freeboardImageDTO.setFreeboard_key(mFreeboardKey);
+                    freeboardImageDTO.setPark_key(mParkKey);
+                    freeboardImageDTO.setImage("empty");
+                    Call<FreeboardImageDTO> addEmptyImageCall = retrofitUtil.postEmptyImage(freeboardImageDTO);
+                    addEmptyImageCall.enqueue(new Callback<FreeboardImageDTO>() {
+                        @Override
+                        public void onResponse(Call<FreeboardImageDTO> call, Response<FreeboardImageDTO> response) {
+                            if(response.isSuccessful()){
+
+                                Call<ArrayList<FreeboardDTO>> getfreeboardInParkCall = retrofitUtil.getAllFreeboard(mParkKey);
+                                getfreeboardInParkCall.enqueue(getFreeboardInParkCallback);
+
+                            }
+
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<FreeboardImageDTO> call, Throwable t) {
+
+                        }
+                    });
+
+                    hideProgressBar();
 
                 }
 
@@ -249,87 +295,19 @@ Callback<ResponseBody> addPictureCallback = new Callback<ResponseBody>() {
 
         }
     };
-  /*  MeResponseCallback kakaoMeResponseCallback = new MeResponseCallback() {
-        @Override
-        public void onFailure(ErrorResult errorResult) {
-            String message = "failed to get user info. msg=" + errorResult;
-            Logger.d(message);
 
-            ErrorCode result = ErrorCode.valueOf(errorResult.getErrorCode());
-            if (result == ErrorCode.CLIENT_ERROR_CODE) {
-                Toast.makeText(mContext, "정보가져오기 실패", Toast.LENGTH_SHORT).show();
+    private void addPicture(Uri uri) {
 
-            }
-        }
+        String imagePath = getPathFromURI(uri);
+        mFile = new File(imagePath);
+        RequestBody reqFile = RequestBody.create(MediaType.parse("image*//*"), mFile);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("upload", mFile.getName(), reqFile);
+        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), mFile.getName());
+        Call<ResponseBody> addPicutreResult = retrofitUtil.postFreeboardImgage(mParkKey, mFreeboardKey, body, name);
+        addPicutreResult.enqueue(addPictureCallback);
+    }
 
-        @Override
-        public void onSessionClosed(ErrorResult errorResult) {
-//                redirectLoginActivity();
-        }
-
-        @Override
-        public void onSuccess(UserProfile userProfile) {
-
-                String title = mLocationFreeboardAddTitleEditText.getText().toString();
-                String content = mLocationFreeboardAddContentEditText.getText().toString();
-               // FirebaseHelper.sendFreeboardwithKaKao(userProfile,mLocationID,title,content,mDownLoadUrlPicture);
-
-        }
-
-        @Override
-        public void onNotSignedUp() {
-
-        }
-    };
-
-    OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener = new OnSuccessListener<UploadTask.TaskSnapshot>() {
-        @Override
-        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-           // 파이어베이스, 페이스북 혹은 카카오톡에 따라 따로 게시물 등록을 처리
-            mDownLoadUrlPicture.add(taskSnapshot.getDownloadUrl().toString());
-            if(mArrayUri.size() == mDownLoadUrlPicture.size()){
-
-                postFreeboard();
-                hideProgressBar();
-                finish();
-
-                *//*FirebaseUser user = FirebaseHelper.signInState();
-                if(user!=null){
-                    String userName = user.getDisplayName();
-                    String
-
-                }
-
-                else if(Session.getCurrentSession().isOpened()){
-                    UserManagement.requestMe(kakaoMeResponseCallback);
-                    hideProgressBar();
-                    finish();
-
-                }*//*
-
-            }
-
-        }
-    };
-
-    private void postFreeboard() {
-        SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
-        String userDI = SharedPreferenceUtil.getUserProfile(USER_ID);
-        String userProfileImageURL = SharedPreferenceUtil.getUserProfile(USER_PROFILE_PICTURE);
-        String userNickName = SharedPreferenceUtil.getUserProfile(USER_NICK_NAME);
-        String title = mLocationFreeboardAddTitleEditText.getText().toString();
-        String content = mLocationFreeboardAddContentEditText.getText().toString();
-
-        FreeboardDTO freeboardDTO = new FreeboardDTO();
-        //freeboardDTO.setUserID(userDI);
-        //freeboardDTO.setUserProfilePictureURL(userProfileImageURL);
-        //freeboardDTO.setUserNickName(userNickName);
-        freeboardDTO.setTitle(title);
-        freeboardDTO.setContent(content);
-        //freeboardDTO.setImageArrayList(mDownLoadUrlPicture);
-       // FirebaseHelper.sendFreeboard(freeboardDTO,mParkKey);
-    }*/
-
+    // gallery에서 가져온 사진을 String Path로 변환
     private String getPathFromURI(Uri contentUri) {
         String[] proj = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(getApplicationContext(), contentUri, proj, null, null, null);
@@ -339,8 +317,72 @@ Callback<ResponseBody> addPictureCallback = new Callback<ResponseBody>() {
         return cursor.getString(column_index);
     }
 
+    Callback<ArrayList<FreeboardDTO>> getFreeboardInParkCallback = new Callback<ArrayList<FreeboardDTO>>() {
+        @Override
+        public void onResponse(Call<ArrayList<FreeboardDTO>> call, Response<ArrayList<FreeboardDTO>> response) {
+            if(response.isSuccessful()){
+
+                ArrayList<FreeboardDTO> freeboardList= response.body();
+
+                mParkFreeboardList = freeboardList;
+                Log.d("send_freeboard", "gogogogoo");
+                //mLocationFreeboardAdapter.setParkList(mParkFreeboardList);
+                for(FreeboardDTO data : freeboardList){
+                    int freeboardKey = data.getFreeboard_key();
+
+                    Call<FreeboardImageDTO> getFreeboardImageCall = retrofitUtil.getOneImageFreeboard(mParkKey,freeboardKey);
+                    getFreeboardImageCall.enqueue(getFreeboardImageCallback);
+                }
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<ArrayList<FreeboardDTO>> call, Throwable t) {
+
+        }
+    };
+
+    Callback<FreeboardImageDTO> getFreeboardImageCallback = new Callback<FreeboardImageDTO>() {
 
 
+        @Override
+        public void onResponse(Call<FreeboardImageDTO> call, Response<FreeboardImageDTO> response) {
+            if (response.isSuccessful()) {
+
+                FreeboardImageDTO freeboardImageData = response.body();
+                Log.d("send_Image_adapter", freeboardImageData.getImage());
+                mParkFreeboardImageList.add(freeboardImageData);
+                if (mParkFreeboardImageList.size() == mParkFreeboardList.size()) {
+                    // LocationFreeboardActivity에 데이터 전달
+                    Log.d("successInSetResult",mParkFreeboardList.get(0).getTitle());
+                    resultToLocationActivity();
+                  //  Log.d("send_Image_adapter", "gogogogoo");
+            }
+            }
+
+            else{
+
+                Log.d("send_Image_adapter", "fail");
+            }
+        }
+
+        @Override
+        public void onFailure(Call<FreeboardImageDTO> call, Throwable t) {
+
+            Log.d("send_Image_adapter",t.getMessage());
+            Log.d("send_Image_adapter", "gogogogoofail");
+
+        }
+    };
+
+    private void resultToLocationActivity() {
+        Intent intent = new Intent();
+        intent.putExtra("parkList", Parcels.wrap( mParkFreeboardList));
+        intent.putExtra("parkImageList", Parcels.wrap( mParkFreeboardImageList));
+        mActivity.setResult(RESULT_OK, intent);
+        finish();
+    }
 
 
 }

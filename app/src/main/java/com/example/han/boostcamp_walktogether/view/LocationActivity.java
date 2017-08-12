@@ -16,11 +16,16 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.R;
-import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
+import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
+import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
 
 import org.parceler.Parcels;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Han on 2017-07-26.
@@ -34,9 +39,11 @@ public class LocationActivity extends BackButtonActionBarActivity {
     private ImageView mLocationImageView;
     private TextView mLocationTextView;
     private TextView mLocationAddressTextView;
+    private TextView mHeartTextView;
+    private TextView mPetTextView;
     private int mParkKey;
-    private final String LOCATION_ID_KEY ="LOCATION_ID";
-
+    private String mLocationName;
+    private RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,6 +60,8 @@ public class LocationActivity extends BackButtonActionBarActivity {
         mLocationImageView = (ImageView)findViewById(R.id.location_imageView);
         mLocationTextView = (TextView)findViewById(R.id.location_textView);
         mLocationAddressTextView = (TextView)findViewById(R.id.location_address_textView);
+        mHeartTextView = (TextView)findViewById(R.id.location_favorite_score);
+        mPetTextView = (TextView)findViewById(R.id.location_pet_score);
 
         mLocationComment.setOnClickListener(onClickListener);
         mLocationFreeboard.setOnClickListener(onClickListener);
@@ -73,6 +82,9 @@ public class LocationActivity extends BackButtonActionBarActivity {
         mLocationAddressTextView.setText(data.getAddress());
 
         mParkKey = data.getPark_key();
+        mLocationName = data.getName();
+        Call<CommentAveragePointDTO> commentAveragePointDTOCall = retrofitUtil.getAveragePoint(mParkKey);
+        commentAveragePointDTOCall.enqueue(commentAvaragePointCallback);
 
     }
 
@@ -86,13 +98,15 @@ public class LocationActivity extends BackButtonActionBarActivity {
                 case R.id.location_button_location_comment :
 
                     Intent intentLocationComment = new Intent(mContext,LocationCommentActivity.class);
-                    intentLocationComment.putExtra(LOCATION_ID_KEY,mParkKey);
+                    intentLocationComment.putExtra(StringKeys.LOCATION_ID_KEY,mParkKey);
+                    intentLocationComment.putExtra(StringKeys.LOCATION_NAME,mLocationName);
                     startActivity(intentLocationComment);
                     break;
 
                 case R.id.location_button_location_freeboard :
                     Intent intentLocationFreeboard = new Intent(mContext,LocationFreeboardActivity.class);
-                    intentLocationFreeboard.putExtra(LOCATION_ID_KEY,mParkKey);
+                    intentLocationFreeboard.putExtra(StringKeys.LOCATION_ID_KEY,mParkKey);
+
                     startActivity(intentLocationFreeboard);
                     break;
 
@@ -114,4 +128,33 @@ public class LocationActivity extends BackButtonActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    Callback<CommentAveragePointDTO> commentAvaragePointCallback =  new Callback<CommentAveragePointDTO>() {
+        @Override
+        public void onResponse(Call<CommentAveragePointDTO> call, Response<CommentAveragePointDTO> response) {
+            if(response.isSuccessful()){
+
+                    Log.d("SuccessAverage","yes");
+                    CommentAveragePointDTO commentAveragePointDTO = response.body();
+                if(commentAveragePointDTO.getAvgPet()!= 0.0 && commentAveragePointDTO.getAvgStar()!= 0.0) {
+                    mHeartTextView.setText(String.valueOf(commentAveragePointDTO.getAvgStar()));
+                    mPetTextView.setText(String.valueOf(commentAveragePointDTO.getAvgPet()));
+                }
+
+
+
+            }else{
+
+                Log.d("SuccessAverage","no");
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<CommentAveragePointDTO> call, Throwable t) {
+
+            Log.d("SuccessAverage","fali  "+t.getMessage());
+
+        }
+    };
 }

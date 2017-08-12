@@ -18,7 +18,6 @@ import android.view.View;
 
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.R;
-import com.example.han.boostcamp_walktogether.data.ParkDataFromFirebaseDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
@@ -144,7 +143,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     }
 
 
-    @Override
+  /*  @Override
     public void onBackPressed() {
 
         AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
@@ -165,7 +164,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         AlertDialog alertDialog = alterDialogBuilder.create();
         alertDialog.show();
 
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -251,7 +250,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
            // RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
 
             // 현재 위치를 기반으로 서버에 주변 공원정보들을 요청한다.
-            Call<List<ParkRowDTO>> parkRowDTOListCall =
+            Call<ArrayList<ParkRowDTO>> parkRowDTOListCall =
             retrofitUtil.getNearestPark(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
             parkRowDTOListCall.enqueue(parkRowDataListCallback);
 
@@ -332,9 +331,9 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
 
     }
     // 주변 정보를 얻어 온 후에 처리를 위한 콜백 리스너
-    Callback<List<ParkRowDTO>> parkRowDataListCallback = new Callback<List<ParkRowDTO>>() {
+    Callback<ArrayList<ParkRowDTO>> parkRowDataListCallback = new Callback<ArrayList<ParkRowDTO>>() {
         @Override
-        public void onResponse(Call<List<ParkRowDTO>> call, Response<List<ParkRowDTO>> response) {
+        public void onResponse(Call<ArrayList<ParkRowDTO>> call, Response<ArrayList<ParkRowDTO>> response) {
             if(response.isSuccessful()){
 
                 // 정보를 받아서 리스트에 저장
@@ -355,7 +354,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         }
 
         @Override
-        public void onFailure(Call<List<ParkRowDTO>> call, Throwable t) {
+        public void onFailure(Call<ArrayList<ParkRowDTO>> call, Throwable t) {
 
         }
     };

@@ -32,7 +32,9 @@
     <string name="location_freeboard_posted_time">작성시간 : </string>
     <string name="viewPager_picture_count">%1$d / %2$d</string>
     <string name="zero_to_five">%1$.1f / 5</string>
-    <string name="zero_to_five_default">0 / 5</string>
+    <string name="zero_to_five_default"> -- </string>
+    <string name="zero_to_five_base"> / 5.0</string>
+    <string name="km">km</string>
     <string name="nickname">닉네임</string>
     <string name="picture">프로필 사진</string>
     <string name="sign_out">로그아웃</string>
@@ -41,6 +43,7 @@
     <string name="fb_login_protocol_scheme">fb455350401493587</string>
     <string name="facebook_login_permission_email">email</string>
     <string name="facebook_login_permission_public_profile">public_profile</string>
+
 
     <!--KaKao String-->
     <string name="kakao_app_key">c2bcdcf45c06c8b540f478de64736a39</string>
@@ -87,6 +90,13 @@
 
     <!--MapActivity-->
     <string name="location_intent_key">locationData</string>
+    <string name="location_search">장소를 검색하려면 누르세요</string>
 
+    <!--MainActivity-->
+    <string name="location_search_detail">직접 주변장소 검색하여 찾기</string>
+    <string name="recent_review">최신 장소 리뷰</string>
+    <string name="recent_freeboard">최신 장소 게시글</string>
+    <string name="location_search_list">리스트로 장소 찾기</string>
+    <string name="location_search_map">지도로 장소 찾기</string>
 
 </resources>
