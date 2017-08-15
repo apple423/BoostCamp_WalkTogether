@@ -31,6 +31,7 @@ import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
+import com.example.han.boostcamp_walktogether.util.ComparatorUtil;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
@@ -50,6 +51,7 @@ import org.parceler.Parcels;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -197,16 +199,17 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         FreeboardDTO dto = new FreeboardDTO();
         // TODO 9. 파이어베이스 user에서 정보를 가져올 수 있기 때문에 처음 로그인 시 shraedPreference에 저장해서 쓰는 방법을 구현할 예정
         // 추후에 카카오톡 로그인을 파이어베이스 user에 추가하면 더 관리가 쉬워질 것이라 생각합니다.
-        SharedPreferenceUtil.setKaKaoCheckSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
+        SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
         String userID = SharedPreferenceUtil.getUserProfile(USER_EMAIL);
         String userProfileImageURL = SharedPreferenceUtil.getUserProfile(USER_PROFILE_PICTURE);
+        Log.d("getPhotoURL",userProfileImageURL);
         String userNickName = SharedPreferenceUtil.getUserProfile(USER_NICK_NAME);
         String title = mLocationFreeboardAddTitleEditText.getText().toString();
         String content = mLocationFreeboardAddContentEditText.getText().toString();
 
         dto.setUser_name(userNickName);
         dto.setUser_id(userID);
-        dto.setUser_profie(userProfileImageURL);
+        dto.setUser_profile(userProfileImageURL);
         dto.setTitle(title);
         dto.setContent(content);
         return dto;
@@ -353,6 +356,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                 FreeboardImageDTO freeboardImageData = response.body();
                 Log.d("send_Image_adapter", freeboardImageData.getImage());
                 mParkFreeboardImageList.add(freeboardImageData);
+                Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
                 if (mParkFreeboardImageList.size() == mParkFreeboardList.size()) {
                     // LocationFreeboardActivity에 데이터 전달
                     Log.d("successInSetResult",mParkFreeboardList.get(0).getTitle());
@@ -378,8 +382,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
     private void resultToLocationActivity() {
         Intent intent = new Intent();
-        intent.putExtra("parkList", Parcels.wrap( mParkFreeboardList));
-        intent.putExtra("parkImageList", Parcels.wrap( mParkFreeboardImageList));
+        intent.putExtra(StringKeys.PARK_LIST, Parcels.wrap( mParkFreeboardList));
+        intent.putExtra(StringKeys.PARK_IMAGE_LIST, Parcels.wrap( mParkFreeboardImageList));
         mActivity.setResult(RESULT_OK, intent);
         finish();
     }

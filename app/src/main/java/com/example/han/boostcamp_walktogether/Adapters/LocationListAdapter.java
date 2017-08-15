@@ -1,6 +1,7 @@
 package com.example.han.boostcamp_walktogether.Adapters;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickLocationListInterface;
 
 import java.util.ArrayList;
 
@@ -26,10 +28,11 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
     private ArrayList<ParkRowDTO> parkRowDTOArrayList;
     private ArrayList<CommentAveragePointDTO> commentAveragePointDTOArrayList;
     private Context mContext;
+    private OnClickLocationListInterface mOnClickLocationListInterface;
 
-    public LocationListAdapter (Context context){
+    public LocationListAdapter (Context context,OnClickLocationListInterface onClickLocationListInterface){
         mContext = context;
-
+        mOnClickLocationListInterface = onClickLocationListInterface;
     }
     public void setDataArrayList(ArrayList<ParkRowDTO> parkRowDTOs, ArrayList<CommentAveragePointDTO> commentAveragePointDTOs){
 
@@ -81,6 +84,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
         TextView mLocationHeartTextView;
         TextView mLocationPetTextView;
         TextView mLocationDistanceTextView;
+        CardView mLocationListCardView;
 
 
         public LocationListViewHolder(View itemView) {
@@ -92,8 +96,20 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
             mLocationHeartTextView = (TextView) itemView.findViewById(R.id.location_list_favorite_score);
             mLocationPetTextView = (TextView)itemView.findViewById(R.id.location_list_pet_score);
             mLocationDistanceTextView = (TextView)itemView.findViewById(R.id.location_list_distance_score);
+            mLocationListCardView = (CardView)itemView.findViewById(R.id.location_list_cardView);
 
+            View.OnClickListener clickCardViewListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    mOnClickLocationListInterface.onClickList(getAdapterPosition());
+
+                }
+            };
+
+            mLocationListCardView.setOnClickListener(clickCardViewListener);
 
         }
     }
+
 }

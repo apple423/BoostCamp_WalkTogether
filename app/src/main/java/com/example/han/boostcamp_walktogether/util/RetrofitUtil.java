@@ -5,13 +5,16 @@ import com.example.han.boostcamp_walktogether.data.CommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
+import com.example.han.boostcamp_walktogether.data.RecentCommentDTO;
 import com.kakao.network.response.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -30,6 +33,8 @@ public interface RetrofitUtil {
 
 
     public static final Retrofit retrofit = new Retrofit.Builder()
+            .client(new OkHttpClient().newBuilder().
+            addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build())
             .baseUrl("http://52.79.111.22:3000")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
@@ -72,8 +77,12 @@ public interface RetrofitUtil {
    @GET("/comment/search/{park_key}")
     Call<ArrayList<CommentDTO>> getAllComment(@Path("park_key") int park_key);
 
+    // 해당 장소의 평균 좋아요와 펫 빈도
    @GET("/comment/search/average/{park_key}")
     Call<CommentAveragePointDTO> getAveragePoint(@Path("park_key") int park_key);
 
+    // 전체 댓글 중 최신 댓글을 5개 가져온다.
+    @GET("/comment/recent")
+    Call<ArrayList<RecentCommentDTO>> getRecentComment();
 
 }

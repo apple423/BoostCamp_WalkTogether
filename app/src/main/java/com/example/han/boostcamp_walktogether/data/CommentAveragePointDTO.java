@@ -6,6 +6,7 @@ package com.example.han.boostcamp_walktogether.data;
 
 public class CommentAveragePointDTO {
 
+    int park_key;
     float avgStar;
     float avgPet;
 
@@ -24,5 +25,13 @@ public class CommentAveragePointDTO {
 
     public void setAvgPet(float avgPet) {
         this.avgPet = avgPet;
+    }
+
+    public int getPark_key() {
+        return park_key;
+    }
+
+    public void setPark_key(int park_key) {
+        this.park_key = park_key;
     }
 }

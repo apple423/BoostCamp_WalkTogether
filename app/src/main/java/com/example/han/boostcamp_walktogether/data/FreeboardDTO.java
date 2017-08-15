@@ -15,7 +15,7 @@ public class FreeboardDTO {
     int park_key;
     int freeboard_key;
     String user_id;
-    String user_profie;
+    String user_profile;
     String user_name;
     String title;
     String content;
@@ -30,12 +30,12 @@ public class FreeboardDTO {
         this.user_id = user_id;
     }
 
-    public String getUser_profie() {
-        return user_profie;
+    public String getUser_profile() {
+        return user_profile;
     }
 
-    public void setUser_profie(String user_profie) {
-        this.user_profie = user_profie;
+    public void setUser_profile(String user_profie) {
+        this.user_profile = user_profie;
     }
 
     public String getUser_name() {

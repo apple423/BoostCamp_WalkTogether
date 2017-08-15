@@ -7,8 +7,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardViewPagerAdapter;
 import com.example.han.boostcamp_walktogether.R;
@@ -49,6 +51,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
     private TextView mTimeTextView;
     private TextView mContentTextView;
     private FreeboardDTO mFreeboardDTO;
+    private ImageView mUserProfileImageView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +67,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         mTimeTextView = (TextView)findViewById(R.id.location_freeboard_select_time_detail);
         mContentTextView = (TextView) findViewById(R.id.location_freeboard_select_content);
         mLocationPicutreViewPager = (ViewPager)findViewById(R.id.location_freeboard_viewPager);
+        mUserProfileImageView = (ImageView)findViewById(R.id.location_freeboard_select_user_profile);
 
         locationFreeboardViewPagerAdapter = new LocationFreeboardViewPagerAdapter(this,getLayoutInflater(),getResources());
         mLocationPicutreViewPager.setAdapter(locationFreeboardViewPagerAdapter);
@@ -81,6 +85,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(mFreeboardDTO.getDate());
         mTimeTextView.setText(dateString);
         mContentTextView.setText(mFreeboardDTO.getContent());
+        Glide.with(this).load(mFreeboardDTO.getUser_profile()).into(mUserProfileImageView);
 
         Call<ArrayList<FreeboardImageDTO>> imageArrayListCall = retrofitUtil.getImagesFreeboard(mLocationKey,mLocationFreeboardKey);
         imageArrayListCall.enqueue(imageArrayListCallback);
@@ -93,6 +98,8 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         public void onResponse(Call<ArrayList<FreeboardImageDTO>> call, Response<ArrayList<FreeboardImageDTO>> response) {
             if(response.isSuccessful()){
 
+                ArrayList<FreeboardImageDTO> freeboardImageDTOs = response.body();
+                if(freeboardImageDTOs.get(0).getImage().equals("empty")) mLocationPicutreViewPager.setVisibility(View.GONE);
                 locationFreeboardViewPagerAdapter.setImageArrayList(response.body());
             }
 

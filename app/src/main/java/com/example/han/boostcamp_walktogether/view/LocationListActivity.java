@@ -1,9 +1,11 @@
 package com.example.han.boostcamp_walktogether.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,7 +20,10 @@ import com.example.han.boostcamp_walktogether.Adapters.LocationListAdapter;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickLocationListInterface;
+import com.example.han.boostcamp_walktogether.util.ComparatorUtil;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
+import com.example.han.boostcamp_walktogether.util.StringKeys;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
@@ -27,9 +32,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import okhttp3.Headers;
+import okhttp3.internal.http2.Header;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,8 +48,13 @@ import retrofit2.Response;
  * Created by Han on 2017-08-12.
  */
 
-public class LocationListActivity extends DrawerBaseActivity implements GoogleApiClient.ConnectionCallbacks {
+public class LocationListActivity extends DrawerBaseActivity implements
+        GoogleApiClient.ConnectionCallbacks,
+        OnClickLocationListInterface
+{
+
     private static final String TAG = LocationListActivity.class.getSimpleName();
+    private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastKnownLocation;
     private boolean mLocationPermissionGranted;
@@ -59,10 +74,11 @@ public class LocationListActivity extends DrawerBaseActivity implements GoogleAp
         View contentView = inflater.inflate(R.layout.activity_location_list, mFrameLayout, false);
         mDrawerLayout.addView(contentView, 0);
 
+        mContext = this;
         mAveragePointDTOArrayList = new ArrayList<>();
         recyclerView = (RecyclerView)findViewById(R.id.location_list_recyclerView);
         linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
-        locationListAdapter = new LocationListAdapter(this);
+        locationListAdapter = new LocationListAdapter(this, this);
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(locationListAdapter);
@@ -123,11 +139,13 @@ public class LocationListActivity extends DrawerBaseActivity implements GoogleAp
                 ArrayList<ParkRowDTO> parkRowDTOList = response.body();
                 mParkRowDTOArrayList = parkRowDTOList;
                 // Log.d("checkList",parkRowDTOList.size());
-                Log.d("RowSize",parkRowDTOList.size() + "man");
+                //Log.d("RowSize",parkRowDTOList.size() + "man");
                 for(ParkRowDTO parkRowData : parkRowDTOList){
                     /*LatLng latLng = new LatLng(parkRowData.getLatitude(),parkRowData.getLongitude());
                     Log.d("checklocation1km", String.valueOf(parkRowData.getLatitude()) + parkRowData.getLongitude());*/
                     int park_key = parkRowData.getPark_key();
+
+
                     Call<CommentAveragePointDTO> commentAvaragePointDTOListCall = retrofitUtil.getAveragePoint(park_key);
                     commentAvaragePointDTOListCall.enqueue(commentAveragePointDTOCallback);
 
@@ -150,10 +168,15 @@ public class LocationListActivity extends DrawerBaseActivity implements GoogleAp
         public void onResponse(Call<CommentAveragePointDTO> call, Response<CommentAveragePointDTO> response) {
             if(response.isSuccessful()){
                 CommentAveragePointDTO commentAveragePointDTO = response.body();
+
+
                 mAveragePointDTOArrayList.add(commentAveragePointDTO);
 
 
+                // 공원 정보와 공원의 평가점수 리스트가 같을시 어뎁터에 보낸다.
                 if(mParkRowDTOArrayList.size() == mAveragePointDTOArrayList.size()){
+
+                    Collections.sort(mAveragePointDTOArrayList,ComparatorUtil.commentAveragePointDTOComparator);
                     locationListAdapter.setDataArrayList(mParkRowDTOArrayList,mAveragePointDTOArrayList);
 
 
@@ -180,4 +203,12 @@ public class LocationListActivity extends DrawerBaseActivity implements GoogleAp
         Log.d(TAG, "Play services connection suspended");
     }
 
+    @Override
+    public void onClickList(int position) {
+        Intent intent = new Intent(mContext,LocationActivity.class);
+        Parcelable parcelableParkRowData = Parcels.wrap(mParkRowDTOArrayList.get(position));
+        intent.putExtra(StringKeys.LOCATION_INTENT_KEY,parcelableParkRowData);
+        startActivity(intent);
+
+    }
 }

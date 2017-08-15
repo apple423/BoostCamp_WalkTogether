@@ -95,7 +95,7 @@ public class LocationCommentActivity extends BackButtonActionBarActivity{
         if(requestCode == PUSH_ADD_COMMENT_BUTTON && resultCode ==RESULT_OK){
 
             Log.d("ActivityCommentResult","yes");
-            Parcelable commentArrayListParcelable = data.getParcelableExtra("commentList");
+            Parcelable commentArrayListParcelable = data.getParcelableExtra(StringKeys.COMMENT_LIST);
             ArrayList<CommentDTO> commentArrayList = Parcels.unwrap(commentArrayListParcelable);
             mLocationCommentAdapter.setmCommentArrayList(commentArrayList);
 

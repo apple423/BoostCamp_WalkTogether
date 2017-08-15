@@ -111,14 +111,14 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == PUSH_ADD_BUTTON && resultCode == RESULT_OK){
             Log.d("successInResult","yes");
-            Parcelable freeboardListParcelabe = data.getParcelableExtra("parkList");
-            Parcelable freeboardImageListParcelable = data.getParcelableExtra("parkImageList");
+            Parcelable freeboardListParcelabe = data.getParcelableExtra(StringKeys.PARK_LIST);
+            Parcelable freeboardImageListParcelable = data.getParcelableExtra(StringKeys.PARK_IMAGE_LIST);
             ArrayList<FreeboardDTO> freeboardArrayList = Parcels.unwrap(freeboardListParcelabe);
             ArrayList<FreeboardImageDTO> freeboardImageArrayList = Parcels.unwrap(freeboardImageListParcelable);
-            //mParkFreeboardList = freeboardArrayList;
-            //mParkFreeboardImageList = freeboardImageArrayList;
+            mParkFreeboardList = freeboardArrayList;
+            mParkFreeboardImageList = freeboardImageArrayList;
             //Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
-            mLocationFreeboardAdapter.setParkListAndImage(freeboardArrayList,freeboardImageArrayList);
+            mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList,mParkFreeboardImageList);
 
         }
 

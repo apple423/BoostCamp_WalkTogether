@@ -1,5 +1,6 @@
 package com.example.han.boostcamp_walktogether.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,9 +13,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.R;
@@ -54,7 +60,9 @@ import retrofit2.Response;
 public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnInfoWindowClickListener {
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMarkerClickListener
+{
     private static final String TAG = MapActivity.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private final LatLng mDefaultLocation = new LatLng(37.405666, 127.114268);
@@ -63,13 +71,21 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     private static final String KEY_LOCATION = "location";
     private RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
     private GoogleMap mMap;
+    private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastKnownLocation;
-
+    private ArrayList<Marker> mLocationMarkerArrayList;
+    private ArrayList<ParkRowDTO> mLocationRowDTOArrayList;
     private boolean mLocationPermissionGranted;
     private CameraPosition mCameraPosition;
     // 처음 맵을 불렀을때만 현재 위치로 이동하고 다시 부를땐 그 자리에 있도록 하기 위함
     private boolean isFisrtMapLoad = true;
+    private Button mLocationNextButton;
+    private TextView mLocationTitleTextView;
+    private ImageButton mMyLocationButton;
+    private Intent mIntent;
+    private double searchLatitude;
+    private double searchLongtitude;
 
 
     @Override
@@ -86,6 +102,19 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         View contentView = inflater.inflate(R.layout.activity_map, mFrameLayout, false);
         mDrawerLayout.addView(contentView, 0);
 
+        mLocationMarkerArrayList = new ArrayList<>();
+        mLocationRowDTOArrayList = new ArrayList<>();
+        mIntent = new Intent(this, LocationActivity.class);
+        mContext = this;
+
+        mLocationNextButton = (Button)findViewById(R.id.map_next_button);
+        mLocationTitleTextView = (TextView)findViewById(R.id.map_title_textView);
+        mMyLocationButton = (ImageButton)findViewById(R.id.map_current_location);
+
+        mLocationNextButton.setOnClickListener(onClickNextButton);
+        mMyLocationButton.setOnClickListener(onClickMyLocationButton);
+        mLocationNextButton.setEnabled(false);
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this,
                         this)
@@ -96,6 +125,11 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
                 .build();
         mGoogleApiClient.connect();
 
+
+        searchLatitude = getIntent().getDoubleExtra(StringKeys.SEARCH_LATITUDE,0);
+        searchLongtitude = getIntent().getDoubleExtra(StringKeys.SEARCH_LONGITUDE,0);
+        Log.d("latitudeSearchInMap",searchLatitude +"");
+        Log.d("longitudeSearchInMap",searchLongtitude +"");
     }
 
     @Override
@@ -131,40 +165,46 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
 
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
+        mMap.setOnMarkerClickListener(this);
+
 
         Log.d("PermissionGranted Ready", Boolean.toString(mLocationPermissionGranted));
-        updateLocationUI();
 
-        if(isFisrtMapLoad) {
+        //getDeviceLocation();
+
+        if(isFisrtMapLoad && searchLatitude==0 && searchLongtitude ==0) {
             getDeviceLocation(); // 현재 위치 알아오고 이동
             isFisrtMapLoad = false;
+
         }
+
+        else if(isFisrtMapLoad && searchLatitude!=0 && searchLongtitude!=0){
+            getCurrentLocation(searchLatitude,searchLongtitude);
+            // 인텐트로 넘어온 해당 좌표로 이동
+            isFisrtMapLoad = false;
+
+        }
+
 
     }
 
 
-  /*  @Override
-    public void onBackPressed() {
+    View.OnClickListener onClickNextButton = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
 
-        AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.finish_prefer))
-                .setPositiveButton(getResources().getString(R.string.finish_yes), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .setNegativeButton(getResources().getString(R.string.finish_no), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+            startActivity(mIntent);
+        }
+    };
 
-        AlertDialog alertDialog = alterDialogBuilder.create();
-        alertDialog.show();
+    View.OnClickListener onClickMyLocationButton = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
 
-    }*/
+           getDeviceLocation();
+
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -187,38 +227,14 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
 
     }
 
-    // 맵의 우측 상단에 현재 위치로 이동하는 버튼을 보여주기 위한 함수
-    private void updateLocationUI() {
-        if (mMap == null) {
 
-            return;
-        }
-        Log.d("PermissionGranted in UI", Boolean.toString(mLocationPermissionGranted));
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-        Log.d("PermissionGranted CHK", Boolean.toString(mLocationPermissionGranted));
-        if (mLocationPermissionGranted) {
-            // 이 버튼을 true로 하기 위해 상단과 같은 퍼미션 체크를 해야한다.
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        } else {
-
-            mMap.setMyLocationEnabled(false);
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-            mLastKnownLocation = null;
-        }
-    }
-
-    // 현재 위치를 알아오고 카메라를 이동하는 함수
+    // 현재 위치를 알아오고 카메라를 이동하고 주변 장소를 가져오는 함수
     private void getDeviceLocation() {
+
+        for(Marker marker : mLocationMarkerArrayList){
+            marker.remove();
+        }
+        mLocationMarkerArrayList.clear();
 
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -247,8 +263,6 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
             Log.d("my Location lng",Double.toString(mLastKnownLocation.getLongitude()));
 
 
-           // RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
-
             // 현재 위치를 기반으로 서버에 주변 공원정보들을 요청한다.
             Call<ArrayList<ParkRowDTO>> parkRowDTOListCall =
             retrofitUtil.getNearestPark(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
@@ -260,6 +274,22 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
+    }
+
+    public void getCurrentLocation(double latitude, double longitude){
+
+        for(Marker marker : mLocationMarkerArrayList){
+            marker.remove();
+        }
+        mLocationMarkerArrayList.clear();
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(latitude, longitude), DEFAULT_ZOOM));
+        Call<ArrayList<ParkRowDTO>> parkRowDTOListCall =
+                retrofitUtil.getNearestPark(latitude,longitude);
+        parkRowDTOListCall.enqueue(parkRowDataListCallback);
+
+
     }
 
     // Location Permission 퍼미션을 얻은 후에
@@ -277,7 +307,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
                 }
             }
         }
-        updateLocationUI();
+        //updateLocationUI();
     }
     // 로그아웃 확인을 눌렀을 시
     DialogInterface.OnClickListener onClickSignOutYes = new DialogInterface.OnClickListener() {
@@ -337,26 +367,54 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
             if(response.isSuccessful()){
 
                 // 정보를 받아서 리스트에 저장
-                List<ParkRowDTO> parkRowDTOList = response.body();
-               // Log.d("checkList",parkRowDTOList.size());
-                for(ParkRowDTO parkRowData : parkRowDTOList){
-                    LatLng latLng = new LatLng(parkRowData.getLatitude(),parkRowData.getLongitude());
-                    Log.d("checklocation1km", String.valueOf(parkRowData.getLatitude()) + parkRowData.getLongitude());
-                    // 맵에 마커를 추가하고 마커에 해당 공원정보에 대한 객체를 넣어준다.
-                    mMap.addMarker(new MarkerOptions().title(parkRowData.getName()).position(latLng))
-                            .setTag(parkRowData);
+                Log.d("ParkRowStatus",response.code() +"");
+                if(response.code() != 500) {
+                    ArrayList<ParkRowDTO> parkRowDTOList = response.body();
+                    mLocationRowDTOArrayList = parkRowDTOList;
+                    // Log.d("checkList",parkRowDTOList.size());
+                    for (ParkRowDTO parkRowData : parkRowDTOList) {
+                        LatLng latLng = new LatLng(parkRowData.getLatitude(), parkRowData.getLongitude());
+                        Log.d("checklocation1km", String.valueOf(parkRowData.getLatitude()) + parkRowData.getLongitude());
+                        // 맵에 마커를 추가하고 마커에 해당 공원정보에 대한 객체를 넣어준다.
+                        Marker marker = mMap.addMarker(new MarkerOptions().title(parkRowData.getName()).position(latLng));
 
+                        marker.setTag(parkRowData);
+
+
+                        mLocationMarkerArrayList.add(marker);
+
+                    }
                 }
 
+                hideProgressBar();
             }else{
-                Log.d("ErroringetNearest",response.errorBody().toString());
+
+                Toast toast = Toast.makeText(mContext,getResources().getString(R.string.no_location),Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.NO_GRAVITY,0,0);
+                toast.show();
+
             }
         }
 
         @Override
         public void onFailure(Call<ArrayList<ParkRowDTO>> call, Throwable t) {
 
+            Log.d("ParkRowStatus",t.getMessage());
+
+
         }
     };
 
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        mLocationNextButton.setEnabled(true);
+        ParkRowDTO data = (ParkRowDTO) marker.getTag();
+        mLocationTitleTextView.setText(data.getName());
+        Parcels.wrap(data);
+        //Intent intent = new Intent(this, LocationActivity.class);
+        mIntent.putExtra(StringKeys.LOCATION_INTENT_KEY,Parcels.wrap(data));
+        //startActivity(intent);
+        return false;
+    }
 }

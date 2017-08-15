@@ -188,8 +188,7 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialogInterfa
             mImageURL = taskSnapshot.getDownloadUrl().toString();
             Log.d("ImageURL in Listener : ",mImageURL);
 
-            // FirebaseUser를 통해 프로필 사진 URL을 넣어 줄 수 있기 때문에 파이어베이스 DB 저장할 필요가 없어서
-            // 계속 사용할지 고려 해봐야 한다.
+
             FirebaseHelper.sendUserData(mEmail,mNickName,mImageURL,"","");
         }
     };

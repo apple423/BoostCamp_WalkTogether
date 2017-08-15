@@ -76,7 +76,8 @@ public class FirebaseHelper {
 
 
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setPhotoUri(Uri.parse(imageURL)) // 프로필 사진 파이어베이스 user에 추가
+                .setPhotoUri(Uri.parse(imageURL)) // 프로필 사진 파이어베이스 user profile picture에 추가
+                .setDisplayName(nickName)
                 .build();
 
         user.updateProfile(profileUpdates)
@@ -103,11 +104,10 @@ public class FirebaseHelper {
         mAuth.signOut();
 
     }
-    // 프로필 사진 업로드
+    // 프로필 사진 업로드F
     public static UploadTask uploadProfilePicture(ImageView imageView){
 
         final Uri[] downloadUrl = new Uri[1];
-        //String[] subEmail = email.split("@");
         FirebaseUser user = mAuth.getCurrentUser();
         String uid = user.getUid();
 

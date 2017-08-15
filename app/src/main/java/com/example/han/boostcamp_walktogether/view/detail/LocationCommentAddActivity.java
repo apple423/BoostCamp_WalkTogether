@@ -166,7 +166,7 @@ public class LocationCommentAddActivity extends BackButtonActionBarActivity impl
                 Log.d("SuccessCommentList","yes");
                 ArrayList<CommentDTO> commentArrayList = response.body();
                 Intent intent = new Intent();
-                intent.putExtra("commentList", Parcels.wrap(commentArrayList));
+                intent.putExtra(StringKeys.COMMENT_LIST, Parcels.wrap(commentArrayList));
                 mActivity.setResult(RESULT_OK,intent);
                 finish();
 

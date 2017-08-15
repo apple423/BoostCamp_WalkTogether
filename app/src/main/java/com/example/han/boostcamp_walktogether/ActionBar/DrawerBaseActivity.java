@@ -7,8 +7,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import com.example.han.boostcamp_walktogether.R;
 
@@ -21,6 +23,7 @@ public class DrawerBaseActivity extends AppCompatActivity {
     protected DrawerLayout mDrawerLayout;
     protected Toolbar mToolbar;
     protected FrameLayout mFrameLayout;
+    protected ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class DrawerBaseActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mProgressBar = (ProgressBar) findViewById(R.id.base_progress_bar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -49,5 +53,15 @@ public class DrawerBaseActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    protected void showProgressBar(){
+        mProgressBar.setVisibility(View.VISIBLE);
+
+    }
+
+    protected void hideProgressBar(){
+
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 }

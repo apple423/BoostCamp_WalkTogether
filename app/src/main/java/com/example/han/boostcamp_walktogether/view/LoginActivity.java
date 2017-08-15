@@ -288,7 +288,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
                         Toast.LENGTH_SHORT).show();
             } else {
 
-                SetUserProfileToSharedPreferences();
+                setUserProfileToSharedPreferences();
                 redirectMainActivity();
 
             }
@@ -314,7 +314,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
                 }
 
-                SetUserProfileToSharedPreferences();
+                setUserProfileToSharedPreferences();
 
 
                 Log.d("FacebookSignIn", "signInWithCredential:success");
@@ -332,11 +332,12 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         }
     };
 
-    private void SetUserProfileToSharedPreferences() {
+    private void setUserProfileToSharedPreferences() {
         FirebaseUser user = FirebaseHelper.signInState();
         SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_EMAIL,user.getEmail());
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,user.getPhotoUrl().toString());
+        Log.d("PhotoURL",user.getPhotoUrl().toString());
         //TODO 1. 프로필 사진 부분을 수정해야 한다. 각 소셜 계정별,파이어베이스 이메일/패스워드 계정 별 처리 필요
         // 현재는 NULL이 들어가게 되있다.
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,user.getDisplayName());

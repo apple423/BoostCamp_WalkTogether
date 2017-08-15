@@ -27,6 +27,16 @@ public class StringKeys {
     public static final String USER_EMAIL= "userEmail";
     public static final String LOCATION_INTENT_KEY = "locationData";
 
+    //ParkList and ParkImageList
+    public static final String PARK_LIST = "parkList";
+    public static final String PARK_IMAGE_LIST = "parkImageList";
+    public static final String COMMENT_LIST = "commentList";
+
+
+    //MainActivity
+    public static final String SEARCH_LATITUDE = "latitude";
+    public static final String SEARCH_LONGITUDE = "longitude";
+
 
 
 }

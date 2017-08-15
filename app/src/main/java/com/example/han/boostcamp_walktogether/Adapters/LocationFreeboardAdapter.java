@@ -32,7 +32,6 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         mContext = context;
        mOnClickLocationFreeboard = onClickLocationFreeboard;
 
-
     }
 
     public void setParkListAndImage(ArrayList<FreeboardDTO> list, ArrayList<FreeboardImageDTO> listImage){
@@ -64,13 +63,20 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         FreeboardDTO data = mParkFreeboardList.get(position);
         FreeboardImageDTO imageData = mParkFreeboardImageList.get(position);
 
+
         holder.mUserNameTextView.setText(data.getUser_name());
         holder.mTitleTextview.setText(data.getTitle());
 
             //TODO 9. null 처리리
           // Glide.with(mContext).load(data.getUser_profie()).into(mProfileImageView);
 
-            holder.mProfileImageView.setImageResource(R.mipmap.ic_launcher);
+            if(data.getUser_profile()!=null){
+                Glide.with(mContext).load(data.getUser_profile()).into(holder.mProfileImageView);
+            }
+            else{
+                holder.mProfileImageView.setImageResource(R.mipmap.ic_launcher);
+            }
+
 
             if(!imageData.getImage().equals("empty")) {
                 Glide.with(mContext).load("http://" + imageData.getImage()).into(holder.mPicutreImageView);
