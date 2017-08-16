@@ -37,6 +37,10 @@ public class StringKeys {
     public static final String SEARCH_LATITUDE = "latitude";
     public static final String SEARCH_LONGITUDE = "longitude";
 
+    //WalkDiaryActivity
+    public static final String IMAGE_FILE_URI = "lmageFileUri";
+    public static final String WALK_DIARY_ADD_DIALOG = "dialog_add";
+    public static final String WALK_DIARY_INFO_DIALOG = "dialog_info";
 
 
 }

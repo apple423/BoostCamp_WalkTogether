@@ -6,6 +6,7 @@ import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.data.RecentCommentDTO;
+import com.example.han.boostcamp_walktogether.data.WalkDiaryDTO;
 import com.kakao.network.response.ResponseBody;
 
 import java.util.ArrayList;
@@ -85,4 +86,11 @@ public interface RetrofitUtil {
     @GET("/comment/recent")
     Call<ArrayList<RecentCommentDTO>> getRecentComment();
 
+    @POST("/walk-diary/add")
+    Call<WalkDiaryDTO> postWalkDiary(@Body WalkDiaryDTO walkDiaryDTO);
+
+    @Multipart
+    @POST("/walk-diary/add/map_image/{diary_key}/{user_email}")
+    Call<ResponseBody> postWalkDiaryMapImage(@Path("diary_key") int diary_key, @Path("user_email") String user_email,
+                                             @Part MultipartBody.Part image, @Part("name") RequestBody name);
 }

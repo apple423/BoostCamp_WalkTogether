@@ -109,4 +109,12 @@
     <string name="walk_diary_time">시간</string>
     <string name="walk_diary_cancel">취소</string>
     <string name="walk_diary_add">등록</string>
+    <string name="walk_diary_confirm">확인</string>
+    <string name="walk_diary_add_dialog_title">산책일지 작성</string>
+    <string name="walk_diary_map_info">이동경로를 그리고 있습니다.</string>
+    <string name="walk_diary_map_info2">다른 앱을 쓰셔도 되고 산책에 집중하셔도 됩니다.</string>
+    <string name="walk_diary_map_info3">산책 종료시 꼭! 산책 끝 버튼을 눌러주세요</string>
+    <string name="walk_diary_add_success">산책일지 등록 성공</string>
+
+
 </resources>

@@ -1,10 +1,15 @@
 package com.example.han.boostcamp_walktogether.view;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,7 +49,9 @@ import retrofit2.Response;
 
 public class MainActivity extends DrawerBaseActivity implements View.OnClickListener{
 
-    private final static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 2;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION =3;
     private CardView mCardViewMap;
     private CardView mCardViewList;
     private Button mButtonSearchDetail, mButtonWalkDiary;
@@ -84,6 +91,7 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
 
         Call<ArrayList<RecentCommentDTO>> recentCommentDTOCall = retrofitUtil.getRecentComment();
         recentCommentDTOCall.enqueue(recentCommentDTOCallback);
+        writePermissionCheckAndRequest();
 
     }
 
@@ -252,6 +260,32 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled operation.
             }
+        }
+    }
+
+    public void writePermissionCheckAndRequest(){
+
+        if (ContextCompat.checkSelfPermission(mContext,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+
+        } else {
+            ActivityCompat.requestPermissions((Activity) mContext,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    public void locationPermissionCheckAndRequest(){
+
+        if (ContextCompat.checkSelfPermission(mContext,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+        } else {
+            ActivityCompat.requestPermissions((Activity) mContext,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 }

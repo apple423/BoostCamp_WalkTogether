@@ -14,18 +14,22 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Han on 2017-08-15.
  */
 
 public class LocationUpdateService {
+    private static final int DEFAULT_ZOOM = 12;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private ArrayList<Location> mArrayListLocation;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -92,15 +96,24 @@ public class LocationUpdateService {
             mPolylineOptions.color(Color.RED);
             mPolylineOptions.width(15);
             mPolylineArrayList.add(mMap.addPolyline(mPolylineOptions));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
         }
     };
 
     public void stopLocationUpdates() {
         Log.d("stopLocationUpdates","yes");
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback); //콜백해제
+        /*mFusedLocationClient.removeLocationUpdates(mLocationCallback); //콜백해제
+        int arrayListHalfPoint = mPolylineArrayList.size()/2;
+        Polyline polyline = mPolylineArrayList.get(arrayListHalfPoint);
+        List<LatLng> latLngs = polyline.getPoints();
+        LatLng latLng = latLngs.get(0);*/
+
         resetPolyLine(); //폴리라인제거
-        mMap.clear(); // 지도 초기화
+        if(mMap !=null){
+            mMap.clear(); // 지도 초기화
+        }
+
     }
 
     public void resetPolyLine(){

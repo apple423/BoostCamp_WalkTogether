@@ -188,6 +188,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
             showProgressBar();
             // freeboardDTO에 게시글 정보 추가
             FreeboardDTO dto = getFreeboardDTO();
+
+            //게시글 등록
             Call<FreeboardDTO> freeboardAddCall  = retrofitUtil.postFreeboard(mParkKey,dto);
             freeboardAddCall.enqueue(addFreeboardCallback);
 
@@ -215,6 +217,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         return dto;
     }
 
+    // 사진 업로드를 위한 콜백
     Callback<ResponseBody> addPictureCallback = new Callback<ResponseBody>() {
         @Override
         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -236,21 +239,19 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         @Override
         public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            hideProgressBar();
-            Call<ArrayList<FreeboardDTO>> getfreeboardInParkCall = retrofitUtil.getAllFreeboard(mParkKey);
-            getfreeboardInParkCall.enqueue(getFreeboardInParkCallback);
-
-            Log.d("imageUploadFail",t.getMessage());
+            Log.d("ImageUploadFail",t.getMessage());
 
         }
     };
 
+    // 게시글 등록을 위한 콜백
    Callback<FreeboardDTO> addFreeboardCallback = new Callback<FreeboardDTO>() {
         @Override
         public void onResponse(Call<FreeboardDTO> call, Response<FreeboardDTO> response) {
             if(response.isSuccessful()){
 
-                // 서버에서 응답을 가져와 사진추가의 파라메터로 사용하기 위해 넣은다.
+                // 서버에서 응답을 가져와 사진추가의 파라메터로 사용하기 위해 autoincrement된 freeboardKey를 쓴다.
+                //
                 mFreeboardKey = response.body().getInsertId();
                 if(mArrayUri.size()!=0) {
                     for (Uri uri : mArrayUri) {
@@ -265,6 +266,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                     freeboardImageDTO.setFreeboard_key(mFreeboardKey);
                     freeboardImageDTO.setPark_key(mParkKey);
                     freeboardImageDTO.setImage("empty");
+
+                    // 사진을 추가하지 않았을 경우
                     Call<FreeboardImageDTO> addEmptyImageCall = retrofitUtil.postEmptyImage(freeboardImageDTO);
                     addEmptyImageCall.enqueue(new Callback<FreeboardImageDTO>() {
                         @Override
@@ -303,6 +306,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
         String imagePath = getPathFromURI(uri);
         mFile = new File(imagePath);
+        Log.d("FiletoStringFree",mFile.toString());
         RequestBody reqFile = RequestBody.create(MediaType.parse("image*//*"), mFile);
         MultipartBody.Part body = MultipartBody.Part.createFormData("upload", mFile.getName(), reqFile);
         RequestBody name = RequestBody.create(MediaType.parse("text/plain"), mFile.getName());
