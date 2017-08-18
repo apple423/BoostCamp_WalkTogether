@@ -12,7 +12,10 @@ public class WalkDiaryDTO {
     String user_email;
     String content;
     Date date;
+    long walk_time;
+    float walk_distance;
     int insertId;
+    int statusCode;
 
     public String getUser_email() {
         return user_email;
@@ -52,5 +55,31 @@ public class WalkDiaryDTO {
 
     public void setInsertId(int insertId) {
         this.insertId = insertId;
+    }
+
+
+    public long getWalk_time() {
+        return walk_time;
+    }
+
+    public void setWalk_time(long walk_time) {
+        this.walk_time = walk_time;
+    }
+
+    public float getWalk_distance() {
+        return walk_distance;
+    }
+
+    public void setWalk_distance(float walk_distance) {
+        this.walk_distance = walk_distance;
+    }
+
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 }

@@ -6,12 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
@@ -23,36 +20,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardAddPictureAdapter;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
-import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.util.ComparatorUtil;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
-import com.example.han.boostcamp_walktogether.view.LocationFreeboardActivity;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.UploadTask;
-import com.kakao.auth.ErrorCode;
-import com.kakao.network.ErrorResult;
 import com.kakao.network.response.ResponseBody;
-import com.kakao.usermgmt.callback.MeResponseCallback;
-import com.kakao.usermgmt.response.model.UserProfile;
-import com.kakao.util.helper.log.Logger;
 
 import org.parceler.Parcels;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -92,6 +76,9 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
     private int mFreeboardKey;
     private ArrayList<FreeboardDTO> mParkFreeboardList;
     private ArrayList<FreeboardImageDTO> mParkFreeboardImageList;
+    private ArrayList<FreeboardDTO> mFreeboardLikeList;
+    private ArrayList<FreeboardDTO> mFreeboardUserLikeList;
+    private String mUserMail;
 
 
     @Override
@@ -105,6 +92,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         mArrayUri = new ArrayList<Uri>();
         mDownLoadUrlPicture = new ArrayList<>();
         mParkFreeboardImageList = new ArrayList<>();
+        mFreeboardLikeList = new ArrayList<>();
+        mFreeboardUserLikeList = new ArrayList<>();
         mContext = this;
         mActivity = this;
 
@@ -120,6 +109,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         pictureRecyclerView.setAdapter(locationFreeboardAddPictureAdapter);
 
         mParkKey = getIntent().getIntExtra(StringKeys.LOCATION_ID_KEY,0);
+        mUserMail = getIntent().getStringExtra(StringKeys.USER_EMAIL);
         mLocationFreeboardAddPicutreImageView.setOnClickListener(onClickAddImageViewListener);
         mLocationFreeboardAddButton.setOnClickListener(onClickAddButton);
 
@@ -337,6 +327,12 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                 for(FreeboardDTO data : freeboardList){
                     int freeboardKey = data.getFreeboard_key();
 
+                    Call<FreeboardDTO> getFreeboardLikeCall = retrofitUtil.getLikeCount(freeboardKey);
+                    getFreeboardLikeCall.enqueue(getFreeboardLikeCallback);
+
+                    Call<FreeboardDTO> getFreeboardUserLikeCall = retrofitUtil.getUserPushLike(freeboardKey,mUserMail);
+                    getFreeboardUserLikeCall.enqueue(getFreeboardLikeUserCallback);
+
                     Call<FreeboardImageDTO> getFreeboardImageCall = retrofitUtil.getOneImageFreeboard(mParkKey,freeboardKey);
                     getFreeboardImageCall.enqueue(getFreeboardImageCallback);
                 }
@@ -346,6 +342,40 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
         @Override
         public void onFailure(Call<ArrayList<FreeboardDTO>> call, Throwable t) {
+
+        }
+    };
+
+    Callback<FreeboardDTO> getFreeboardLikeCallback = new Callback<FreeboardDTO>() {
+        @Override
+        public void onResponse(Call<FreeboardDTO> call, Response<FreeboardDTO> response) {
+            if(response.isSuccessful()){
+
+                mFreeboardLikeList.add(response.body());
+
+            }
+        }
+
+        @Override
+        public void onFailure(Call<FreeboardDTO> call, Throwable t) {
+
+        }
+    };
+
+
+    Callback<FreeboardDTO> getFreeboardLikeUserCallback = new Callback<FreeboardDTO>() {
+        @Override
+        public void onResponse(Call<FreeboardDTO> call, Response<FreeboardDTO> response) {
+            if(response.isSuccessful()){
+
+                mFreeboardUserLikeList.add(response.body());
+
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<FreeboardDTO> call, Throwable t) {
 
         }
     };
@@ -360,8 +390,13 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                 FreeboardImageDTO freeboardImageData = response.body();
                 Log.d("send_Image_adapter", freeboardImageData.getImage());
                 mParkFreeboardImageList.add(freeboardImageData);
-                Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
-                if (mParkFreeboardImageList.size() == mParkFreeboardList.size()) {
+
+                if (mParkFreeboardImageList.size() == mParkFreeboardList.size()
+                        && mParkFreeboardImageList.size() == mFreeboardLikeList.size()
+                        && mFreeboardLikeList.size() == mFreeboardUserLikeList.size()) {
+                    Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
+                    Collections.sort(mFreeboardLikeList,ComparatorUtil.likeDTOComparator);
+                    Collections.sort(mFreeboardUserLikeList,ComparatorUtil.likeDTOComparator);
                     // LocationFreeboardActivity에 데이터 전달
                     Log.d("successInSetResult",mParkFreeboardList.get(0).getTitle());
                     resultToLocationActivity();
@@ -388,6 +423,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         Intent intent = new Intent();
         intent.putExtra(StringKeys.PARK_LIST, Parcels.wrap( mParkFreeboardList));
         intent.putExtra(StringKeys.PARK_IMAGE_LIST, Parcels.wrap( mParkFreeboardImageList));
+        intent.putExtra(StringKeys.PARK_LIKE_LIST, Parcels.wrap( mFreeboardLikeList));
+        intent.putExtra(StringKeys.PARK_USER_LIKE, Parcels.wrap( mFreeboardUserLikeList));
         mActivity.setResult(RESULT_OK, intent);
         finish();
     }

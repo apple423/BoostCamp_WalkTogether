@@ -21,6 +21,8 @@ public class FreeboardDTO {
     String content;
     Date date;
     int insertId;
+    int like_count;
+    int statusCode;
 
     public String getUser_id() {
         return user_id;
@@ -93,4 +95,13 @@ public class FreeboardDTO {
     public void setFreeboard_key(int freeboard_key) {
         this.freeboard_key = freeboard_key;
     }
+
+    public int getLike_count() {
+        return like_count;
+    }
+
+    public void setLike_count(int like_count) {
+        this.like_count = like_count;
+    }
+
 }

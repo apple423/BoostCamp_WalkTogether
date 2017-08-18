@@ -1,6 +1,7 @@
 package com.example.han.boostcamp_walktogether.widget;
 
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryDTO;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryImageDTO;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickWalkDiaryButtonInterface;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
@@ -27,6 +29,7 @@ import com.kakao.network.response.ResponseBody;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import okhttp3.MediaType;
@@ -52,14 +55,26 @@ public class WalkDiaryAddDialog extends DialogFragment {
     private Button mWalkDiaryCancelButton;
     private ArrayList<WalkDiaryDTO> mWalkDiaryDTOArrayList;
     private ArrayList<WalkDiaryImageDTO> mWalkDiaryImageDTOArrayList;
+    private OnClickWalkDiaryButtonInterface onClickWalkDiaryButtonInterface;
+    private long mWalkTime;
+    private float mWalkDistance;
     private final RetrofitUtil mRetrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-    public static WalkDiaryAddDialog newInstance(Uri uri,String email) {
+        onClickWalkDiaryButtonInterface = (OnClickWalkDiaryButtonInterface) context;
+
+    }
+
+    public static WalkDiaryAddDialog newInstance(Uri uri, String email, long time, float distance) {
 
         Bundle args = new Bundle();
         args.putParcelable(StringKeys.IMAGE_FILE_URI, Parcels.wrap(uri));
         args.putString(StringKeys.USER_EMAIL,email);
+        args.putLong(StringKeys.WALK_DIARY_TAKING_TIME,time);
+        args.putFloat(StringKeys.WALK_DIARY_DISTANCE,distance);
         WalkDiaryAddDialog fragment = new WalkDiaryAddDialog();
         fragment.setArguments(args);
         return fragment;
@@ -73,7 +88,10 @@ public class WalkDiaryAddDialog extends DialogFragment {
         String email = getArguments().getString(StringKeys.USER_EMAIL);
         mUri = Parcels.unwrap(pacelableFile);
         mUserEmail = email;
+        mWalkTime = getArguments().getLong(StringKeys.WALK_DIARY_TAKING_TIME);
+        mWalkDistance = getArguments().getFloat(StringKeys.WALK_DIARY_DISTANCE);
         mWalkDiaryImageDTOArrayList = new ArrayList<>();
+
 
 
     }
@@ -135,6 +153,8 @@ public class WalkDiaryAddDialog extends DialogFragment {
         WalkDiaryDTO walkDiaryDTO = new WalkDiaryDTO();
         walkDiaryDTO.setContent(mContentEditText.getText().toString());
         walkDiaryDTO.setUser_email(mUserEmail);
+        walkDiaryDTO.setWalk_time(mWalkTime);
+        walkDiaryDTO.setWalk_distance(mWalkDistance);
 
         Call<WalkDiaryDTO> walkDirayDTOCall = mRetrofitUtil.postWalkDiary(walkDiaryDTO);
         walkDirayDTOCall.enqueue(walkDiaryDTOCallback);
@@ -185,14 +205,52 @@ public class WalkDiaryAddDialog extends DialogFragment {
                 Toast.makeText(getActivity(),
                         getResources().getString(R.string.walk_diary_add_success),
                         Toast.LENGTH_SHORT).show();
-                deleteImage();
+                Call<ArrayList<WalkDiaryDTO>> getWalkDiaryCall = mRetrofitUtil.getUsersWalkDiary(mUserEmail);
+                getWalkDiaryCall.enqueue(getWalkDiaryCallback);
 
-            }
+                      }
 
         }
 
         @Override
         public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+        }
+    };
+
+
+    Callback<ArrayList<WalkDiaryDTO>> getWalkDiaryCallback = new Callback<ArrayList<WalkDiaryDTO>>() {
+        @Override
+        public void onResponse(Call<ArrayList<WalkDiaryDTO>> call, Response<ArrayList<WalkDiaryDTO>> response) {
+            if(response.isSuccessful()){
+
+                mWalkDiaryDTOArrayList = response.body();
+                Call<ArrayList<WalkDiaryImageDTO>> getWalkDiaryImageCall = mRetrofitUtil.getUserWalkDiaryImages(mUserEmail);
+                getWalkDiaryImageCall.enqueue(getWalkDiaryImageCallback);
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<ArrayList<WalkDiaryDTO>> call, Throwable t) {
+
+        }
+    };
+
+    Callback<ArrayList<WalkDiaryImageDTO>> getWalkDiaryImageCallback  = new Callback<ArrayList<WalkDiaryImageDTO>>() {
+        @Override
+        public void onResponse(Call<ArrayList<WalkDiaryImageDTO>> call, Response<ArrayList<WalkDiaryImageDTO>> response) {
+            if(response.isSuccessful()){
+
+                mWalkDiaryImageDTOArrayList = response.body();
+                onClickWalkDiaryButtonInterface.onClickAddDiaryButton(mWalkDiaryDTOArrayList,mWalkDiaryImageDTOArrayList);
+                deleteImage();
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<ArrayList<WalkDiaryImageDTO>> call, Throwable t) {
 
         }
     };

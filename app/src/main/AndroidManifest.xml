@@ -46,6 +46,7 @@
         <activity android:name=".view.detail.LocationFreeboardSelectActivity"/>
         <activity android:name=".view.detail.LocationCommentAddActivity"/>
         <activity android:name=".view.WalkDiaryActivity"/>
+        <activity android:name=".view.detail.FreeboardCommentAddActivity"/>
 
         <service android:name=".service.DiaryMakingService"/>
 

@@ -8,6 +8,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -23,8 +24,14 @@ import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.Adapters.WalkDiaryAdapter;
 import com.example.han.boostcamp_walktogether.LocationUpdateService;
 import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.data.WalkDiaryDTO;
+import com.example.han.boostcamp_walktogether.data.WalkDiaryImageDTO;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickWalkDiaryButtonInterface;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickWalkDiaryDeleteInterface;
+import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
+import com.example.han.boostcamp_walktogether.widget.NoDataFragment;
 import com.example.han.boostcamp_walktogether.widget.WalkDiaryAddDialog;
 import com.example.han.boostcamp_walktogether.widget.WalkDiaryInfoInMapDialog;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -35,9 +42,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.kakao.network.response.ResponseBody;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_EMAIL;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFILE;
@@ -46,11 +60,13 @@ import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFIL
  * Created by Han on 2017-08-15.
  */
 
-public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyCallback{
+public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyCallback, OnClickWalkDiaryButtonInterface,
+        OnClickWalkDiaryDeleteInterface{
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 2;
-    private static final int DEFAULT_ZOOM = 13;
+    private static final int DEFAULT_ZOOM = 14;
+    private static final int SNAPSHOT_ZOOM = 12;
     private Button mStartWalkingButton, mStopWalkingButton;
     private LocationUpdateService mLocationUpdateService;
     private GoogleMap mMap;
@@ -59,6 +75,9 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
     private String userEmail;
     private android.app.FragmentManager mFragmentManager;
     private FragmentManager mSupportFragmentManager;
+    private long startMiliSec, endMiliSec, mLongWalkTime;
+    private float mWalkDistance;
+    private int mDiary_key;
 
 
     private RecyclerView mDiaryRecyclerView;
@@ -66,11 +85,16 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
     private WalkDiaryAdapter mWalkDiaryAdapter;
 
     private boolean mLocationPermissionGranted;
-    private Location mLastKnownLocation;
+    private Location mLastKnownLocation,mStartLocation,mEndLocation;
     private GoogleApiClient mGoogleApiClient;
     private OnMapReadyCallback onMapReadyCallback;
+    private NoDataFragment mNoDataFragment;
 
    // private WalkDiaryAddDialog walkDiaryAddDialog;
+    private ArrayList<WalkDiaryDTO> mWalkDiaryDTOArrayList;
+    private ArrayList<WalkDiaryImageDTO> mWalkDiaryImageDTOArrayList;
+    private final RetrofitUtil mRetrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
+
 
 
     @Override
@@ -90,7 +114,7 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
         mDiaryRecyclerView = (RecyclerView)findViewById(R.id.walk_diary_recyclerView);
 
         mLinearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
-        mWalkDiaryAdapter = new WalkDiaryAdapter();
+        mWalkDiaryAdapter = new WalkDiaryAdapter(this,getResources(),this);
         mDiaryRecyclerView.setLayoutManager(mLinearLayoutManager);
         mDiaryRecyclerView.setAdapter(mWalkDiaryAdapter);
         //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -108,10 +132,19 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
         mGoogleApiClient.connect();
 
         mMapFragment = SupportMapFragment.newInstance();
+        mNoDataFragment = NoDataFragment.newInstance();
         SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
         userEmail = SharedPreferenceUtil.getUserProfile(USER_EMAIL);
         //mMapFragment.getMapAsync(onMapReadyCallback);
 
+        getWalkDiaryData();
+
+    }
+
+    private void getWalkDiaryData() {
+        showProgressBar();
+        Call<ArrayList<WalkDiaryDTO>> getWalkDiaryCall = mRetrofitUtil.getUsersWalkDiary(userEmail);
+        getWalkDiaryCall.enqueue(getWalkDiaryCallback);
     }
 
     View.OnClickListener onClickButtonListener = new View.OnClickListener() {
@@ -123,6 +156,16 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
             switch (id){
 
                 case R.id.walk_start_button :
+                    startMiliSec = System.currentTimeMillis();
+                    try{
+                        mStartLocation =LocationServices.FusedLocationApi
+                                .getLastLocation(mGoogleApiClient);
+
+                    }catch (SecurityException e){
+
+                        Log.e("GetCurrentLocationFail",e.getMessage());
+                    }
+
 
                     mStartWalkingButton.setVisibility(View.GONE);
                     mStopWalkingButton.setVisibility(View.VISIBLE);
@@ -141,31 +184,43 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
                     break;
 
                 case R.id.walk_stop_button :
+                    endMiliSec = System.currentTimeMillis();
+                    try{
+                        mEndLocation =LocationServices.FusedLocationApi
+                                .getLastLocation(mGoogleApiClient);
 
-                    mMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+                    }catch (SecurityException e){
+
+                        Log.e("GetCurrentLocationFail",e.getMessage());
+                    }
+
+                    mLongWalkTime = endMiliSec - startMiliSec;
+                    LatLng latLng = mLocationUpdateService.getMiddleLatLng();
+                    mWalkDistance = mLocationUpdateService.getDistance();
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,DEFAULT_ZOOM));
                     mMap.snapshot(snapshotReadyCallback);
                     android.support.v4.app.FragmentTransaction fragmentTransactionStop =
                             mSupportFragmentManager.beginTransaction();
                     fragmentTransactionStop.remove(mMapFragment);
                     fragmentTransactionStop.commit();
-                    //mMap.snapshot(snapshotReadyCallback);
 
-                    mLocationUpdateService.stopLocationUpdates();
+
+                    //mLocationUpdateService.stopLocationUpdates();
                     mDiaryRecyclerView.setVisibility(View.VISIBLE);
                     mStartWalkingButton.setVisibility(View.VISIBLE);
                     mStopWalkingButton.setVisibility(View.GONE);
+                    showProgressBar();
             }
-
 
         }
     };
 
     @Override
     public void onBackPressed() {
-        if(mDiaryRecyclerView.isShown()){
+        if(mDiaryRecyclerView.isShown() || mNoDataFragment.isVisible()){
             super.onBackPressed();
         }
-        else{
+        else {
 
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_MAIN);
@@ -228,7 +283,7 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
             // TODO Auto-generated method stub
             bitmap = snapshot;
             try {
-                showProgressBar();
+                //showProgressBar();
                 File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator
                         +"walktogether");
 
@@ -261,12 +316,12 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
 
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, imageUri));
 
-
-                // 일지등록 다이얼로그 생성하고 띄워준다.
-                WalkDiaryAddDialog walkDiaryAddDialog = WalkDiaryAddDialog.newInstance(imageUri,userEmail);
-                walkDiaryAddDialog.show(mFragmentManager,StringKeys.WALK_DIARY_ADD_DIALOG);
-
                 hideProgressBar();
+                // 일지등록 다이얼로그 생성하고 띄워준다.
+                WalkDiaryAddDialog walkDiaryAddDialog = WalkDiaryAddDialog.newInstance(imageUri,userEmail,mLongWalkTime,mWalkDistance);
+                walkDiaryAddDialog.show(mFragmentManager,StringKeys.WALK_DIARY_ADD_DIALOG);
+                mLocationUpdateService.stopLocationUpdates();
+               // hideProgressBar();
                 Log.d("SuccessImageStore","yes");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -274,4 +329,151 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
         }
     };
 
+
+    Callback<ArrayList<WalkDiaryDTO>> getWalkDiaryCallback = new Callback<ArrayList<WalkDiaryDTO>>() {
+        @Override
+        public void onResponse(Call<ArrayList<WalkDiaryDTO>> call, Response<ArrayList<WalkDiaryDTO>> response) {
+            if(response.isSuccessful()){
+                if(response.body().get(0).getStatusCode()==503){
+                    noDataFragmentScreen();
+                }
+                else {
+                    mWalkDiaryDTOArrayList = response.body();
+                    Call<ArrayList<WalkDiaryImageDTO>> getWalkDiaryImageCall = mRetrofitUtil.getUserWalkDiaryImages(userEmail);
+                    getWalkDiaryImageCall.enqueue(getWalkDiaryImageCallback);
+                    //noDataFragmentScreen();
+                }
+
+            }
+            else{
+                hideProgressBar();
+               noDataFragmentScreen();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<ArrayList<WalkDiaryDTO>> call, Throwable t) {
+            hideProgressBar();
+            noDataFragmentScreen();
+        }
+    };
+
+
+    Callback<ArrayList<WalkDiaryImageDTO>> getWalkDiaryImageCallback  = new Callback<ArrayList<WalkDiaryImageDTO>>() {
+        @Override
+        public void onResponse(Call<ArrayList<WalkDiaryImageDTO>> call, Response<ArrayList<WalkDiaryImageDTO>> response) {
+            if(response.isSuccessful()){
+
+                hideProgressBar();
+                mWalkDiaryImageDTOArrayList = response.body();
+                mWalkDiaryAdapter.setWalkDiaryDTOArrayLists(mWalkDiaryDTOArrayList,mWalkDiaryImageDTOArrayList);
+
+                noDataFragmentScreen();
+
+            }else{
+
+                noDataFragmentScreen();
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<ArrayList<WalkDiaryImageDTO>> call, Throwable t) {
+            hideProgressBar();
+            noDataFragmentScreen();
+        }
+    };
+
+    private void noDataFragmentScreen() {
+        if(mWalkDiaryAdapter.getItemCount()==0){
+
+            mDiaryRecyclerView.setVisibility(View.GONE);
+
+            android.support.v4.app.FragmentTransaction fragmentTransactionReplaceNoData =
+                    mSupportFragmentManager.beginTransaction();
+            fragmentTransactionReplaceNoData.replace(R.id.walk_diary_frame, mNoDataFragment);
+            fragmentTransactionReplaceNoData.commit();
+        }
+        else{
+            mDiaryRecyclerView.setVisibility(View.VISIBLE);
+            android.support.v4.app.FragmentTransaction fragmentTransactionRemoveNodata =
+                    mSupportFragmentManager.beginTransaction();
+            fragmentTransactionRemoveNodata.remove(mNoDataFragment);
+            fragmentTransactionRemoveNodata.commit();
+
+        }
+    }
+
+    @Override
+    public void onClickAddDiaryButton(ArrayList<WalkDiaryDTO> walkDiaryDTOs, ArrayList<WalkDiaryImageDTO> walkDiaryImageDTOs) {
+
+        mWalkDiaryDTOArrayList = walkDiaryDTOs;
+        mWalkDiaryImageDTOArrayList = walkDiaryImageDTOs;
+        mWalkDiaryAdapter.setWalkDiaryDTOArrayLists(mWalkDiaryDTOArrayList,mWalkDiaryImageDTOArrayList);
+
+    }
+
+    @Override
+    public void onClickDeleteButton(int position) {
+        mDiary_key = mWalkDiaryImageDTOArrayList.get(position).getDiary_key();
+        String imageURL = mWalkDiaryImageDTOArrayList.get(position).getImage_url();
+        String [] splitImageURL = imageURL.split("/");
+        String imageName = splitImageURL[4];
+        mWalkDiaryDTOArrayList.remove(position);
+        mWalkDiaryImageDTOArrayList.remove(position);
+        mWalkDiaryAdapter.setWalkDiaryDTOArrayLists(mWalkDiaryDTOArrayList,mWalkDiaryImageDTOArrayList);
+
+        if(mWalkDiaryAdapter.getItemCount() == 0){
+
+            mDiaryRecyclerView.setVisibility(View.GONE);
+
+
+            android.support.v4.app.FragmentTransaction fragmentTransactionReplaceNoDataInDelete =
+                    mSupportFragmentManager.beginTransaction();
+            fragmentTransactionReplaceNoDataInDelete.replace(R.id.walk_diary_frame, mNoDataFragment);
+            fragmentTransactionReplaceNoDataInDelete.commit();
+
+        }
+
+        Call<ResponseBody> deleteWalkDiaryImage = mRetrofitUtil.deleteWalkDiaryImage(mDiary_key,userEmail,imageName);
+        deleteWalkDiaryImage.enqueue(deleteWalkDiaryImageCallback);
+
+    }
+
+    Callback<ResponseBody> deleteWalkDiaryImageCallback = new Callback<ResponseBody>() {
+        @Override
+        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            if(response.isSuccessful()){
+
+                Call<ResponseBody> deleteWalkDiaryCall = mRetrofitUtil.deleteWalkDiary(mDiary_key,userEmail);
+                deleteWalkDiaryCall.enqueue(deleteWalkDiaryCallback);
+
+
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+        }
+    };
+
+    Callback<ResponseBody> deleteWalkDiaryCallback = new Callback<ResponseBody>() {
+        @Override
+        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            if(response.isSuccessful()){
+
+                //getWalkDiaryData();
+            }
+
+
+        }
+
+        @Override
+        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+        }
+    };
 }

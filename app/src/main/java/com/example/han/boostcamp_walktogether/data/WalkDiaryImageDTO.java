@@ -9,6 +9,7 @@ public class WalkDiaryImageDTO {
     int diary_key;
     String user_email;
     String image_url;
+    int statusCode;
 
 
     public int getDiary_key() {
@@ -33,5 +34,14 @@ public class WalkDiaryImageDTO {
 
     public void setImage_url(String image_url) {
         this.image_url = image_url;
+    }
+
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 }

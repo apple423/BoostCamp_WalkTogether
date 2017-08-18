@@ -7,19 +7,23 @@ import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.data.RecentCommentDTO;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryDTO;
+import com.example.han.boostcamp_walktogether.data.WalkDiaryImageDTO;
 import com.kakao.network.response.ResponseBody;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -93,4 +97,32 @@ public interface RetrofitUtil {
     @POST("/walk-diary/add/map_image/{diary_key}/{user_email}")
     Call<ResponseBody> postWalkDiaryMapImage(@Path("diary_key") int diary_key, @Path("user_email") String user_email,
                                              @Part MultipartBody.Part image, @Part("name") RequestBody name);
+
+    @GET("/walk-diary/search/{user_email}")
+    Call<ArrayList<WalkDiaryDTO>> getUsersWalkDiary(@Path("user_email") String user_email);
+
+    @GET("/walk-diary/search/images/{user_email}")
+    Call<ArrayList<WalkDiaryImageDTO>> getUserWalkDiaryImages(@Path("user_email") String user_email);
+
+    @DELETE("/walk-diary/delete/{diary_key}/{user_email}")
+    Call<ResponseBody> deleteWalkDiary(@Path("diary_key") int diary_key, @Path("user_email") String user_email);
+
+    @DELETE("/walk-diary/delete/images/{diary_key}/{user_email}/{image_name}")
+    Call<ResponseBody> deleteWalkDiaryImage(@Path("diary_key") int diary_key, @Path("user_email") String user_email,
+                                            @Path("image_name") String image_name);
+
+    @POST("/freeboard/like/add/{freeboard_key}/{user_email}")
+    Call<FreeboardDTO> postLike(@Path("freeboard_key") int freeboard_key, @Path("user_email") String user_email,
+                                @Body FreeboardDTO freeboardDTO);
+
+    @DELETE("/freeboard/like/delete/{freeboard_key}/{user_email}")
+    Call<ResponseBody> deleteLike(@Path("freeboard_key") int freeboard_key, @Path("user_email") String user_email);
+
+    // 유저가 좋아요를 눌렀나 안 눌렀나
+    @GET("/freeboard/like/search/{freeboard_key}/{user_email}")
+    Call<FreeboardDTO> getUserPushLike(@Path("freeboard_key") int freeboard_key, @Path("user_email") String user_email);
+
+    // 모든 게시글의 좋아요 수를 가져오기 위함
+    @GET("/freeboard/like/search/{freeboard_key}")
+    Call<FreeboardDTO> getLikeCount(@Path("freeboard_key") int freeboard_key);
 }

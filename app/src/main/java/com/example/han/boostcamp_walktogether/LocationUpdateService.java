@@ -39,6 +39,10 @@ public class LocationUpdateService {
     private GoogleMap mMap;
     private PolylineOptions mPolylineOptions;
     private ArrayList<Polyline> mPolylineArrayList;
+    private ArrayList<LatLng> mLatLngArrayList;
+    private boolean distanceFlag;
+    private Location mPrevLocation, mNewLocation;
+    private float mDistance;
 
     public void setmMap(GoogleMap mMap) {
         this.mMap = mMap;
@@ -47,6 +51,7 @@ public class LocationUpdateService {
     public LocationUpdateService(Context context){
 
         mContext = context;
+        mDistance = 0;
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         mArrayListLocation = new ArrayList<>();
         mPolylineArrayList = new ArrayList<>();
@@ -89,6 +94,29 @@ public class LocationUpdateService {
         @Override
         public void onLocationResult(LocationResult locationResult) {
 
+            mArrayListLocation.add(locationResult.getLastLocation());
+            if(distanceFlag){
+
+                mPrevLocation = locationResult.getLastLocation();
+                distanceFlag = false;
+            }
+            else{
+
+                mNewLocation = locationResult.getLastLocation();
+                distanceFlag = true;
+            }
+
+            if(mPrevLocation !=null && mNewLocation !=null){
+
+                if(distanceFlag){
+                    mDistance += mPrevLocation.distanceTo(mNewLocation);
+                }
+                else{
+                    mDistance += mNewLocation.distanceTo(mPrevLocation);
+                }
+
+            }
+
             Log.d("locationResult","yes");
             LatLng latLng = new LatLng(locationResult.getLastLocation().getLatitude(),
                     locationResult.getLastLocation().getLongitude());
@@ -103,16 +131,19 @@ public class LocationUpdateService {
 
     public void stopLocationUpdates() {
         Log.d("stopLocationUpdates","yes");
-        /*mFusedLocationClient.removeLocationUpdates(mLocationCallback); //콜백해제
-        int arrayListHalfPoint = mPolylineArrayList.size()/2;
+
+        /*int arrayListHalfPoint = mPolylineArrayList.size()/2;
         Polyline polyline = mPolylineArrayList.get(arrayListHalfPoint);
         List<LatLng> latLngs = polyline.getPoints();
         LatLng latLng = latLngs.get(0);*/
 
+        mDistance = 0;
         resetPolyLine(); //폴리라인제거
         if(mMap !=null){
             mMap.clear(); // 지도 초기화
         }
+
+       mFusedLocationClient.removeLocationUpdates(mLocationCallback); //콜백해제
 
     }
 
@@ -130,6 +161,19 @@ public class LocationUpdateService {
     public ArrayList<Location> getmArrayListLocation(){
         Log.d("ArrayListInService",mArrayListLocation.get(0).getLatitude() + "");
         return  mArrayListLocation;
+    }
+
+    public float getDistance(){
+
+        return mDistance;
+    }
+
+    public LatLng getMiddleLatLng(){
+        int arrayListHalfPoint = mArrayListLocation.size()/2;
+        Location location = mArrayListLocation.get(arrayListHalfPoint);
+        LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+        return latLng;
+
     }
 
 

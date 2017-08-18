@@ -30,6 +30,8 @@ public class StringKeys {
     //ParkList and ParkImageList
     public static final String PARK_LIST = "parkList";
     public static final String PARK_IMAGE_LIST = "parkImageList";
+    public static final String PARK_LIKE_LIST ="parkLike";
+    public static final String PARK_USER_LIKE = "parkUserLike";
     public static final String COMMENT_LIST = "commentList";
 
 
@@ -41,6 +43,8 @@ public class StringKeys {
     public static final String IMAGE_FILE_URI = "lmageFileUri";
     public static final String WALK_DIARY_ADD_DIALOG = "dialog_add";
     public static final String WALK_DIARY_INFO_DIALOG = "dialog_info";
+    public static final String WALK_DIARY_TAKING_TIME = "walkTime";
+    public static final String WALK_DIARY_DISTANCE = "walkDistance";
 
 
 }

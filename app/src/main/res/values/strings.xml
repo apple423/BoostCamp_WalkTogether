@@ -44,6 +44,8 @@
     <string name="facebook_login_permission_email">email</string>
     <string name="facebook_login_permission_public_profile">public_profile</string>
 
+    <!--common String-->
+    <string name="http">http://</string>
 
     <!--KaKao String-->
     <string name="kakao_app_key">c2bcdcf45c06c8b540f478de64736a39</string>
@@ -70,6 +72,7 @@
 
     <!--LocationFreeboardActivity-->
     <string name="location_freeboard_activity_title">장소 게시판</string>
+    <string name="zero">0</string>
 
 
     <!--LocationFreeboardAddActivity-->
@@ -77,6 +80,8 @@
 
     <!--LocationFreeboardSelectActivity-->
     <string name="location_freeboard_select_activity_title">장소 게시판</string>
+    <string name="location_freeboard_comment">댓글:%1$d개</string>
+    <string name="location_freeboard_comment_base">댓글0개</string>
 
     <!--OnBackPressedDialog-->
     <string name="finish_prefer">종료하시겠습니까?</string>
@@ -115,6 +120,17 @@
     <string name="walk_diary_map_info2">다른 앱을 쓰셔도 되고 산책에 집중하셔도 됩니다.</string>
     <string name="walk_diary_map_info3">산책 종료시 꼭! 산책 끝 버튼을 눌러주세요</string>
     <string name="walk_diary_add_success">산책일지 등록 성공</string>
+    <string name="walk_diary_time_walking_time">산책한 시간</string>
+    <string name="walk_diary_distance">이동한 거리</string>
+    <string name="walk_diary_walking_time_format">%1$d시간 %2$d분 %3$d초</string>
+    <string name="walk_diary_walking_distance_format">%1$.1f km</string>
+    <string name="walk_diary_time_title_format">yyyy-MM-dd , HH시 mm분의 산책</string>
+    <string name="walk_diary_content">산책일지</string>
 
+    <!--NoDataFragment-->
+    <string name="no_data">데이터가 없습니다. 등록해주세요.</string>
 
+    <!--location_freeboard_comment-->
+    <string name="submit">등록</string>
+    <string name="location_freeboard_comment_title">댓글</string>
 </resources>

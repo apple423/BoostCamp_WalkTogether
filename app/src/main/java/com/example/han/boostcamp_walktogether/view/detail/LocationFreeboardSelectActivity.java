@@ -1,10 +1,13 @@
 package com.example.han.boostcamp_walktogether.view.detail;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,6 +15,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
+import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardCommentAdapter;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardViewPagerAdapter;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
@@ -44,14 +48,17 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
     private LocationFreeboardViewPagerAdapter locationFreeboardViewPagerAdapter;
     private DatabaseReference databaseReference;
     private String mLocationID;
+    private Context mContext;
     private int mLocationKey;
     private int mLocationFreeboardKey;
     private TextView mUserNameTextView;
     private TextView mTitleTextView;
     private TextView mTimeTextView;
     private TextView mContentTextView;
+    private TextView mCommentTextView;
     private FreeboardDTO mFreeboardDTO;
     private ImageView mUserProfileImageView;
+    private RecyclerView mFreeboardCommentRecyclerview;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,17 +69,25 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         mFrameLayout.addView(contentView, 0);
         mTextView.setText(getResources().getString(R.string.location_freeboard_select_activity_title));
 
+        mContext = this;
         mUserNameTextView = (TextView)findViewById(R.id.location_freeboard_select_user_detail);
         mTitleTextView = (TextView)findViewById(R.id.location_freeboard_select_title_detail);
         mTimeTextView = (TextView)findViewById(R.id.location_freeboard_select_time_detail);
         mContentTextView = (TextView) findViewById(R.id.location_freeboard_select_content);
         mLocationPicutreViewPager = (ViewPager)findViewById(R.id.location_freeboard_viewPager);
         mUserProfileImageView = (ImageView)findViewById(R.id.location_freeboard_select_user_profile);
+        mFreeboardCommentRecyclerview = (RecyclerView)findViewById(R.id.location_freeboard_comment_recyclerView);
+        mCommentTextView = (TextView)findViewById(R.id.location_freeboard_select_comment_textView);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        LocationFreeboardCommentAdapter locationFreeboardCommentAdapter = new LocationFreeboardCommentAdapter();
+
+        mFreeboardCommentRecyclerview.setLayoutManager(linearLayoutManager);
+        mFreeboardCommentRecyclerview.setAdapter(locationFreeboardCommentAdapter);
 
         locationFreeboardViewPagerAdapter = new LocationFreeboardViewPagerAdapter(this,getLayoutInflater(),getResources());
         mLocationPicutreViewPager.setAdapter(locationFreeboardViewPagerAdapter);
-        //mLocationID = getIntent().getStringExtra(StringKeys.LOCATION_ID_KEY);
-        //mLocationFreeboardKey=getIntent().getStringExtra(StringKeys.LOCATION_FREEBOARD_KEY);
+
         RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
 
         Parcelable parcelable = getIntent().getParcelableExtra(StringKeys.LOCATION_FREEBOARD_PARCELABLE);
@@ -80,16 +95,32 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         mLocationFreeboardKey = mFreeboardDTO.getFreeboard_key();
         mLocationKey = mFreeboardDTO.getPark_key();
 
+        drawView();
+        mCommentTextView.setOnClickListener(onClickCommentListener);
+
+        Call<ArrayList<FreeboardImageDTO>> imageArrayListCall = retrofitUtil.getImagesFreeboard(mLocationKey,mLocationFreeboardKey);
+        imageArrayListCall.enqueue(imageArrayListCallback);
+
+    }
+
+    View.OnClickListener onClickCommentListener = new View.OnClickListener(){
+
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(mContext,FreeboardCommentAddActivity.class);
+            mContext.startActivity(intent);
+
+        }
+    };
+
+    private void drawView() {
         mUserNameTextView.setText(mFreeboardDTO.getUser_name());
         mTitleTextView.setText(mFreeboardDTO.getTitle());
         String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(mFreeboardDTO.getDate());
         mTimeTextView.setText(dateString);
         mContentTextView.setText(mFreeboardDTO.getContent());
         Glide.with(this).load(mFreeboardDTO.getUser_profile()).into(mUserProfileImageView);
-
-        Call<ArrayList<FreeboardImageDTO>> imageArrayListCall = retrofitUtil.getImagesFreeboard(mLocationKey,mLocationFreeboardKey);
-        imageArrayListCall.enqueue(imageArrayListCallback);
-
     }
 
 

@@ -1,8 +1,11 @@
 package com.example.han.boostcamp_walktogether.Adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +16,12 @@ import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickFreeboardInterface;
+import com.ldoublem.thumbUplib.ThumbUpView;
 
 import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Han on 2017-07-27.
@@ -22,21 +29,30 @@ import java.util.ArrayList;
 // 장소별 게시판의 게시글들을 보여주기 위한 RecyclerView의 어댑터
 public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeboardAdapter.LocationFreeboardViewHolder> {
 
-    private OnClickLocationFreeboard mOnClickLocationFreeboard;
+    private OnClickFreeboardInterface mOnClickFreeboardInterface;
     private ArrayList<FreeboardDTO> mParkFreeboardList;
     private ArrayList<FreeboardImageDTO> mParkFreeboardImageList;
+    private ArrayList<FreeboardDTO> mFreeboardLikeList;
+    private ArrayList<FreeboardDTO> mFreeboardUserLikeList;
     private Context mContext;
+    private Resources mResources;
+    private boolean mLike;
 
-    public LocationFreeboardAdapter(Context context,OnClickLocationFreeboard onClickLocationFreeboard){
+    public LocationFreeboardAdapter(Context context, OnClickFreeboardInterface onClickFreeboardInterface, Resources resources){
 
         mContext = context;
-       mOnClickLocationFreeboard = onClickLocationFreeboard;
+       mOnClickFreeboardInterface = onClickFreeboardInterface;
+        mResources =resources;
 
     }
 
-    public void setParkListAndImage(ArrayList<FreeboardDTO> list, ArrayList<FreeboardImageDTO> listImage){
+    public void setParkListAndImage(ArrayList<FreeboardDTO> list, ArrayList<FreeboardImageDTO> listImage
+    ,ArrayList<FreeboardDTO> freeboardLikeList, ArrayList<FreeboardDTO> freeboardLikeUserList){
         mParkFreeboardList = list;
         mParkFreeboardImageList = listImage;
+        mFreeboardLikeList = freeboardLikeList;
+        mFreeboardUserLikeList = freeboardLikeUserList;
+
         notifyDataSetChanged();
 
     }
@@ -58,10 +74,12 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
     }
 
     @Override
-    public void onBindViewHolder(LocationFreeboardViewHolder holder, int position) {
+    public void onBindViewHolder(final LocationFreeboardViewHolder holder, final int position) {
 
         FreeboardDTO data = mParkFreeboardList.get(position);
         FreeboardImageDTO imageData = mParkFreeboardImageList.get(position);
+        FreeboardDTO likeData = mFreeboardLikeList.get(position);
+        FreeboardDTO userLikeData = mFreeboardUserLikeList.get(position);
 
 
         holder.mUserNameTextView.setText(data.getUser_name());
@@ -87,8 +105,28 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
             }
 
+            holder.mContentTextView.setText(data.getContent());
+
+
+
+        if(userLikeData.getLike_count() == 0){
+
+            holder.mLikeImageView.setUnlike();
+            holder.mLikeCountTextView.setTextColor(Color.BLACK);
 
         }
+        else{
+            holder.mLikeImageView.setLike();
+            holder.mLikeCountTextView.setTextColor(mResources.getColor(R.color.redText));
+        }
+
+        holder.mLikeCountTextView.setText(String.valueOf(likeData.getLike_count()));
+
+
+
+        }
+
+
 
     @Override
     public int getItemCount() {
@@ -102,28 +140,49 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         private TextView mTitleTextview;
         private TextView mUserNameTextView;
         private ImageView mPicutreImageView;
-        private ImageView mProfileImageView;
+        private CircleImageView mProfileImageView;
         private CardView mLocationFreeboardCardView;
+        private TextView mContentTextView;
+        private ThumbUpView mLikeImageView;
+        private TextView mLikeCountTextView;
 
         public LocationFreeboardViewHolder(View itemView) {
             super(itemView);
             mLocationFreeboardCardView = (CardView)itemView.findViewById(R.id.location_freeboard_cardView);
             mTitleTextview = (TextView)itemView.findViewById(R.id.location_freeboard_title);
             mUserNameTextView = (TextView) itemView.findViewById(R.id.location_freeboard_user_name);
-            mProfileImageView = (ImageView)itemView.findViewById(R.id.location_freeboard_user);
+            mProfileImageView = (CircleImageView) itemView.findViewById(R.id.location_freeboard_user);
             mPicutreImageView=(ImageView)itemView.findViewById(R.id.location_freeboard_picture);
+            mContentTextView = (TextView) itemView.findViewById(R.id.location_freeboard_content);
+            mLikeImageView = (ThumbUpView) itemView.findViewById(R.id.location_freeboard_like_imageView);
+            mLikeCountTextView = (TextView) itemView.findViewById(R.id.location_freeboard_like_textView);
 
             View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnClickLocationFreeboard.onClickBoard(getAdapterPosition());
+                    mOnClickFreeboardInterface.onClickBoard(getAdapterPosition());
                 }
             };
 
             mLocationFreeboardCardView.setOnClickListener(onClickListener);
+            mLikeImageView.setOnThumbUp(onThumbUp);
 
         }
-    }
+
+        ThumbUpView.OnThumbUp onThumbUp =    new ThumbUpView.OnThumbUp() {
+            @Override
+            public void like(boolean like) {
+
+                mOnClickFreeboardInterface.onClickLike(mLikeCountTextView,getAdapterPosition(),like);
+
+            }
+
+        };
+
+
+            }
 
 
 }
+
+
