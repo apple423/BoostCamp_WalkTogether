@@ -82,6 +82,7 @@
     <string name="location_freeboard_select_activity_title">장소 게시판</string>
     <string name="location_freeboard_comment">댓글:%1$d개</string>
     <string name="location_freeboard_comment_base">댓글0개</string>
+    <string name="show_all_comment">모든 댓글 보러가기</string>
 
     <!--OnBackPressedDialog-->
     <string name="finish_prefer">종료하시겠습니까?</string>
@@ -133,4 +134,6 @@
     <!--location_freeboard_comment-->
     <string name="submit">등록</string>
     <string name="location_freeboard_comment_title">댓글</string>
+    <string name="comment_submit_time">yyyy-MM-dd,HH시 mm분</string>
+
 </resources>

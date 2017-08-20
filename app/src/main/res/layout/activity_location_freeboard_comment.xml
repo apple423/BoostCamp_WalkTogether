@@ -3,14 +3,52 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/location_freeboard_comment_detail_recyclerView"
+    <FrameLayout
+        android:id="@+id/location_freeboard_comment_detail_frame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="100"
         android:layout_marginTop="64dp">
 
-    </android.support.v7.widget.RecyclerView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/location_freeboard_comment_detail_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+           >
+
+        </android.support.v7.widget.RecyclerView>
+
+        <LinearLayout
+            android:id="@+id/location_freeboard_comment_detail_noData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_caution"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/no_data"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+
+
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,11 +58,13 @@
         >
 
         <EditText
+            android:id="@+id/location_freeboard_comment_detail_editText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2"/>
 
         <Button
+            android:id="@+id/location_freeboard_comment_detail_add_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/submit"

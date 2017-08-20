@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.example.han.boostcamp_walktogether.util.ComparatorUtil;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
+import com.example.han.boostcamp_walktogether.view.LocationFreeboardActivity;
 import com.kakao.network.response.ResponseBody;
 
 import org.parceler.Parcels;
@@ -323,6 +325,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
                 mParkFreeboardList = freeboardList;
                 Log.d("send_freeboard", "gogogogoo");
+                new AsyncArrayList().execute();
                 //mLocationFreeboardAdapter.setParkList(mParkFreeboardList);
                 for(FreeboardDTO data : freeboardList){
                     int freeboardKey = data.getFreeboard_key();
@@ -390,18 +393,6 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                 FreeboardImageDTO freeboardImageData = response.body();
                 Log.d("send_Image_adapter", freeboardImageData.getImage());
                 mParkFreeboardImageList.add(freeboardImageData);
-
-                if (mParkFreeboardImageList.size() == mParkFreeboardList.size()
-                        && mParkFreeboardImageList.size() == mFreeboardLikeList.size()
-                        && mFreeboardLikeList.size() == mFreeboardUserLikeList.size()) {
-                    Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
-                    Collections.sort(mFreeboardLikeList,ComparatorUtil.likeDTOComparator);
-                    Collections.sort(mFreeboardUserLikeList,ComparatorUtil.likeDTOComparator);
-                    // LocationFreeboardActivity에 데이터 전달
-                    Log.d("successInSetResult",mParkFreeboardList.get(0).getTitle());
-                    resultToLocationActivity();
-                  //  Log.d("send_Image_adapter", "gogogogoo");
-            }
             }
 
             else{
@@ -427,6 +418,36 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         intent.putExtra(StringKeys.PARK_USER_LIKE, Parcels.wrap( mFreeboardUserLikeList));
         mActivity.setResult(RESULT_OK, intent);
         finish();
+    }
+
+    public class AsyncArrayList extends AsyncTask<Void, Void, Void> {
+
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            while(true) {
+
+                if (mParkFreeboardImageList.size() == mParkFreeboardList.size()
+                        && mParkFreeboardImageList.size() == mFreeboardLikeList.size()
+                        && mFreeboardLikeList.size() == mFreeboardUserLikeList.size()
+                        && mFreeboardUserLikeList.size() == mParkFreeboardList.size()) {
+
+                    Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
+                    Collections.sort(mFreeboardLikeList, ComparatorUtil.likeDTOComparator);
+                    Collections.sort(mFreeboardUserLikeList, ComparatorUtil.likeDTOComparator);
+                    Log.d("asynctaskFinish","yes");
+                    return null;
+                }
+
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.d("asynctaskPostFinish","yes");
+            resultToLocationActivity();
+        }
     }
 
 

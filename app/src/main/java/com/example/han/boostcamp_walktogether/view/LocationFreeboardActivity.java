@@ -47,6 +47,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
                                         implements OnClickFreeboardInterface {
 
     private static final int PUSH_ADD_BUTTON = 101;
+    private static final int PUSH_SELECT_ACTIVITY = 102;
     private GridLayoutManager mGridlayoutManager;
     private RecyclerView mLocationFreeboardRecycelerView;
     private LocationFreeboardAdapter mLocationFreeboardAdapter;
@@ -146,6 +147,17 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
                     , mFreeboardLikeList, mFreeboardUserLikeList);
 
         }
+        else if(requestCode == PUSH_SELECT_ACTIVITY && resultCode == RESULT_OK){
+            Parcelable freeboardLikeListParcelabe = data.getParcelableExtra(StringKeys.PARK_LIKE_LIST);
+            Parcelable freeboardUserLikeListParcelabe = data.getParcelableExtra(StringKeys.PARK_USER_LIKE);
+            ArrayList<FreeboardDTO> freeboardLikeArrayList = Parcels.unwrap(freeboardLikeListParcelabe);
+            ArrayList<FreeboardDTO> freeboardUserLikeArrayList = Parcels.unwrap(freeboardUserLikeListParcelabe);
+            mFreeboardLikeList = freeboardLikeArrayList;
+            mFreeboardUserLikeList = freeboardUserLikeArrayList;
+            mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
+                    , mFreeboardLikeList, mFreeboardUserLikeList);
+
+        }
 
 
     }
@@ -156,7 +168,8 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         locationFreeboardSelectIntent.putExtra(StringKeys.LOCATION_ID_KEY, mParKey);
         locationFreeboardSelectIntent.putExtra(StringKeys.LOCATION_FREEBOARD_KEY, mParkFreeboardList.get(position).getFreeboard_key());
         locationFreeboardSelectIntent.putExtra(StringKeys.LOCATION_FREEBOARD_PARCELABLE, Parcels.wrap(mParkFreeboardList.get(position)));
-        startActivity(locationFreeboardSelectIntent);
+        //startActivity(locationFreeboardSelectIntent);
+        startActivityForResult(locationFreeboardSelectIntent,PUSH_SELECT_ACTIVITY);
 
     }
 

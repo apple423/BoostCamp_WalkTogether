@@ -2,6 +2,7 @@ package com.example.han.boostcamp_walktogether.util;
 
 import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
 import com.example.han.boostcamp_walktogether.data.CommentDTO;
+import com.example.han.boostcamp_walktogether.data.FreeboardCommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
@@ -90,31 +91,39 @@ public interface RetrofitUtil {
     @GET("/comment/recent")
     Call<ArrayList<RecentCommentDTO>> getRecentComment();
 
+    // 산책일지를 서버에 추가하기 위함
     @POST("/walk-diary/add")
     Call<WalkDiaryDTO> postWalkDiary(@Body WalkDiaryDTO walkDiaryDTO);
 
+    // 산책일지의 이미지를 업로드 하기 위함
     @Multipart
     @POST("/walk-diary/add/map_image/{diary_key}/{user_email}")
     Call<ResponseBody> postWalkDiaryMapImage(@Path("diary_key") int diary_key, @Path("user_email") String user_email,
                                              @Part MultipartBody.Part image, @Part("name") RequestBody name);
 
+    // 유저의 산책일지를 서버에서 가져오기 위함
     @GET("/walk-diary/search/{user_email}")
     Call<ArrayList<WalkDiaryDTO>> getUsersWalkDiary(@Path("user_email") String user_email);
 
+    // 유저의 산책일지의 사진을 가져오기 위함
     @GET("/walk-diary/search/images/{user_email}")
     Call<ArrayList<WalkDiaryImageDTO>> getUserWalkDiaryImages(@Path("user_email") String user_email);
 
+    // 유저가 선택한 산책일지를 삭제하기 위함
     @DELETE("/walk-diary/delete/{diary_key}/{user_email}")
     Call<ResponseBody> deleteWalkDiary(@Path("diary_key") int diary_key, @Path("user_email") String user_email);
 
+    // 유저가 선택한 산책일지와 함께 사진을 서버에서 지우기 위함
     @DELETE("/walk-diary/delete/images/{diary_key}/{user_email}/{image_name}")
     Call<ResponseBody> deleteWalkDiaryImage(@Path("diary_key") int diary_key, @Path("user_email") String user_email,
                                             @Path("image_name") String image_name);
 
+    // 선택 게시글의 좋아요를 했음을 보내기 위함
     @POST("/freeboard/like/add/{freeboard_key}/{user_email}")
     Call<FreeboardDTO> postLike(@Path("freeboard_key") int freeboard_key, @Path("user_email") String user_email,
                                 @Body FreeboardDTO freeboardDTO);
 
+    // 선택 게시글의 좋아요를 삭제하기 위함
     @DELETE("/freeboard/like/delete/{freeboard_key}/{user_email}")
     Call<ResponseBody> deleteLike(@Path("freeboard_key") int freeboard_key, @Path("user_email") String user_email);
 
@@ -125,4 +134,22 @@ public interface RetrofitUtil {
     // 모든 게시글의 좋아요 수를 가져오기 위함
     @GET("/freeboard/like/search/{freeboard_key}")
     Call<FreeboardDTO> getLikeCount(@Path("freeboard_key") int freeboard_key);
+
+    // 게시글의 댓글 수를 가져오기 위함
+    @GET("/freeboard/comment/search/count/{freeboard_key}")
+    Call<FreeboardCommentDTO> getFreeboardCommentCount(@Path("freeboard_key") int freeboard_key);
+
+    // 게시글의 댓글을 서버에 추가하기 위함
+    @POST("/freeboard/comment/add")
+    Call<FreeboardCommentDTO> postFreeboardComment(@Body FreeboardCommentDTO freeboardCommentDTO);
+
+    // 게시글의 댓글들을 모두 가져오기 위함
+    @GET("/freeboard/comment/search/{freeboard_key}")
+    Call<ArrayList<FreeboardCommentDTO>> getFreeboardComment(@Path("freeboard_key") int freeboard_key);
+
+    // 게시글의 댓글들을 모두 가져오기 위함
+    @GET("/freeboard/comment/search/five/{freeboard_key}")
+    Call<ArrayList<FreeboardCommentDTO>> getFreeboardCommentFive(@Path("freeboard_key") int freeboard_key);
+
+
 }

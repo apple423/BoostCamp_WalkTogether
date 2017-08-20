@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">
-        #ffff00</color>
-    <color name="colorPrimaryDark">#c7cc00</color>
-    <color name="colorAccent">#ffff00</color>
-    <color name="colorPrimaryLight">#ffff5a</color>
+    <color name="colorPrimary">#e0e0e0</color>
+    <color name="colorPrimaryDark">#aeaeae</color>
+    <color name="colorAccent">#ffcc0000</color>
+    <color name="colorPrimaryLight">#ffffff</color>
     <color name="appBarIconDefault">#8a000000</color>
     <color name="appBarIconSelected">#000000</color>
     <color name="faceBookSignInButtonBackground">#48629B</color>
