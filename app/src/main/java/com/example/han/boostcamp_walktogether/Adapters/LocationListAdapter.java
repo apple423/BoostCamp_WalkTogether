@@ -54,12 +54,15 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
         CommentAveragePointDTO commentAveragePointDTO = commentAveragePointDTOArrayList.get(position);
         if(parkRowData.getImage_url().length()==0){
 
-            holder.mPicutureImageView.setImageResource(R.drawable.park_default_picture);
+            //holder.mPicutureImageView.setImageResource(R.drawable.park_default_picture);
+            Glide.with(mContext).load(R.drawable.park_default_picture).into(holder.mPicutureImageView);
         }
 
         else{
 
-            Glide.with(mContext).load(parkRowData.getImage_url()).into(holder.mPicutureImageView);
+            Glide.with(mContext).load(parkRowData.getImage_url())
+                    .placeholder(R.drawable.placeholder)
+                    .into(holder.mPicutureImageView);
 
         }
 

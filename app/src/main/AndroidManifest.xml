@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
 
 
     <application
@@ -25,12 +26,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
 
         <activity android:name=".view.MainActivity"/>
 
-        <activity android:name=".view.LoginActivity"
-            />
+        <activity android:name=".view.LoginActivity"/>
         <activity android:name=".view.MapActivity"/>
         <activity android:name=".view.LocationListActivity"/>
         <activity android:name=".view.LocationActivity"
@@ -39,18 +41,27 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".view.MapActivity"/>
+
         </activity>
         <activity android:name=".view.LocationCommentActivity"/>
         <activity android:name=".view.LocationFreeboardActivity"/>
         <activity android:name=".view.detail.LocationFreeboardAddActivity"/>
         <activity android:name=".view.detail.LocationFreeboardSelectActivity"/>
         <activity android:name=".view.detail.LocationCommentAddActivity"/>
-        <activity android:name=".view.WalkDiaryActivity"/>
+        <activity android:name=".view.WalkDiaryActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="@string/kakao_scheme"
+                    android:host="@string/kakaolink_host" />
+
+            </intent-filter>
+
+
+        </activity>
+
         <activity android:name=".view.detail.FreeboardCommentAddActivity"/>
-
-        <service android:name=".service.DiaryMakingService"/>
-
-
 
 
         <activity android:name="com.facebook.FacebookActivity"

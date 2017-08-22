@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.data.FreeboardCommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.interfaces.OnClickFreeboardInterface;
@@ -34,6 +35,7 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
     private ArrayList<FreeboardImageDTO> mParkFreeboardImageList;
     private ArrayList<FreeboardDTO> mFreeboardLikeList;
     private ArrayList<FreeboardDTO> mFreeboardUserLikeList;
+    private ArrayList<FreeboardCommentDTO> mFreeboardCommentList;
     private Context mContext;
     private Resources mResources;
     private boolean mLike;
@@ -47,12 +49,13 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
     }
 
     public void setParkListAndImage(ArrayList<FreeboardDTO> list, ArrayList<FreeboardImageDTO> listImage
-    ,ArrayList<FreeboardDTO> freeboardLikeList, ArrayList<FreeboardDTO> freeboardLikeUserList){
+    ,ArrayList<FreeboardDTO> freeboardLikeList, ArrayList<FreeboardDTO> freeboardLikeUserList,
+                                    ArrayList<FreeboardCommentDTO> freeboardCommentList){
         mParkFreeboardList = list;
         mParkFreeboardImageList = listImage;
         mFreeboardLikeList = freeboardLikeList;
         mFreeboardUserLikeList = freeboardLikeUserList;
-
+        mFreeboardCommentList = freeboardCommentList;
         notifyDataSetChanged();
 
     }
@@ -73,6 +76,7 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         return new LocationFreeboardViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(final LocationFreeboardViewHolder holder, final int position) {
 
@@ -80,6 +84,7 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         FreeboardImageDTO imageData = mParkFreeboardImageList.get(position);
         FreeboardDTO likeData = mFreeboardLikeList.get(position);
         FreeboardDTO userLikeData = mFreeboardUserLikeList.get(position);
+        FreeboardCommentDTO commentDTO = mFreeboardCommentList.get(position);
 
 
         holder.mUserNameTextView.setText(data.getUser_name());
@@ -97,11 +102,12 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
 
             if(!imageData.getImage().equals("empty")) {
-                Glide.with(mContext).load("http://" + imageData.getImage()).into(holder.mPicutreImageView);
+                Glide.with(mContext).load("http://" + imageData.getImage()).placeholder(R.drawable.placeholder).into(holder.mPicutreImageView);
             }
             else{
 
-                holder.mPicutreImageView.setImageResource(R.drawable.park_default_picture);
+                Glide.with(mContext).load(R.drawable.park_default_picture).placeholder(R.drawable.placeholder).into(holder.mPicutreImageView);
+                //holder.mPicutreImageView.setImageResource(R.drawable.park_default_picture);
 
             }
 
@@ -121,6 +127,8 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         }
 
         holder.mLikeCountTextView.setText(String.valueOf(likeData.getLike_count()));
+
+        holder.mCommentCountTextView.setText(String.valueOf(commentDTO.getComment_count()));
 
 
 
@@ -145,6 +153,8 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         private TextView mContentTextView;
         private ThumbUpView mLikeImageView;
         private TextView mLikeCountTextView;
+        private ImageView mCommmentImageView;
+        private TextView mCommentCountTextView;
 
         public LocationFreeboardViewHolder(View itemView) {
             super(itemView);
@@ -156,18 +166,36 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
             mContentTextView = (TextView) itemView.findViewById(R.id.location_freeboard_content);
             mLikeImageView = (ThumbUpView) itemView.findViewById(R.id.location_freeboard_like_imageView);
             mLikeCountTextView = (TextView) itemView.findViewById(R.id.location_freeboard_like_textView);
+            mCommmentImageView = (ImageView) itemView.findViewById(R.id.location_freeboard_comment_imageView);
+            mCommentCountTextView = (TextView) itemView.findViewById(R.id.location_freeboard_comment_textView);
 
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnClickFreeboardInterface.onClickBoard(getAdapterPosition());
-                }
-            };
 
             mLocationFreeboardCardView.setOnClickListener(onClickListener);
+            mCommmentImageView.setOnClickListener(onClickListener);
             mLikeImageView.setOnThumbUp(onThumbUp);
 
         }
+
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = v.getId();
+
+                switch (id){
+                    case R.id.location_freeboard_cardView :
+                        mOnClickFreeboardInterface.onClickBoard(getAdapterPosition());
+                        break;
+
+                    case R.id.location_freeboard_comment_imageView :
+                        mOnClickFreeboardInterface.onClickComment(getAdapterPosition());
+
+                        break;
+
+                }
+
+            }
+        };
 
         ThumbUpView.OnThumbUp onThumbUp =    new ThumbUpView.OnThumbUp() {
             @Override

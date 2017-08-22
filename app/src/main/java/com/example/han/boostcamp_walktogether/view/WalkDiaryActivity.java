@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -18,11 +19,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.Adapters.WalkDiaryAdapter;
-import com.example.han.boostcamp_walktogether.LocationUpdateService;
+import com.example.han.boostcamp_walktogether.service.LocationUpdateService;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryDTO;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryImageDTO;
@@ -42,13 +46,28 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.kakao.kakaolink.KakaoLink;
+import com.kakao.kakaolink.KakaoTalkLinkMessageBuilder;
+import com.kakao.kakaolink.v2.KakaoLinkResponse;
+import com.kakao.kakaolink.v2.KakaoLinkService;
+import com.kakao.message.template.ButtonObject;
+import com.kakao.message.template.ContentObject;
+import com.kakao.message.template.FeedTemplate;
+import com.kakao.message.template.LinkObject;
+import com.kakao.message.template.SocialObject;
+import com.kakao.network.ErrorResult;
+import com.kakao.network.callback.ResponseCallback;
 import com.kakao.network.response.ResponseBody;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
+import me.wangyuwei.flipshare.FlipShareView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -210,6 +229,7 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
                     mStartWalkingButton.setVisibility(View.VISIBLE);
                     mStopWalkingButton.setVisibility(View.GONE);
                     showProgressBar();
+
             }
 
         }
@@ -314,6 +334,7 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
                 out.close();
                 Uri imageUri = Uri.parse("file://"+file);
 
+                //미디어 스캔
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, imageUri));
 
                 hideProgressBar();
@@ -413,6 +434,82 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
 
     }
 
+
+
+    @Override
+    public void onClickShareSMSButton(int position) {
+
+
+
+        WalkDiaryDTO walkDiaryDTO = mWalkDiaryDTOArrayList.get(position);
+        mDiary_key = walkDiaryDTO.getDiary_key();
+        String imageURL = mWalkDiaryImageDTOArrayList.get(position).getImage_url();
+
+        WalkDiaryAdapter.WalkDiaryViewHolder holder = (WalkDiaryAdapter.WalkDiaryViewHolder)
+                mDiaryRecyclerView.findViewHolderForAdapterPosition(position);
+        ImageView imageView = holder.getmMapMoveImageView();
+        Uri imageUri = getLocalBitmapUri(imageView);
+
+
+        long time = walkDiaryDTO.getDate().getTime() - walkDiaryDTO.getWalk_time();
+        Date date = new Date(time);
+        String dateString = new SimpleDateFormat(this.getString(R.string.walk_diary_time_title_format)
+                , Locale.KOREA)
+                .format(date);
+        String walkingTime =  mWalkDiaryAdapter.convertSecondsToHMmSs(walkDiaryDTO.getWalk_time());
+        String walkingDistance = mWalkDiaryAdapter.covertDistance(walkDiaryDTO.getWalk_distance());
+
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.putExtra("sms_body", dateString + " " + walkingTime + " " + walkingDistance);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        sendIntent.setType("image/*");
+
+        startActivity(Intent.createChooser(sendIntent, "골라"));
+
+    }
+
+    @Override
+    public void onClickShareKakaoButton(int position) {
+
+        WalkDiaryDTO walkDiaryDTO = mWalkDiaryDTOArrayList.get(position);
+        mDiary_key = walkDiaryDTO.getDiary_key();
+        String imageURL = mWalkDiaryImageDTOArrayList.get(position).getImage_url();
+        long time = walkDiaryDTO.getDate().getTime() - walkDiaryDTO.getWalk_time();
+        Date date = new Date(time);
+        String dateString = new SimpleDateFormat(this.getString(R.string.walk_diary_time_title_format)
+                , Locale.KOREA)
+                .format(date);
+
+        String walkingTime =  mWalkDiaryAdapter.convertSecondsToHMmSs(walkDiaryDTO.getWalk_time());
+        String walkingDistance = mWalkDiaryAdapter.covertDistance(walkDiaryDTO.getWalk_distance());
+
+        FeedTemplate params = FeedTemplate
+                .newBuilder(ContentObject.newBuilder(dateString,
+                       "http://"+imageURL,
+                        LinkObject.newBuilder().build())
+                        .setDescrption(getResources().getString(R.string.walk_diary_time_walking_time) + " " + walkingTime
+                        +"\n" + getResources().getString(R.string.walk_diary_distance) + " " + walkingDistance)
+
+                        .build())
+                .addButton(new ButtonObject("앱에서 보기", LinkObject.newBuilder().build()))
+                .build();
+
+        KakaoLinkService
+                .getInstance().sendDefault(this, params, new ResponseCallback<KakaoLinkResponse>() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+
+            }
+
+            @Override
+            public void onSuccess(KakaoLinkResponse result) {
+
+            }
+        });
+    }
+
+
+
     @Override
     public void onClickDeleteButton(int position) {
         mDiary_key = mWalkDiaryImageDTOArrayList.get(position).getDiary_key();
@@ -439,6 +536,7 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
         deleteWalkDiaryImage.enqueue(deleteWalkDiaryImageCallback);
 
     }
+
 
     Callback<ResponseBody> deleteWalkDiaryImageCallback = new Callback<ResponseBody>() {
         @Override
@@ -476,4 +574,35 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
 
         }
     };
+
+    public Uri getLocalBitmapUri(ImageView imageView) {
+        // Extract Bitmap from ImageView drawable
+        Drawable drawable = imageView.getDrawable();
+        Log.d("getDrawable",drawable.toString());
+        Bitmap bmp = null;
+
+        if (drawable instanceof GlideBitmapDrawable){
+            bmp = ((GlideBitmapDrawable) imageView.getDrawable()).getBitmap();
+            Log.d("getBMP",bmp.toString());
+        } else {
+            return null;
+        }
+        // Store image to default external storage directory
+        Uri bmpUri = null;
+        try {
+            File file =  new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS), "share_image_" + System.currentTimeMillis() + ".png");
+            file.getParentFile().mkdirs();
+            FileOutputStream out = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+
+            out.close();
+            bmpUri = Uri.fromFile(file);
+            Log.d("bmpURI",bmpUri.toString());
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, bmpUri));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmpUri;
+    }
 }

@@ -7,18 +7,20 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:text="@string/walk_diary_map_info"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
         android:gravity="center"
         android:layout_gravity="center"
-        android:textSize="16sp"
         android:layout_marginBottom="16dp"/>
 
     <TextView
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:text="@string/walk_diary_map_info2"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
         android:gravity="center"
         android:layout_gravity="center"
-        android:textSize="16sp"
         android:layout_marginBottom="16dp"/>
     <TextView
         android:layout_width="250dp"
@@ -27,6 +29,7 @@
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
@@ -36,9 +39,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/walk_diary_confirm"
-        android:background="@color/transparent"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/colorAccent"
         android:textSize="20sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:background="@color/transparent"
+
+        />
 
 </LinearLayout>

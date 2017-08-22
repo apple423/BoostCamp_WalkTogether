@@ -1,5 +1,6 @@
 package com.example.han.boostcamp_walktogether.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,11 +17,16 @@ import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryDTO;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryImageDTO;
 import com.example.han.boostcamp_walktogether.interfaces.OnClickWalkDiaryDeleteInterface;
+import com.kakao.kakaolink.KakaoLink;
+import com.kakao.kakaolink.KakaoTalkLinkMessageBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import me.wangyuwei.flipshare.FlipShareView;
+import me.wangyuwei.flipshare.ShareItem;
 
 /**
  * Created by Han on 2017-08-15.
@@ -55,9 +62,6 @@ public class WalkDiaryAdapter extends RecyclerView.Adapter<WalkDiaryAdapter.Walk
         WalkDiaryImageDTO walkDiaryImageDTO = walkDiaryImageDTOArrayList.get(position);
 
         long time = walkDiaryDTO.getDate().getTime() - walkDiaryDTO.getWalk_time();
-        Log.d("GetTime", String.valueOf(walkDiaryDTO.getDate().getTime()));
-        Log.d("GetWalkTime",String.valueOf(walkDiaryDTO.getWalk_time()));
-        Log.d("ConvertTime", String.valueOf(time));
         Date date = new Date(time);
         String dateString = new SimpleDateFormat(mResouces.getString(R.string.walk_diary_time_title_format)
                 , Locale.KOREA)
@@ -100,7 +104,8 @@ public class WalkDiaryAdapter extends RecyclerView.Adapter<WalkDiaryAdapter.Walk
         private TextView mContentTextView;
         private TextView mWalkingTime;
         private TextView mWalkingDistance;
-        private ImageView mDeleteImageView;
+        private ImageButton mDeleteImageButton;
+        private ImageButton mShareImageButton;
 
         public WalkDiaryViewHolder(View itemView) {
             super(itemView);
@@ -110,20 +115,65 @@ public class WalkDiaryAdapter extends RecyclerView.Adapter<WalkDiaryAdapter.Walk
             mContentTextView = (TextView) itemView.findViewById(R.id.walk_diary_content_textView);
             mWalkingTime = (TextView) itemView.findViewById(R.id.walk_diary_walking_time_textView);
             mWalkingDistance = (TextView) itemView.findViewById(R.id.walk_diary_walking_distance_textView);
-            mDeleteImageView = (ImageView) itemView.findViewById(R.id.walk_diary_delete_imageView);
+            mShareImageButton = (ImageButton) itemView.findViewById(R.id.walk_diary_share_imageButton);
+            mDeleteImageButton = (ImageButton) itemView.findViewById(R.id.walk_diary_delete_imageButton);
 
-            View.OnClickListener onClickDeleteImageListener = new View.OnClickListener() {
 
-
-                @Override
-                public void onClick(View v) {
-                    mOnClickWalkDiaryDeleteInterface.onClickDeleteButton(getAdapterPosition());
-                }
-            };
-
-            mDeleteImageView.setOnClickListener(onClickDeleteImageListener);
+            mShareImageButton.setOnClickListener(onClickShareImageListener);
+            mDeleteImageButton.setOnClickListener(onClickDeleteImageListener);
 
         }
+
+
+        View.OnClickListener onClickShareImageListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FlipShareView share = new FlipShareView.Builder((Activity) mContext,mShareImageButton)
+                        .addItem(new ShareItem("SMS"))
+                        .addItem(new ShareItem("KAKAO"))
+                        .setBackgroundColor(0x60000000)
+                        .create();
+
+                share.setOnFlipClickListener(new FlipShareView.OnFlipClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+
+                        switch (position){
+
+                            case 0 : mOnClickWalkDiaryDeleteInterface.onClickShareSMSButton(getAdapterPosition());
+                                break;
+
+                            case 1 : mOnClickWalkDiaryDeleteInterface.onClickShareKakaoButton(getAdapterPosition());
+                                break;
+
+                        }
+                    }
+
+                    @Override
+                    public void dismiss() {
+
+                    }
+                });
+
+
+            }
+        };
+
+        View.OnClickListener onClickDeleteImageListener = new View.OnClickListener() {
+
+
+            @Override
+            public void onClick(View v) {
+                mOnClickWalkDiaryDeleteInterface.onClickDeleteButton(getAdapterPosition());
+            }
+        };
+
+        public ImageView getmMapMoveImageView(){
+
+            return mMapMoveImageView;
+        }
+
+
     }
 
 
@@ -144,8 +194,6 @@ public class WalkDiaryAdapter extends RecyclerView.Adapter<WalkDiaryAdapter.Walk
         return String.format(distanceFormat,distanceKM);
     }
 
-    /*public String convertSecondtoDate(long seconds){
 
 
-    }*/
 }

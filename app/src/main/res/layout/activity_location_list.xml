@@ -12,5 +12,32 @@
 
     </android.support.v7.widget.RecyclerView>
 
+    <LinearLayout
+        android:id="@+id/location_freeboard_list_noData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_caution"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/no_data"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+
+
+
+    </LinearLayout>
+
 
 </LinearLayout>

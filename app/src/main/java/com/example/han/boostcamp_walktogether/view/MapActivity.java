@@ -263,6 +263,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
             Log.d("my Location lng",Double.toString(mLastKnownLocation.getLongitude()));
 
 
+            showProgressBar();
             // 현재 위치를 기반으로 서버에 주변 공원정보들을 요청한다.
             Call<ArrayList<ParkRowDTO>> parkRowDTOListCall =
             retrofitUtil.getNearestPark(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());

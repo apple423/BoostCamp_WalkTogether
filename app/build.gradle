@@ -23,6 +23,9 @@ dependencies {
 
     repositories {
         mavenCentral()
+        maven {
+            url 'https://dl.bintray.com/wangyuwei/maven'
+        }
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -41,11 +44,12 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:11.0.4'
     compile 'com.google.firebase:firebase-storage:11.0.4'
     testCompile 'junit:junit:4.12'
-    compile 'com.github.bumptech.glide:glide:4.0.0'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.android.support:support-v4:25.3.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
+    compile 'jp.wasabeef:glide-transformations:2.0.2'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile group: 'com.kakao.sdk', name: 'usermgmt', version: project.KAKAO_SDK_VERSION
+    compile group: 'com.kakao.sdk', name: 'kakaolink', version: project.KAKAO_SDK_VERSION
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
@@ -55,6 +59,8 @@ dependencies {
     compile 'com.google.firebase:firebase-crash:11.0.4'
     compile 'com.ldoublem.thumbUplib:ThumbUplib:0.5'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'me.wangyuwei:FlipShare:1.0.2'
+
 }
 
 

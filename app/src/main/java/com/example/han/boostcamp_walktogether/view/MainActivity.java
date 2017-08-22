@@ -19,12 +19,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationRecentCommentAdapter;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.RecentCommentDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
+import com.example.han.boostcamp_walktogether.interfaces.OnClickRecentCommentInterface;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -47,7 +49,7 @@ import retrofit2.Response;
  * Created by Han on 2017-08-12.
  */
 
-public class MainActivity extends DrawerBaseActivity implements View.OnClickListener{
+public class MainActivity extends DrawerBaseActivity implements View.OnClickListener, OnClickRecentCommentInterface{
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 2;
@@ -59,6 +61,8 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
     private RecyclerView mRecentCommentRecyclerView;
     private LinearLayoutManager linearLayoutManager;
     private LocationRecentCommentAdapter locationRecentCommentAdapter;
+    private ArrayList<RecentCommentDTO> mRecentCommentDTOArrayList;
+    private ImageView mRefreshComment;
     private RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
 
     @Override
@@ -75,9 +79,10 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
         mRecentCommentRecyclerView = (RecyclerView)findViewById(R.id.recent_review_recyclerView);
         mButtonSearchDetail = (Button)findViewById(R.id.search_detail);
         mButtonWalkDiary = (Button)findViewById(R.id.walk_diary_button);
+        mRefreshComment = (ImageView)findViewById(R.id.recent_review_refresh_imageView);
 
         linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        locationRecentCommentAdapter = new LocationRecentCommentAdapter();
+        locationRecentCommentAdapter = new LocationRecentCommentAdapter(this,this);
         mRecentCommentRecyclerView.setLayoutManager(linearLayoutManager);
         mRecentCommentRecyclerView.setAdapter(locationRecentCommentAdapter);
 
@@ -87,6 +92,7 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
         mCardViewMap.setOnClickListener(this);
         mCardViewList.setOnClickListener(this);
         mButtonWalkDiary.setOnClickListener(this);
+        mRefreshComment.setOnClickListener(this);
         //FirebaseCrash.report(new Exception("My first Android non-fatal error"));
 
         Call<ArrayList<RecentCommentDTO>> recentCommentDTOCall = retrofitUtil.getRecentComment();
@@ -213,6 +219,14 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
                 Intent intentWalkDiary = new Intent(mContext,WalkDiaryActivity.class);
                 startActivity(intentWalkDiary);
                 break;
+
+
+            case R.id.recent_review_refresh_imageView :
+
+                Call<ArrayList<RecentCommentDTO>> recentCommentCall = retrofitUtil.getRecentComment();
+                recentCommentCall.enqueue(recentCommentDTOCallback);
+
+                break;
         }
 
 
@@ -224,6 +238,7 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
             if(response.isSuccessful()){
 
                 ArrayList<RecentCommentDTO> recentCommentDTOArrayList = response.body();
+                mRecentCommentDTOArrayList = recentCommentDTOArrayList;
                 locationRecentCommentAdapter.setCommentDTOArrayList(recentCommentDTOArrayList);
 
             }
@@ -287,5 +302,14 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+    }
+
+    @Override
+    public void onClickRecentComment(int position) {
+        Intent intent = new Intent(mContext,LocationCommentActivity.class);
+        intent.putExtra(StringKeys.LOCATION_ID_KEY,mRecentCommentDTOArrayList.get(position).getPark_key());
+        intent.putExtra(StringKeys.LOCATION_NAME,mRecentCommentDTOArrayList.get(position).getName());
+        startActivity(intent);
+
     }
 }

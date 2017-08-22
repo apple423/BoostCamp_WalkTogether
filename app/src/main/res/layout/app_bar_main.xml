@@ -31,11 +31,11 @@
                 android:textStyle="bold" />
             <ImageView
                 android:id="@+id/toolbar_heart_imageView"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginStart="20dp"
-                android:src="@mipmap/ic_heart"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginStart="25dp"
+                android:src="@drawable/dog_title"
                 android:scaleType="centerCrop"
 
                 />

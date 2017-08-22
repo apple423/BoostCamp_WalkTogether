@@ -10,4 +10,5 @@ public interface OnClickFreeboardInterface {
 
     void onClickBoard(int position);
     String onClickLike(TextView textView, int position, boolean like);
+    void onClickComment(int position);
 }

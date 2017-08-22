@@ -6,11 +6,14 @@ package com.example.han.boostcamp_walktogether.data;
 
 public class RecentCommentDTO {
 
+
+    int park_key;
     String name;
     String address;
     String comment;
     float star_point;
     float pet_point;
+    String image_url;
 
     public String getName() {
         return name;
@@ -50,5 +53,21 @@ public class RecentCommentDTO {
 
     public void setPet_point(float pet_point) {
         this.pet_point = pet_point;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
+    }
+
+    public int getPark_key() {
+        return park_key;
+    }
+
+    public void setPark_key(int park_key) {
+        this.park_key = park_key;
     }
 }

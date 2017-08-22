@@ -27,7 +27,6 @@
                 android:layout_height="120dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/park"
                 android:scaleType="centerCrop"
                 />
 
@@ -141,7 +140,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="6dp"
                     android:scaleType="centerCrop"
-                    android:src="@mipmap/ic_location"
+                    android:src="@mipmap/ic_location_yellow"
                     android:layout_marginLeft="10dp"
                  />
 

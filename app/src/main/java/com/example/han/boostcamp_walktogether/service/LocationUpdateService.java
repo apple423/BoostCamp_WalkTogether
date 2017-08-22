@@ -1,4 +1,4 @@
-package com.example.han.boostcamp_walktogether;
+package com.example.han.boostcamp_walktogether.service;
 
 import android.app.Activity;
 import android.content.Context;

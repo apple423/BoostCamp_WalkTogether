@@ -33,7 +33,7 @@
     <string name="viewPager_picture_count">%1$d / %2$d</string>
     <string name="zero_to_five">%1$.1f / 5</string>
     <string name="zero_to_five_default"> -- </string>
-    <string name="zero_to_five_base"> / 5.0</string>
+    <string name="zero_to_five_base"> /  5.0</string>
     <string name="km">km</string>
     <string name="nickname">닉네임</string>
     <string name="picture">프로필 사진</string>
@@ -49,6 +49,8 @@
 
     <!--KaKao String-->
     <string name="kakao_app_key">c2bcdcf45c06c8b540f478de64736a39</string>
+    <string name="kakao_scheme">kakaoc2bcdcf45c06c8b540f478de64736a39</string>
+    <string name="kakaolink_host">kakaolink</string>
     <string name="kakao_sign_in">카카오톡으로 로그인</string>
     <string name="kakao_sign_up">가입하기</string>
 
@@ -134,6 +136,6 @@
     <!--location_freeboard_comment-->
     <string name="submit">등록</string>
     <string name="location_freeboard_comment_title">댓글</string>
-    <string name="comment_submit_time">yyyy-MM-dd,HH시 mm분</string>
+    <string name="comment_submit_time">yyyy-MM-dd , HH시 mm분</string>
 
 </resources>

@@ -79,7 +79,7 @@ public class LocationCommentAddActivity extends BackButtonActionBarActivity impl
         SharedPreferenceUtil.setUserProfileSharedPreference(this,StringKeys.USER_PROFILE, MODE_PRIVATE);
         mUserID = SharedPreferenceUtil.getUserProfile(StringKeys.USER_EMAIL);
         mUserName = SharedPreferenceUtil.getUserProfile(StringKeys.USER_NICK_NAME);
-        mUserProfile = SharedPreferenceUtil.getUserProfile(StringKeys.USER_PROFILE);
+        mUserProfile = SharedPreferenceUtil.getUserProfile(StringKeys.USER_PROFILE_PICTURE);
 
 
         mLocationStarRatingBar.setOnRatingBarChangeListener(this);

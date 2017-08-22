@@ -60,7 +60,7 @@ public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
         imageView = (ImageView)view.findViewById(R.id.location_freeboard_picture_imageView_viewPager);
         //imageView.setImageResource(R.mipmap.ic_launcher);
 
-        Glide.with(mContext).load("http://"+imageURL).into(imageView);
+        Glide.with(mContext).load("http://"+imageURL).placeholder(R.drawable.placeholder).into(imageView);
         textView = (TextView) view.findViewById(R.id.location_freeboard_picture_textView_viewPager);
 
         String count = mResources.getString(R.string.viewPager_picture_count);

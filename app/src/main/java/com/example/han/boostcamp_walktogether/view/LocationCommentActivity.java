@@ -61,7 +61,7 @@ public class LocationCommentActivity extends BackButtonActionBarActivity{
         mLocationTitleTextView = (TextView)findViewById(R.id.location_comment_location_title_textView);
 
         mLinearlayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
-        mLocationCommentAdapter = new LocationCommentAdapter();
+        mLocationCommentAdapter = new LocationCommentAdapter(this,getResources());
         mContext =this;
         mParkKey = getIntent().getIntExtra(StringKeys.LOCATION_ID_KEY,0);
         mLocationName = getIntent().getStringExtra(StringKeys.LOCATION_NAME);

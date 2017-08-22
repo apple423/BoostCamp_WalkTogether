@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardAddPictureAdapter;
 import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.data.FreeboardCommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
 import com.example.han.boostcamp_walktogether.util.ComparatorUtil;
@@ -80,6 +81,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
     private ArrayList<FreeboardImageDTO> mParkFreeboardImageList;
     private ArrayList<FreeboardDTO> mFreeboardLikeList;
     private ArrayList<FreeboardDTO> mFreeboardUserLikeList;
+    private ArrayList<FreeboardCommentDTO> mFreeboardCommentCountList;
     private String mUserMail;
 
 
@@ -96,6 +98,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         mParkFreeboardImageList = new ArrayList<>();
         mFreeboardLikeList = new ArrayList<>();
         mFreeboardUserLikeList = new ArrayList<>();
+        mFreeboardCommentCountList = new ArrayList<>();
         mContext = this;
         mActivity = this;
 
@@ -338,6 +341,9 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
                     Call<FreeboardImageDTO> getFreeboardImageCall = retrofitUtil.getOneImageFreeboard(mParkKey,freeboardKey);
                     getFreeboardImageCall.enqueue(getFreeboardImageCallback);
+
+                    Call<FreeboardCommentDTO> getFreeboardCommentCountCall = retrofitUtil.getFreeboardCommentCount(freeboardKey);
+                    getFreeboardCommentCountCall.enqueue(getFreeboardCommentCountCallback);
                 }
             }
 
@@ -391,21 +397,35 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
             if (response.isSuccessful()) {
 
                 FreeboardImageDTO freeboardImageData = response.body();
-                Log.d("send_Image_adapter", freeboardImageData.getImage());
                 mParkFreeboardImageList.add(freeboardImageData);
             }
 
             else{
 
-                Log.d("send_Image_adapter", "fail");
+
             }
         }
 
         @Override
         public void onFailure(Call<FreeboardImageDTO> call, Throwable t) {
 
-            Log.d("send_Image_adapter",t.getMessage());
-            Log.d("send_Image_adapter", "gogogogoofail");
+
+        }
+    };
+
+    Callback<FreeboardCommentDTO> getFreeboardCommentCountCallback = new Callback<FreeboardCommentDTO>() {
+        @Override
+        public void onResponse(Call<FreeboardCommentDTO> call, Response<FreeboardCommentDTO> response) {
+            if(response.isSuccessful()){
+
+                mFreeboardCommentCountList.add(response.body());
+
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<FreeboardCommentDTO> call, Throwable t) {
 
         }
     };
@@ -416,6 +436,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         intent.putExtra(StringKeys.PARK_IMAGE_LIST, Parcels.wrap( mParkFreeboardImageList));
         intent.putExtra(StringKeys.PARK_LIKE_LIST, Parcels.wrap( mFreeboardLikeList));
         intent.putExtra(StringKeys.PARK_USER_LIKE, Parcels.wrap( mFreeboardUserLikeList));
+        intent.putExtra(StringKeys.FREEBOARD_COMMNET_COUNT, Parcels.wrap(mFreeboardCommentCountList));
         mActivity.setResult(RESULT_OK, intent);
         finish();
     }
@@ -431,11 +452,13 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
                 if (mParkFreeboardImageList.size() == mParkFreeboardList.size()
                         && mParkFreeboardImageList.size() == mFreeboardLikeList.size()
                         && mFreeboardLikeList.size() == mFreeboardUserLikeList.size()
-                        && mFreeboardUserLikeList.size() == mParkFreeboardList.size()) {
+                        && mFreeboardUserLikeList.size() == mFreeboardCommentCountList.size()
+                        && mFreeboardCommentCountList.size() == mParkFreeboardList.size()) {
 
                     Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
                     Collections.sort(mFreeboardLikeList, ComparatorUtil.likeDTOComparator);
                     Collections.sort(mFreeboardUserLikeList, ComparatorUtil.likeDTOComparator);
+                    Collections.sort(mFreeboardCommentCountList,ComparatorUtil.commentDTOComparator);
                     Log.d("asynctaskFinish","yes");
                     return null;
                 }

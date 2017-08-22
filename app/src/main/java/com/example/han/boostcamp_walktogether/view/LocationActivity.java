@@ -74,9 +74,12 @@ public class LocationActivity extends BackButtonActionBarActivity {
         mLocationTextView.setText(data.getName());
 
         if(data.getImage_url().length()==0){
-            mLocationImageView.setImageResource(R.drawable.park_default_picture);
+            //mLocationImageView.setImageResource(R.drawable.park_default_picture);
+            Glide.with(this).load(R.drawable.park_default_picture).into(mLocationImageView);
         }else{
             Glide.with(this).load(data.getImage_url()).into(mLocationImageView);
+
+
         }
 
         mLocationAddressTextView.setText(data.getAddress());

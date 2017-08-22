@@ -3,7 +3,6 @@ package com.example.han.boostcamp_walktogether.interfaces;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
-import com.bumptech.glide.RequestBuilder;
 
 /**
  * Created by Han on 2017-07-31.

@@ -38,7 +38,7 @@ import retrofit2.http.Path;
 public interface RetrofitUtil {
 
 
-    public static final Retrofit retrofit = new Retrofit.Builder()
+    Retrofit retrofit = new Retrofit.Builder()
             .client(new OkHttpClient().newBuilder().
             addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build())
             .baseUrl("http://52.79.111.22:3000")
@@ -147,7 +147,7 @@ public interface RetrofitUtil {
     @GET("/freeboard/comment/search/{freeboard_key}")
     Call<ArrayList<FreeboardCommentDTO>> getFreeboardComment(@Path("freeboard_key") int freeboard_key);
 
-    // 게시글의 댓글들을 모두 가져오기 위함
+    // 게시글의 댓글들을 5개만 가져오기 위함
     @GET("/freeboard/comment/search/five/{freeboard_key}")
     Call<ArrayList<FreeboardCommentDTO>> getFreeboardCommentFive(@Path("freeboard_key") int freeboard_key);
 

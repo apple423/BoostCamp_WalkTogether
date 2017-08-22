@@ -5,6 +5,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.parceler.Parcel;
 
+import java.util.Date;
+
 /**
  * Created by Han on 2017-08-11.
  */
@@ -18,6 +20,8 @@ public class CommentDTO {
     float star_point;
     float pet_point;
     String comment;
+    Date date;
+
     
     public int getComment_key() {
         return comment_key;
@@ -82,5 +86,13 @@ public class CommentDTO {
 
     public void setUser_profile(String user_profile) {
         this.user_profile = user_profile;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

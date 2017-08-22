@@ -51,7 +51,7 @@ import retrofit2.Response;
 public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity{
 
 
-    private final static int COMMENT_ADD_SCREEN = 101;
+    private final static int COMMENT_ADD_SCREEN = 103;
     private ViewPager mLocationPicutreViewPager;
     private LocationFreeboardViewPagerAdapter locationFreeboardViewPagerAdapter;
     private DatabaseReference databaseReference;
@@ -325,6 +325,12 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
 
 
         @Override
+        protected void onPreExecute() {
+
+            showProgressBar();
+        }
+
+        @Override
         protected Void doInBackground(Void... params) {
 
             Call<ArrayList<FreeboardDTO>> getAllFreeboardCall = retrofitUtil.getAllFreeboard(mLocationKey);
@@ -347,9 +353,11 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            hideProgressBar();
             Intent intent = new Intent();
             intent.putExtra(StringKeys.PARK_LIKE_LIST,Parcels.wrap(mFreeboardLikeList));
             intent.putExtra(StringKeys.PARK_USER_LIKE,Parcels.wrap(mFreeboardUserLikeList));
+            intent.putExtra(StringKeys.FREEBOARD_COMMNET_COUNT,mCountComment);
             setResult(RESULT_OK,intent);
             finish();
 

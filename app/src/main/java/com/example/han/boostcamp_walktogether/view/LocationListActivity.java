@@ -50,8 +50,7 @@ import retrofit2.Response;
 
 public class LocationListActivity extends DrawerBaseActivity implements
         GoogleApiClient.ConnectionCallbacks,
-        OnClickLocationListInterface
-{
+        OnClickLocationListInterface {
 
     private static final String TAG = LocationListActivity.class.getSimpleName();
     private Context mContext;
@@ -120,6 +119,7 @@ public class LocationListActivity extends DrawerBaseActivity implements
             // RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
 
             // 현재 위치를 기반으로 서버에 주변 공원정보들을 요청한다.
+            showProgressBar();
             Call<ArrayList<ParkRowDTO>> parkRowDTOListCall =
                     retrofitUtil.getNearestPark(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
             parkRowDTOListCall.enqueue(parkRowDataListCallback);
@@ -176,6 +176,7 @@ public class LocationListActivity extends DrawerBaseActivity implements
                 // 공원 정보와 공원의 평가점수 리스트가 같을시 어뎁터에 보낸다.
                 if(mParkRowDTOArrayList.size() == mAveragePointDTOArrayList.size()){
 
+                    hideProgressBar();
                     Collections.sort(mAveragePointDTOArrayList,ComparatorUtil.commentAveragePointDTOComparator);
                     locationListAdapter.setDataArrayList(mParkRowDTOArrayList,mAveragePointDTOArrayList);
 

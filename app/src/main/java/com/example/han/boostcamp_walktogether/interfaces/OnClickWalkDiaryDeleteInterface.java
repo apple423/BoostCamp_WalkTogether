@@ -8,4 +8,6 @@ public interface OnClickWalkDiaryDeleteInterface {
 
 
     void onClickDeleteButton(int position);
+    void onClickShareSMSButton(int position);
+    void onClickShareKakaoButton(int position);
 }

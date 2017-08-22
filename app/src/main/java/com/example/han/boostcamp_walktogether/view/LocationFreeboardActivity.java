@@ -14,10 +14,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardAdapter;
+import com.example.han.boostcamp_walktogether.data.FreeboardCommentDTO;
 import com.example.han.boostcamp_walktogether.interfaces.OnClickFreeboardInterface;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
@@ -26,6 +28,7 @@ import com.example.han.boostcamp_walktogether.util.ComparatorUtil;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
+import com.example.han.boostcamp_walktogether.view.detail.FreeboardCommentAddActivity;
 import com.example.han.boostcamp_walktogether.view.detail.LocationFreeboardAddActivity;
 import com.example.han.boostcamp_walktogether.view.detail.LocationFreeboardSelectActivity;
 import com.kakao.network.response.ResponseBody;
@@ -48,15 +51,18 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
 
     private static final int PUSH_ADD_BUTTON = 101;
     private static final int PUSH_SELECT_ACTIVITY = 102;
+    private final static int COMMENT_ADD_SCREEN = 103;
     private GridLayoutManager mGridlayoutManager;
     private RecyclerView mLocationFreeboardRecycelerView;
+    private LinearLayout mLinearLayoutNodata;
     private LocationFreeboardAdapter mLocationFreeboardAdapter;
-    private int mParKey;
+    private int mParKey, mPosition;
     private String mUserEmail;
     private ArrayList<FreeboardDTO> mParkFreeboardList;
     private ArrayList<FreeboardImageDTO> mParkFreeboardImageList;
     private ArrayList<FreeboardDTO> mFreeboardLikeList;
     private ArrayList<FreeboardDTO> mFreeboardUserLikeList;
+    private ArrayList<FreeboardCommentDTO> mCommentCountList;
     private FreeboardDTO mFreeboardUserLikeSendDTO;
 
     private final RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
@@ -71,6 +77,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         mTextView.setText(getResources().getString(R.string.location_freeboard_activity_title));
 
         mLocationFreeboardRecycelerView = (RecyclerView) findViewById(R.id.location_freeboard_recyclerView);
+        mLinearLayoutNodata = (LinearLayout) findViewById(R.id.location_freeboard_noData);
 
         mGridlayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
 
@@ -86,11 +93,12 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         mParkFreeboardImageList = new ArrayList<>();
         mFreeboardLikeList = new ArrayList<>();
         mFreeboardUserLikeList = new ArrayList<>();
+        mCommentCountList = new ArrayList<>();
         mFreeboardUserLikeSendDTO = new FreeboardDTO();
 
         Call<ArrayList<FreeboardDTO>> getfreeboardInParkCall = retrofitUtil.getAllFreeboard(mParKey);
         getfreeboardInParkCall.enqueue(getFreeboardInParkCallback);
-        // showProgressBar();
+
 
     }
 
@@ -131,31 +139,44 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
             Parcelable freeboardImageListParcelable = data.getParcelableExtra(StringKeys.PARK_IMAGE_LIST);
             Parcelable freeboardLikeListParcelabe = data.getParcelableExtra(StringKeys.PARK_LIKE_LIST);
             Parcelable freeboardUserLikeListParcelabe = data.getParcelableExtra(StringKeys.PARK_USER_LIKE);
+            Parcelable freeboardCommentCountListParcelable = data.getParcelableExtra(StringKeys.FREEBOARD_COMMNET_COUNT);
 
             ArrayList<FreeboardDTO> freeboardArrayList = Parcels.unwrap(freeboardListParcelabe);
             ArrayList<FreeboardImageDTO> freeboardImageArrayList = Parcels.unwrap(freeboardImageListParcelable);
             ArrayList<FreeboardDTO> freeboardLikeArrayList = Parcels.unwrap(freeboardLikeListParcelabe);
             ArrayList<FreeboardDTO> freeboardUserLikeArrayList = Parcels.unwrap(freeboardUserLikeListParcelabe);
+            ArrayList<FreeboardCommentDTO> freeboardCommentCountList = Parcels.unwrap(freeboardCommentCountListParcelable);
 
             mParkFreeboardList = freeboardArrayList;
             mParkFreeboardImageList = freeboardImageArrayList;
             mFreeboardLikeList = freeboardLikeArrayList;
             mFreeboardUserLikeList = freeboardUserLikeArrayList;
+            mCommentCountList = freeboardCommentCountList;
 
             //Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
             mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
-                    , mFreeboardLikeList, mFreeboardUserLikeList);
+                    , mFreeboardLikeList, mFreeboardUserLikeList, mCommentCountList);
 
         }
         else if(requestCode == PUSH_SELECT_ACTIVITY && resultCode == RESULT_OK){
             Parcelable freeboardLikeListParcelabe = data.getParcelableExtra(StringKeys.PARK_LIKE_LIST);
             Parcelable freeboardUserLikeListParcelabe = data.getParcelableExtra(StringKeys.PARK_USER_LIKE);
+            int count = data.getIntExtra(StringKeys.FREEBOARD_COMMNET_COUNT,0);
             ArrayList<FreeboardDTO> freeboardLikeArrayList = Parcels.unwrap(freeboardLikeListParcelabe);
             ArrayList<FreeboardDTO> freeboardUserLikeArrayList = Parcels.unwrap(freeboardUserLikeListParcelabe);
+            mCommentCountList.get(mPosition).setComment_count(count);
             mFreeboardLikeList = freeboardLikeArrayList;
             mFreeboardUserLikeList = freeboardUserLikeArrayList;
             mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
-                    , mFreeboardLikeList, mFreeboardUserLikeList);
+                    , mFreeboardLikeList, mFreeboardUserLikeList, mCommentCountList);
+
+        }
+        else if(requestCode == COMMENT_ADD_SCREEN && resultCode ==RESULT_OK){
+
+            int count = data.getIntExtra(StringKeys.FREEBOARD_COMMNET_COUNT,0);
+            mCommentCountList.get(mPosition).setComment_count(count);
+            mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
+                    , mFreeboardLikeList, mFreeboardUserLikeList, mCommentCountList);
 
         }
 
@@ -164,6 +185,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
 
     @Override
     public void onClickBoard(int position) {
+        mPosition = position;
         Intent locationFreeboardSelectIntent = new Intent(this, LocationFreeboardSelectActivity.class);
         locationFreeboardSelectIntent.putExtra(StringKeys.LOCATION_ID_KEY, mParKey);
         locationFreeboardSelectIntent.putExtra(StringKeys.LOCATION_FREEBOARD_KEY, mParkFreeboardList.get(position).getFreeboard_key());
@@ -231,10 +253,22 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
 
     }
 
+    @Override
+    public void onClickComment(int position) {
+
+        mPosition = position;
+        Intent intent = new Intent(this,FreeboardCommentAddActivity.class);
+        intent.putExtra(StringKeys.LOCATION_FREEBOARD_KEY,mParkFreeboardList.get(position).getFreeboard_key());
+        //mContext.startActivity(intent);
+        startActivityForResult(intent,COMMENT_ADD_SCREEN);
+
+    }
+
 
     Callback<ArrayList<FreeboardDTO>> getFreeboardInParkCallback = new Callback<ArrayList<FreeboardDTO>>() {
         @Override
         public void onResponse(Call<ArrayList<FreeboardDTO>> call, Response<ArrayList<FreeboardDTO>> response) {
+            showProgressBar();
             if (response.isSuccessful()) {
 
                 ArrayList<FreeboardDTO> freeboardList = response.body();
@@ -254,7 +288,15 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
 
                     Call<FreeboardImageDTO> getFreeboardImageCall = retrofitUtil.getOneImageFreeboard(mParKey, freeboardKey);
                     getFreeboardImageCall.enqueue(getFreeboardImageCallback);
+
+                    Call<FreeboardCommentDTO> getFreeboardCommentCountCall = retrofitUtil.getFreeboardCommentCount(freeboardKey);
+                    getFreeboardCommentCountCall.enqueue(getFreeboardCommentCountCallback);
                 }
+            }else {
+
+                mLocationFreeboardRecycelerView.setVisibility(View.GONE);
+                mLinearLayoutNodata.setVisibility(View.VISIBLE);
+                hideProgressBar();
             }
 
         }
@@ -325,6 +367,24 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         }
     };
 
+
+    Callback<FreeboardCommentDTO> getFreeboardCommentCountCallback = new Callback<FreeboardCommentDTO>() {
+        @Override
+        public void onResponse(Call<FreeboardCommentDTO> call, Response<FreeboardCommentDTO> response) {
+            if(response.isSuccessful()){
+
+                mCommentCountList.add(response.body());
+
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<FreeboardCommentDTO> call, Throwable t) {
+
+        }
+    };
+
     public class AsyncArrayList extends AsyncTask<Void, Void, Void> {
 
 
@@ -336,11 +396,12 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
                 if (mParkFreeboardImageList.size() == mParkFreeboardList.size()
                         && mParkFreeboardImageList.size() == mFreeboardLikeList.size()
                         && mFreeboardLikeList.size() == mFreeboardUserLikeList.size()
-                        && mFreeboardUserLikeList.size() == mParkFreeboardList.size()) {
+                        && mFreeboardUserLikeList.size() == mCommentCountList.size()) {
 
                     Collections.sort(mParkFreeboardImageList, ComparatorUtil.imageDTOComparator);
                     Collections.sort(mFreeboardLikeList, ComparatorUtil.likeDTOComparator);
                     Collections.sort(mFreeboardUserLikeList, ComparatorUtil.likeDTOComparator);
+                    Collections.sort(mCommentCountList, ComparatorUtil.commentDTOComparator);
                     /*mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
                             , mFreeboardLikeList, mFreeboardUserLikeList);*/
                     Log.d("asynctaskFinish","yes");
@@ -354,7 +415,13 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         protected void onPostExecute(Void aVoid) {
             Log.d("asynctaskPostFinish","yes");
             mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
-                    , mFreeboardLikeList, mFreeboardUserLikeList);
+                    , mFreeboardLikeList, mFreeboardUserLikeList, mCommentCountList);
+
+            mLocationFreeboardRecycelerView.setVisibility(View.VISIBLE);
+            mLinearLayoutNodata.setVisibility(View.GONE);
+            hideProgressBar();
+
+
         }
     }
 }
