@@ -28,16 +28,17 @@
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/ic_caution"/>
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/hungry_dog"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/no_data"
+                android:text="@string/no_comment"
                 android:textSize="20sp"
                 android:textStyle="bold"/>
 
@@ -68,8 +69,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/submit"
-            android:backgroundTint="@color/colorAccent"
+            android:background="@drawable/button_selector"
             android:layout_weight="0.5"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="8dp"
+            android:enabled="false"
             />
     </LinearLayout>
 

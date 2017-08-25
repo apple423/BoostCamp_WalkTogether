@@ -18,7 +18,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="SplashTheme" parent="AppTheme.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_image</item>
+        <!-- <item name="android:windowBackground">@drawable/splash_image</item>-->
     </style>
 
     <style name="ToolbarColoredBackArrow" parent="AppTheme">

@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">함께가요</string>
-
+    <string name="google_maps_key">AIzaSyD33CZy68KFJnxEYrverS9pZ6MwsrhVjgM</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!--Login Activity -->
     <string name="action_library">오픈소스 라이브러리</string>
     <string name="toolbar_main_title">함께가요</string>
     <string name="email">이메일</string>
@@ -11,7 +12,11 @@
     <string name="sign_up">회원가입</string>
     <string name="sign_in">로그인</string>
     <string name="or">또는</string>
-    <string name="google_maps_key">AIzaSyD33CZy68KFJnxEYrverS9pZ6MwsrhVjgM</string>
+    <string name="facebook_login">페이스북으로 로그인</string>
+    <string name="kakao_login">카카오톡으로 로그인</string>
+
+
+
     <string name="search_location_with_list">산책장소 목록으로 보기</string>
     <string name="search_location_with_map">산책장소 맵으로 보기</string>
     <string name="search_location_with_autoComplete">산책장소 검색으로 보기</string>
@@ -134,7 +139,11 @@
 
     <!--NoDataFragment-->
     <string name="no_data">데이터가 없습니다. 등록해주세요.</string>
+    <string name="no_location_comment">장소리뷰가 없습니다. 등록해주세요</string>
+    <string name="no_freeboard">게시글이 없습니다. 등록해주세요.</string>
+    <string name="no_walk_diary">산책일지가 없습니다. 등록해주세요.</string>
     <string name="no_location_list">주변에 장소가 없습니다.</string>
+    <string name="no_comment">댓글이 없습니다. 등록해주세요</string>
 
     <!--location_freeboard_comment-->
     <string name="submit">등록</string>
@@ -145,5 +154,7 @@
     <string name="location_top_near">거리순</string>
     <string name="location_top_fav">인기순</string>
     <string name="location_top_animal">반려동물 순</string>
+    <string name="etc">기타</string>
+
 
 </resources>

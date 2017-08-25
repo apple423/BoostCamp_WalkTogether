@@ -24,4 +24,18 @@
 
     </group>
 
+    <item android:title="@string/etc">
+        <menu>
+            <item
+                android:id="@+id/nav_library"
+                android:icon="@mipmap/ic_library"
+                android:title="@string/action_library" />
+
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@mipmap/ic_sign_out"
+                android:title="@string/sign_out"/>
+        </menu>
+    </item>
+
     </menu>

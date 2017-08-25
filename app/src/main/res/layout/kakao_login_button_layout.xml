@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="250dp"
     android:layout_height="60dp"
-    android:background="@color/kakaoSignInButtonBackground">
+    android:orientation="horizontal"
+    android:background="@drawable/kakao_button_shape">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
+        android:id="@+id/imageView_kakao_logo"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:layout_gravity="center_vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:contentDescription="@string/com_kakao_login_image_tts"
-        android:scaleType="fitXY"
-        android:src="@drawable/kakao_login" />
+        android:scaleType="centerCrop"
+        android:background="@drawable/kakao_account_logo" />
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="25dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/kakao_login_bar"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/kakao_login"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        android:paddingLeft="16dp"
+        android:layout_gravity="center_vertical"/>
 
 </LinearLayout>

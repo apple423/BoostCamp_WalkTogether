@@ -1,5 +1,6 @@
 package com.example.han.boostcamp_walktogether.ActionBar;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +9,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,9 +23,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.R;
+import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
 import com.example.han.boostcamp_walktogether.view.LocationListActivity;
+import com.example.han.boostcamp_walktogether.view.LoginActivity;
 import com.example.han.boostcamp_walktogether.view.MapActivity;
 import com.example.han.boostcamp_walktogether.view.WalkDiaryActivity;
 import com.example.han.boostcamp_walktogether.view.detail.LibraryActivity;
@@ -32,6 +36,9 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.kakao.auth.Session;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -93,10 +100,16 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id){
-            case  R.id.action_library :
-                Intent intent = new Intent(this, LibraryActivity.class);
-                startActivity(intent);
-                break;
+
+            case R.id.action_sign_out:
+                AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
+                        .setTitle(getResources().getString(R.string.logout_prefer))
+                        .setPositiveButton(getResources().getString(R.string.logout_yes), onClickSignOutYes)
+                        .setNegativeButton(getResources().getString(R.string.logout_no), onClickSignOutNo);
+
+                AlertDialog alertDialog = alterDialogBuilder.create();
+                alertDialog.show();
+                return true;
 
         }
 
@@ -168,6 +181,22 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
                 }
                 break;
 
+            case R.id.nav_library :
+                Intent intent = new Intent(this, LibraryActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.nav_logout :
+
+                AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
+                        .setTitle(getResources().getString(R.string.logout_prefer))
+                        .setPositiveButton(getResources().getString(R.string.logout_yes), onClickSignOutYes)
+                        .setNegativeButton(getResources().getString(R.string.logout_no), onClickSignOutNo);
+
+                AlertDialog alertDialog = alterDialogBuilder.create();
+                alertDialog.show();
+                break;
+
         }
 
         mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -199,5 +228,44 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
                 // The user canceled operation.
             }
         }
+    }
+
+    // 로그아웃 확인을 눌렀을 시
+    DialogInterface.OnClickListener onClickSignOutYes = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+
+            // 페이스북과 파이어베이스의 경우
+            if (FirebaseHelper.signInState() != null) {
+                FirebaseHelper.signOut();
+                redirectLoginActivity();
+            }
+            // 카카오톡의 경우
+            else if (Session.getCurrentSession().isOpened()) {
+
+                UserManagement.requestLogout(new LogoutResponseCallback() {
+                    @Override
+                    public void onCompleteLogout() {
+                        redirectLoginActivity();
+                    }
+
+
+                });
+            }
+
+        }
+    };
+
+    DialogInterface.OnClickListener onClickSignOutNo = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.cancel();
+        }
+    };
+
+    public void redirectLoginActivity() {
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(loginIntent);
     }
 }

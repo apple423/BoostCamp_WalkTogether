@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,13 +72,14 @@ import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFIL
  * Created by Han on 2017-07-25.
  */
 
-public class LoginActivity extends DrawerBaseActivity implements OnClickProfileImageButtonClickInterface, RequestKakaoMeAndSignUpInterface {
+public class LoginActivity extends AppCompatActivity implements OnClickProfileImageButtonClickInterface, RequestKakaoMeAndSignUpInterface {
 
     private static final int PICK_FROM_GALLERY = 100;
 
     private Button mSignInButton;
     private Button mSignUpButton;
     private ImageButton mFacebookSignInButton;
+    private LinearLayout mFacebookSignInLinear;
     private SignUpDialog mSignUpDialog;
     private SendImageViewToDialogInterface mSendImageViewToDialogInterface;
     private ImageView mProfilePictureFromDialog;
@@ -95,18 +98,16 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View contentView = inflater.inflate(R.layout.activity_login, mFrameLayout, false);
-        mDrawerLayout.addView(contentView, 0);
+        setContentView(R.layout.activity_login);
 
         mContext = this;
         mSignInButton = (Button) findViewById(R.id.sign_in_button);
         mSignUpButton = (Button) findViewById(R.id.sign_up_button);
-        mFacebookSignInButton = (ImageButton) findViewById(R.id.facebook_sign_in_button);
+        //mFacebookSignInButton = (ImageButton) findViewById(R.id.facebook_sign_in_button);
         mEmailEditText = (EditText) findViewById(R.id.sign_in_email_editText);
         mPasswordEditText = (EditText) findViewById(R.id.sign_in_password_editText);
         mProgressBar = (ProgressBar) findViewById(R.id.sign_in_progressBar);
+        mFacebookSignInLinear = (LinearLayout) findViewById(R.id.facebook_sign_in_linear);
 
 
 
@@ -131,7 +132,8 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
 
         mSignInButton.setOnClickListener(mOnClickListener);
         mSignUpButton.setOnClickListener(mOnClickListener);
-        mFacebookSignInButton.setOnClickListener(mOnClickListener);
+        //mFacebookSignInButton.setOnClickListener(mOnClickListener);
+        mFacebookSignInLinear.setOnClickListener(mOnClickListener);
     }
 
 
@@ -273,7 +275,7 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
                     mSignUpDialog.show();
                     break;
 
-                case R.id.facebook_sign_in_button :
+                case R.id.facebook_sign_in_linear :
                     mCallbackManager = CallbackManager.Factory.create();
                     mFacebookLoginManager.logInWithReadPermissions((Activity) mContext, mFacebookLoginArrayList);
                     mFacebookLoginManager.registerCallback(mCallbackManager,facebookCallback);
@@ -345,13 +347,6 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_EMAIL,user.getEmail());
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,user.getPhotoUrl().toString());
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,user.getDisplayName());
-
-        Glide.with(this).load(user.getPhotoUrl()).into(mNavProfileCircleImageView);
-        mNavNametextView.setText(user.getDisplayName());
-        mNavEmailtextView.setText(user.getEmail());
-
-
-
 
     }
 
@@ -433,11 +428,11 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
                 SharedPreferenceUtil.editKaKaoCheckSharedPreference(KAKAO_DATA_SEND_CHECK,true);
 
             }
-            /*SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
+            SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_EMAIL, userProfile.getEmail());
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,userProfile.getThumbnailImagePath());
-            SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,userProfile.getNickname());*/
-            setUserProfileToSharedPreferences();
+            SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,userProfile.getNickname());
+            //setUserProfileToSharedPreferences();
 
             redirectMainActivity();
         }

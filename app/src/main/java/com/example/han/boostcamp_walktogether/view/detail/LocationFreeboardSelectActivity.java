@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -65,6 +66,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
     private TextView mContentTextView;
     private TextView mCommentTextView;
     private TextView mShowCommentTextView;
+    private LinearLayout mNoCommentLinearLayout;
     private FreeboardDTO mFreeboardDTO;
     private ImageView mUserProfileImageView;
     private ImageView mCommentImageView;
@@ -100,6 +102,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         mThumbUpView = (ThumbUpView)findViewById(R.id.location_freeboard_select_like);
         mShowCommentTextView = (TextView) findViewById(R.id.location_freeboard_comment_show_textView);
         mCommentImageView = (ImageView)findViewById(R.id.location_freeboard_select_comment_imageView);
+        mNoCommentLinearLayout = (LinearLayout)findViewById(R.id.location_freeboard_comment_no_comment);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         mLocationFreeboardCommentAdapter = new LocationFreeboardCommentAdapter(this,getResources());
@@ -126,6 +129,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         mCommentTextView.setOnClickListener(onClickCommentListener);
         mShowCommentTextView.setOnClickListener(onClickCommentListener);
         mCommentImageView.setOnClickListener(onClickCommentListener);
+        mNoCommentLinearLayout.setOnClickListener(onClickCommentListener);
         mThumbUpView.setOnThumbUp(onClickLike);
 
 
@@ -305,11 +309,27 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
                 ArrayList<FreeboardCommentDTO> freeboardCommentDTOArrayList = response.body();
 
                     mLocationFreeboardCommentAdapter.setFreeboardCommentDTOArrayList(freeboardCommentDTOArrayList);
+
+                    if(freeboardCommentDTOArrayList.size()>0){
+
+                        mFreeboardCommentRecyclerview.setVisibility(View.VISIBLE);
+                        mNoCommentLinearLayout.setVisibility(View.GONE);
+                    }
                     if (freeboardCommentDTOArrayList.size()>=5){
+
 
                         mShowCommentTextView.setVisibility(View.VISIBLE);
                     }
+                    else if(freeboardCommentDTOArrayList.size()==0){
 
+                       mFreeboardCommentRecyclerview.setVisibility(View.GONE);
+                        mNoCommentLinearLayout.setVisibility(View.VISIBLE);
+                    }
+
+            }else{
+
+                mFreeboardCommentRecyclerview.setVisibility(View.GONE);
+                mNoCommentLinearLayout.setVisibility(View.VISIBLE);
             }
         }
 
@@ -318,6 +338,28 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
 
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(mCountComment == 0){
+
+            mFreeboardCommentRecyclerview.setVisibility(View.GONE);
+            mNoCommentLinearLayout.setVisibility(View.VISIBLE);
+        }
+        else if(mCountComment>0){
+            mFreeboardCommentRecyclerview.setVisibility(View.VISIBLE);
+            mNoCommentLinearLayout.setVisibility(View.GONE);
+
+
+        }
+        if(mCountComment>5){
+
+            mShowCommentTextView.setVisibility(View.VISIBLE);
+
+        }
+    }
 
     @Override
     public void onBackPressed() {

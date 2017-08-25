@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -78,6 +80,7 @@ public class FreeboardCommentAddActivity extends BackButtonActionBarActivity {
 
 
         mButtonPost.setOnClickListener(onClickPostButtonListener);
+        mFreeboardCommentEditText.addTextChangedListener(textWatcher);
 
         getFreeboardComment();
 
@@ -233,4 +236,33 @@ public class FreeboardCommentAddActivity extends BackButtonActionBarActivity {
 
         }
     }
+
+    TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+            if(s.length()==0){
+                mButtonPost.setEnabled(false);
+                String textLengthString = String.format(getResources().getString(R.string.zero_to_200),s.length());
+               // mLocationFreeboardAddTextLength.setText(textLengthString);
+            }
+            else if(s.length()>0){
+                mButtonPost.setEnabled(true);
+                String textLengthString = String.format(getResources().getString(R.string.zero_to_200),s.length());
+               // mLocationFreeboardAddTextLength.setText(textLengthString);
+
+            }
+
+        }
+    };
 }
