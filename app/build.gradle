@@ -26,6 +26,9 @@ dependencies {
         maven {
             url 'https://dl.bintray.com/wangyuwei/maven'
         }
+        maven {
+            url 'https://jitpack.io'
+        }
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -60,6 +63,8 @@ dependencies {
     compile 'com.ldoublem.thumbUplib:ThumbUplib:0.5'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'me.wangyuwei:FlipShare:1.0.2'
+    compile 'com.github.ViksaaSkool:AwesomeSplash:v1.0.0'
+
 
 }
 

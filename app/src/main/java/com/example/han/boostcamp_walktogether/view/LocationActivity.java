@@ -139,7 +139,6 @@ public class LocationActivity extends BackButtonActionBarActivity {
                 case R.id.location_button_location_freeboard :
                     Intent intentLocationFreeboard = new Intent(mContext,LocationFreeboardActivity.class);
                     intentLocationFreeboard.putExtra(StringKeys.LOCATION_ID_KEY,mParkKey);
-
                     startActivity(intentLocationFreeboard);
                     break;
 

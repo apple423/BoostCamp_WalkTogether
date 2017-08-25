@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,8 +35,6 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     private ArrayList<ParkListDTO> parkListDTOArrayList;
-    private ArrayList<ParkRowDTO> parkRowDTOArrayList;
-    private ArrayList<CommentAveragePointDTO> commentAveragePointDTOArrayList;
     private Context mContext;
     private OnClickLocationListInterface mOnClickLocationListInterface;
 
@@ -43,13 +42,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         mContext = context;
         mOnClickLocationListInterface = onClickLocationListInterface;
     }
-    public void setDataArrayList(ArrayList<ParkRowDTO> parkRowDTOs, ArrayList<CommentAveragePointDTO> commentAveragePointDTOs){
 
-        parkRowDTOArrayList = parkRowDTOs;
-        commentAveragePointDTOArrayList = commentAveragePointDTOs;
-        notifyDataSetChanged();
-
-    }
     public void setParkArrayList(ArrayList<ParkListDTO> parkArrayList){
 
         parkListDTOArrayList = parkArrayList;
@@ -128,13 +121,15 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public class LocationListViewHolder extends RecyclerView.ViewHolder{
-        ImageView mPicutureImageView;
-        TextView mLocationTitleTextView;
-        TextView mLocationAddressTextView;
-        TextView mLocationHeartTextView;
-        TextView mLocationPetTextView;
-        TextView mLocationDistanceTextView;
-        CardView mLocationListCardView;
+        private ImageView mPicutureImageView;
+        private TextView mLocationTitleTextView;
+        private TextView mLocationAddressTextView;
+        private TextView mLocationHeartTextView;
+        private TextView mLocationPetTextView;
+        private TextView mLocationDistanceTextView;
+        private CardView mLocationListCardView;
+        private Button mLocationFreeboardButton, mLocationCommentButton;
+
 
 
         public LocationListViewHolder(View itemView) {
@@ -147,19 +142,44 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mLocationPetTextView = (TextView)itemView.findViewById(R.id.location_list_pet_score);
             mLocationDistanceTextView = (TextView)itemView.findViewById(R.id.location_list_distance_score);
             mLocationListCardView = (CardView)itemView.findViewById(R.id.location_list_cardView);
+            mLocationFreeboardButton = (Button) itemView.findViewById(R.id.location_list_freeboard_button);
+            mLocationCommentButton = (Button) itemView.findViewById(R.id.location_list_comment_button);
 
-            View.OnClickListener clickCardViewListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                    mOnClickLocationListInterface.onClickList(getAdapterPosition());
 
-                }
-            };
-
-            mLocationListCardView.setOnClickListener(clickCardViewListener);
+           // mLocationListCardView.setOnClickListener(onClickCardViewListener);
+            mLocationFreeboardButton.setOnClickListener(onClickFreeboardButtonListener);
+            mLocationCommentButton.setOnClickListener(onClickCommentButtonListener);
 
         }
+        View.OnClickListener onClickCardViewListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mOnClickLocationListInterface.onClickList(getAdapterPosition());
+
+            }
+        };
+
+        View.OnClickListener onClickFreeboardButtonListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mOnClickLocationListInterface.onClickLocationFreeboard(getAdapterPosition());
+
+            }
+        };
+
+        View.OnClickListener onClickCommentButtonListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mOnClickLocationListInterface.onClickLocationComment(getAdapterPosition());
+
+            }
+        };
+
+
     }
 
     public class LocationListTopViewHolder extends RecyclerView.ViewHolder{

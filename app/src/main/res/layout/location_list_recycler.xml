@@ -33,11 +33,12 @@
             <ImageView
                 android:id="@+id/location_list_picture"
                 android:layout_width="100dp"
-                android:layout_height="140dp"
+                android:layout_height="130dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:scaleType="centerCrop"
-                />
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="8dp" />
 
             <TextView
                 android:id="@+id/location_list_title"
@@ -186,34 +187,37 @@
 
             <Button
                 android:id="@+id/location_list_freeboard_button"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
                 android:text="@string/location_freeboard"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="8dp"
-                android:background="@drawable/button_selector"
+                android:background="@drawable/button_selector_transparent"
                 app:layout_constraintTop_toBottomOf="@+id/location_list_linear"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintVertical_bias="0.0"
                 app:layout_constraintLeft_toRightOf="@+id/location_list_picture"
+                app:layout_constraintRight_toLeftOf="@+id/location_list_comment_button"
+                android:layout_marginRight="8dp"
                  />
 
 
             <Button
                 android:id="@+id/location_list_comment_button"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
                 android:text="@string/location_comment"
                 android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/button_selector"
+                android:background="@drawable/button_selector_transparent"
                 app:layout_constraintTop_toBottomOf="@+id/location_list_linear"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/location_list_freeboard_button"
+
+                 />
 
 
         </android.support.constraint.ConstraintLayout>

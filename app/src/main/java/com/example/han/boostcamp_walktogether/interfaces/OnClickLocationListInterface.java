@@ -7,5 +7,7 @@ package com.example.han.boostcamp_walktogether.interfaces;
 public interface OnClickLocationListInterface {
 
     void onClickList(int position);
+    void onClickLocationFreeboard(int position);
+    void onClickLocationComment(int position);
 
 }

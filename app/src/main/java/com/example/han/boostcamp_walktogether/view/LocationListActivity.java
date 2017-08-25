@@ -138,68 +138,6 @@ public class LocationListActivity extends DrawerBaseActivity implements
         }
     }
 
-    Callback<ArrayList<ParkRowDTO>> parkRowDataListCallback = new Callback<ArrayList<ParkRowDTO>>() {
-        @Override
-        public void onResponse(Call<ArrayList<ParkRowDTO>> call, Response<ArrayList<ParkRowDTO>> response) {
-            if(response.isSuccessful()){
-
-                // 정보를 받아서 리스트에 저장
-                ArrayList<ParkRowDTO> parkRowDTOList = response.body();
-                mParkRowDTOArrayList = parkRowDTOList;
-                // Log.d("checkList",parkRowDTOList.size());
-                //Log.d("RowSize",parkRowDTOList.size() + "man");
-                for(ParkRowDTO parkRowData : parkRowDTOList){
-                    /*LatLng latLng = new LatLng(parkRowData.getLatitude(),parkRowData.getLongitude());
-                    Log.d("checklocation1km", String.valueOf(parkRowData.getLatitude()) + parkRowData.getLongitude());*/
-                    int park_key = parkRowData.getPark_key();
-
-
-                    Call<CommentAveragePointDTO> commentAvaragePointDTOListCall = retrofitUtil.getAveragePoint(park_key);
-                    commentAvaragePointDTOListCall.enqueue(commentAveragePointDTOCallback);
-
-                }
-
-            }else{
-                Log.d("ErroringetNearest",response.errorBody().toString());
-            }
-        }
-
-        @Override
-        public void onFailure(Call<ArrayList<ParkRowDTO>> call, Throwable t) {
-
-        }
-    };
-
-
-    Callback<CommentAveragePointDTO> commentAveragePointDTOCallback = new Callback<CommentAveragePointDTO>() {
-        @Override
-        public void onResponse(Call<CommentAveragePointDTO> call, Response<CommentAveragePointDTO> response) {
-            if(response.isSuccessful()){
-                CommentAveragePointDTO commentAveragePointDTO = response.body();
-
-
-                mAveragePointDTOArrayList.add(commentAveragePointDTO);
-
-
-                // 공원 정보와 공원의 평가점수 리스트가 같을시 어뎁터에 보낸다.
-                if(mParkRowDTOArrayList.size() == mAveragePointDTOArrayList.size()){
-
-                    hideProgressBar();
-                    Collections.sort(mAveragePointDTOArrayList,ComparatorUtil.commentAveragePointDTOComparator);
-                    locationListAdapter.setDataArrayList(mParkRowDTOArrayList,mAveragePointDTOArrayList);
-
-
-                }
-
-            }
-
-        }
-
-        @Override
-        public void onFailure(Call<CommentAveragePointDTO> call, Throwable t) {
-
-        }
-    };
 
     Callback<ArrayList<ParkListDTO>> getParkListDTOCallback = new Callback<ArrayList<ParkListDTO>>() {
         @Override
@@ -255,6 +193,30 @@ public class LocationListActivity extends DrawerBaseActivity implements
         Parcelable parcelableParkRowData = Parcels.wrap(mParkListDTOArrayList.get(position-1));
         intent.putExtra(StringKeys.LOCATION_INTENT_LIST_KEY,parcelableParkRowData);
         startActivity(intent);
+
+    }
+
+    @Override
+    public void onClickLocationFreeboard(int position) {
+        Intent intent = new Intent(this,LocationFreeboardActivity.class);
+        ParkListDTO parkListDTO = mParkListDTOArrayList.get(position-1);
+        int parkKey = parkListDTO.getPark_key();
+        intent.putExtra(StringKeys.LOCATION_ID_KEY,parkKey);
+        startActivity(intent);
+
+    }
+
+    @Override
+    public void onClickLocationComment(int position) {
+        Intent intent = new Intent(this,LocationCommentActivity.class);
+        ParkListDTO parkListDTO = mParkListDTOArrayList.get(position-1);
+        int parkKey = parkListDTO.getPark_key();
+        String locationName = parkListDTO.getName();
+        intent.putExtra(StringKeys.LOCATION_ID_KEY,parkKey);
+        intent.putExtra(StringKeys.LOCATION_NAME,locationName);
+        startActivity(intent);
+
+
 
     }
 }
