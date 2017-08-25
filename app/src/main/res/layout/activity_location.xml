@@ -22,7 +22,6 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_gravity="center"
-            app:cardBackgroundColor="@color/colorPrimaryLight"
             android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
@@ -127,7 +126,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_gravity="center"
-            android:background="@color/colorPrimaryLight"
+
           >
 
 
@@ -166,7 +165,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
+
         >
 
         <Button
@@ -174,11 +173,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/location_freeboard"
+            android:textStyle="bold"
+            android:background="@drawable/button_selector"
             android:layout_weight="1"
-            android:layout_marginRight="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_margin="16dp"
+
 
             />
 
@@ -187,11 +186,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/location_comment"
+            android:textStyle="bold"
+            android:background="@drawable/button_selector"
             android:layout_weight="1"
-            android:layout_marginRight="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginEnd="12dp"/>
+            android:layout_margin="16dp"/>
 
     </LinearLayout>
 

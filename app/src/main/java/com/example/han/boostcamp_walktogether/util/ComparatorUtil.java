@@ -5,6 +5,7 @@ import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardCommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
+import com.example.han.boostcamp_walktogether.data.ParkListDTO;
 import com.example.han.boostcamp_walktogether.data.RecentCommentDTO;
 
 import java.util.Comparator;
@@ -40,6 +41,35 @@ public class ComparatorUtil  {
         @Override
         public int compare(CommentAveragePointDTO o1, CommentAveragePointDTO o2) {
             return o1.getPark_key() - o2.getPark_key();
+        }
+    };
+
+    public static Comparator<ParkListDTO> sortByFavInLocationList = new Comparator<ParkListDTO>() {
+        @Override
+        public int compare(ParkListDTO o1, ParkListDTO o2) {
+            return Math.round(o2.getAvgStar() - o1.getAvgStar());
+        }
+    };
+
+    public static Comparator<ParkListDTO> sortByAnimalLocationList = new Comparator<ParkListDTO>() {
+
+
+        @Override
+        public int compare(ParkListDTO o1, ParkListDTO o2) {
+            return Math.round(o2.getAvgPet() - o1.getAvgPet());
+        }
+    };
+
+    public static Comparator<ParkListDTO> sortByDistanceLocationList = new Comparator<ParkListDTO>() {
+        @Override
+        public int compare(ParkListDTO o1, ParkListDTO o2) {
+            if(o1.getDistance()>o2.getDistance())
+                return 1;
+            else if (o1.getDistance() == o2.getDistance())
+                return 0;
+
+            else return -1;
+
         }
     };
 

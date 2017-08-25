@@ -43,6 +43,34 @@
 
         </android.support.v7.widget.RecyclerView>
 
+        <LinearLayout
+            android:id="@+id/location_comment_list_noData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_caution"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/no_data"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+
+
+
+        </LinearLayout>
+
+
     </LinearLayout>
 
 
@@ -52,15 +80,18 @@
         android:layout_weight="9">
 
         <Button
-
+            android:id="@+id/location_comment_to_add_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="평가 남기기"
+            android:textStyle="bold"
             android:layout_gravity="center|bottom"
             android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginLeft="8dp"
-            android:id="@+id/location_comment_to_add_button" />
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/button_selector"
+            />
 
 
     </FrameLayout>

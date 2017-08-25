@@ -26,6 +26,7 @@ public class StringKeys {
     public static final String USER_PROFILE_PICTURE = "userProfilePicture";
     public static final String USER_EMAIL= "userEmail";
     public static final String LOCATION_INTENT_KEY = "locationData";
+    public static final String LOCATION_INTENT_LIST_KEY = "locationListDATA";
 
     //ParkList and ParkImageList (LocationFreeboardAcitivity)
     public static final String PARK_LIST = "parkList";

@@ -60,12 +60,6 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
     }
 
-//    public void setParkImageList(ArrayList<FreeboardImageDTO> listimage){
-//        mParkFreeboardImageList = listimage;
-//        notifyDataSetChanged();
-//
-//    }
-
     @Override
     public LocationFreeboardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -90,8 +84,6 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
         holder.mUserNameTextView.setText(data.getUser_name());
         holder.mTitleTextview.setText(data.getTitle());
 
-            //TODO 9. null 처리리
-          // Glide.with(mContext).load(data.getUser_profie()).into(mProfileImageView);
 
             if(data.getUser_profile()!=null){
                 Glide.with(mContext).load(data.getUser_profile()).into(holder.mProfileImageView);
@@ -102,12 +94,15 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
 
 
             if(!imageData.getImage().equals("empty")) {
-                Glide.with(mContext).load("http://" + imageData.getImage()).placeholder(R.drawable.placeholder).into(holder.mPicutreImageView);
+                Glide.with(mContext).load("http://" + imageData.getImage())
+                        .placeholder(R.drawable.placeholder)
+                        .into(holder.mPicutreImageView);
             }
             else{
 
-                Glide.with(mContext).load(R.drawable.park_default_picture).placeholder(R.drawable.placeholder).into(holder.mPicutreImageView);
-                //holder.mPicutreImageView.setImageResource(R.drawable.park_default_picture);
+                Glide.with(mContext).load(R.drawable.park_default_picture)
+                        .placeholder(R.drawable.placeholder)
+                        .into(holder.mPicutreImageView);
 
             }
 

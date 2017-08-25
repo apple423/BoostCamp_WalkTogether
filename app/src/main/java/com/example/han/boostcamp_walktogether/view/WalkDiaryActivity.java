@@ -149,12 +149,12 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
                 .addApi(Places.PLACE_DETECTION_API)
                 .build();
         mGoogleApiClient.connect();
+        getUserProfileAndSetHeader();
 
         mMapFragment = SupportMapFragment.newInstance();
         mNoDataFragment = NoDataFragment.newInstance();
         SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
         userEmail = SharedPreferenceUtil.getUserProfile(USER_EMAIL);
-        //mMapFragment.getMapAsync(onMapReadyCallback);
 
         getWalkDiaryData();
 
@@ -436,15 +436,15 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
 
 
 
+    // share 버튼의 sms를 누를시 intent를 통해 전달 할 수 있다.
     @Override
     public void onClickShareSMSButton(int position) {
-
-
 
         WalkDiaryDTO walkDiaryDTO = mWalkDiaryDTOArrayList.get(position);
         mDiary_key = walkDiaryDTO.getDiary_key();
         String imageURL = mWalkDiaryImageDTOArrayList.get(position).getImage_url();
 
+        // 이미지뷰의 메모리에서 png로 만들어 로컬에 저장 후 uri를 얻어 온다.
         WalkDiaryAdapter.WalkDiaryViewHolder holder = (WalkDiaryAdapter.WalkDiaryViewHolder)
                 mDiaryRecyclerView.findViewHolderForAdapterPosition(position);
         ImageView imageView = holder.getmMapMoveImageView();
@@ -468,6 +468,7 @@ public class WalkDiaryActivity extends DrawerBaseActivity implements OnMapReadyC
 
     }
 
+    // share버튼을 누른 후 kakao를 누를 시 카카오링크를 통해 일지를 전송할 수 있다.
     @Override
     public void onClickShareKakaoButton(int position) {
 

@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -112,6 +114,7 @@ public class WalkDiaryAddDialog extends DialogFragment {
 
         mWalkDiaryAddButton.setOnClickListener(onClickAddButton);
         mWalkDiaryCancelButton.setOnClickListener(onClickCancelButton);
+        mContentEditText.addTextChangedListener(textWatcher);
 
         Glide.with(this)
                 .load(mUri)
@@ -146,6 +149,31 @@ public class WalkDiaryAddDialog extends DialogFragment {
         getActivity().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, mUri));
         dismiss();
     }
+
+    TextWatcher textWatcher= new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if(s.length()>0){
+
+                mWalkDiaryAddButton.setEnabled(true);
+            }
+            else if(s.length()==0){
+
+                mWalkDiaryAddButton.setEnabled(false);
+            }
+
+        }
+    };
 
 
     public void addWalkDiaryContent(){

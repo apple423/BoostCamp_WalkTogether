@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
@@ -46,6 +47,7 @@ public class LocationCommentActivity extends BackButtonActionBarActivity{
     private Context mContext;
     private int mParkKey;
     private String mLocationName;
+    private LinearLayout mLinearNodata;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +61,7 @@ public class LocationCommentActivity extends BackButtonActionBarActivity{
         mLocationCommentRecycelerView = (RecyclerView)findViewById(R.id.location_comment_recyclerView);
         mAddCommentButton = (Button)findViewById(R.id.location_comment_to_add_button);
         mLocationTitleTextView = (TextView)findViewById(R.id.location_comment_location_title_textView);
+        mLinearNodata = (LinearLayout)findViewById(R.id.location_comment_list_noData);
 
         mLinearlayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         mLocationCommentAdapter = new LocationCommentAdapter(this,getResources());
@@ -97,8 +100,11 @@ public class LocationCommentActivity extends BackButtonActionBarActivity{
             Log.d("ActivityCommentResult","yes");
             Parcelable commentArrayListParcelable = data.getParcelableExtra(StringKeys.COMMENT_LIST);
             ArrayList<CommentDTO> commentArrayList = Parcels.unwrap(commentArrayListParcelable);
-            mLocationCommentAdapter.setmCommentArrayList(commentArrayList);
-
+            if(commentArrayList.size()!=0) {
+                mLocationCommentAdapter.setmCommentArrayList(commentArrayList);
+                mLocationCommentRecycelerView.setVisibility(View.VISIBLE);
+                mLinearNodata.setVisibility(View.GONE);
+            }
         }
 
     }
@@ -122,7 +128,22 @@ public class LocationCommentActivity extends BackButtonActionBarActivity{
         public void onResponse(Call<ArrayList<CommentDTO>> call, Response<ArrayList<CommentDTO>> response) {
             if(response.isSuccessful()){
                 ArrayList<CommentDTO> commentArrayList = response.body();
-                mLocationCommentAdapter.setmCommentArrayList(commentArrayList);
+
+                if(commentArrayList.size()==0){
+                    mLocationCommentRecycelerView.setVisibility(View.GONE);
+                    mLinearNodata.setVisibility(View.VISIBLE);
+
+                }
+                else{
+                    mLocationCommentRecycelerView.setVisibility(View.VISIBLE);
+                    mLinearNodata.setVisibility(View.GONE);
+                    mLocationCommentAdapter.setmCommentArrayList(commentArrayList);
+                }
+
+
+            }else{
+                mLocationCommentRecycelerView.setVisibility(View.GONE);
+                mLinearNodata.setVisibility(View.VISIBLE);
 
             }
 

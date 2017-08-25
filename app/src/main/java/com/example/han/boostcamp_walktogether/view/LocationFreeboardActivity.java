@@ -157,6 +157,12 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
             mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
                     , mFreeboardLikeList, mFreeboardUserLikeList, mCommentCountList);
 
+            if(mLocationFreeboardAdapter.getItemCount()!=0){
+
+                mLocationFreeboardRecycelerView.setVisibility(View.VISIBLE);
+                mLinearLayoutNodata.setVisibility(View.GONE);
+            }
+
         }
         else if(requestCode == PUSH_SELECT_ACTIVITY && resultCode == RESULT_OK){
             Parcelable freeboardLikeListParcelabe = data.getParcelableExtra(StringKeys.PARK_LIKE_LIST);
@@ -211,7 +217,6 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
                 public void onResponse(Call<FreeboardDTO> call, Response<FreeboardDTO> response) {
                     if (response.isSuccessful()) {
 
-                        Log.d("LikePostSuccess", "tetete");
                     }
 
                 }

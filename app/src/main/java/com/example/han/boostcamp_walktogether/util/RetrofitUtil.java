@@ -5,6 +5,7 @@ import com.example.han.boostcamp_walktogether.data.CommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardCommentDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardDTO;
 import com.example.han.boostcamp_walktogether.data.FreeboardImageDTO;
+import com.example.han.boostcamp_walktogether.data.ParkListDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.data.RecentCommentDTO;
 import com.example.han.boostcamp_walktogether.data.WalkDiaryDTO;
@@ -48,6 +49,9 @@ public interface RetrofitUtil {
     // 현재 사용자의 위도 경도를 받아 반경 1km이내에 공원들을 가져올 수 있다.
     @GET("/db/{myLatitude}/{myLongitude}")
     Call<ArrayList<ParkRowDTO>> getNearestPark(@Path("myLatitude") double myLatitude, @Path("myLongitude") double myLongitude);
+
+    @GET("/db/list/{myLatitude}/{myLongitude}")
+    Call<ArrayList<ParkListDTO>> getNearestParkList(@Path("myLatitude") double myLatitude, @Path("myLongitude") double myLongitude);
 
     // 장소별 게시판에 게시물을 등록한다.
     @POST("/freeboard/add/{park_key}")
@@ -150,6 +154,8 @@ public interface RetrofitUtil {
     // 게시글의 댓글들을 5개만 가져오기 위함
     @GET("/freeboard/comment/search/five/{freeboard_key}")
     Call<ArrayList<FreeboardCommentDTO>> getFreeboardCommentFive(@Path("freeboard_key") int freeboard_key);
+
+
 
 
 }

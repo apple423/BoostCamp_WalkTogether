@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -54,6 +55,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_DATA_SEND_CHECK;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.FACEBOOK_SHARED_PREFERENCES;
 import static com.example.han.boostcamp_walktogether.util.StringKeys.KAKAO_DATA_SEND_CHECK;
@@ -87,6 +90,8 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
     private CallbackManager mCallbackManager;
     private KaKaoSessionCallback mKaKaoSessionCallback;
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +107,8 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         mEmailEditText = (EditText) findViewById(R.id.sign_in_email_editText);
         mPasswordEditText = (EditText) findViewById(R.id.sign_in_password_editText);
         mProgressBar = (ProgressBar) findViewById(R.id.sign_in_progressBar);
+
+
 
         mSignUpDialog = new SignUpDialog(this, this);
         mSendImageViewToDialogInterface = mSignUpDialog;
@@ -337,10 +344,15 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
         SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_EMAIL,user.getEmail());
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,user.getPhotoUrl().toString());
-        Log.d("PhotoURL",user.getPhotoUrl().toString());
-        //TODO 1. 프로필 사진 부분을 수정해야 한다. 각 소셜 계정별,파이어베이스 이메일/패스워드 계정 별 처리 필요
-        // 현재는 NULL이 들어가게 되있다.
         SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,user.getDisplayName());
+
+        Glide.with(this).load(user.getPhotoUrl()).into(mNavProfileCircleImageView);
+        mNavNametextView.setText(user.getDisplayName());
+        mNavEmailtextView.setText(user.getEmail());
+
+
+
+
     }
 
     // 페이스북 로그인 성공 여부를 위한 콜백리스너
@@ -421,10 +433,11 @@ public class LoginActivity extends DrawerBaseActivity implements OnClickProfileI
                 SharedPreferenceUtil.editKaKaoCheckSharedPreference(KAKAO_DATA_SEND_CHECK,true);
 
             }
-            SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
+            /*SharedPreferenceUtil.setUserProfileSharedPreference(mContext,USER_PROFILE,MODE_PRIVATE);
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_EMAIL, userProfile.getEmail());
             SharedPreferenceUtil.editUserProfileSharedPreference(USER_PROFILE_PICTURE,userProfile.getThumbnailImagePath());
-            SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,userProfile.getNickname());
+            SharedPreferenceUtil.editUserProfileSharedPreference(USER_NICK_NAME,userProfile.getNickname());*/
+            setUserProfileToSharedPreferences();
 
             redirectMainActivity();
         }

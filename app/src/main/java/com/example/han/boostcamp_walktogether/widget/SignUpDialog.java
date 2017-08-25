@@ -163,7 +163,6 @@ public class SignUpDialog extends Dialog implements SendImageViewToDialogInterfa
                     Log.d("From Gallery","sadggdssag");
                 }
                 mImageURL = "";
-                //TODO 3. 사용자의 프로필 사진을 Node에 올리도록 수정해야 한다.
 
                 UploadTask uploadTask= FirebaseHelper.uploadProfilePicture(mProfilePictureImageView);
                 uploadTask.addOnFailureListener(new OnFailureListener() {

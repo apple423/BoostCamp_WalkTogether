@@ -12,4 +12,5 @@
     <color name="transparent">#00ffffff</color>
     <color name="transparent_grey">#f1f1f1</color>
     <color name="redText">#ffcc0000</color>
+    <color name="background_grey">#FAFAFA</color>
 </resources>

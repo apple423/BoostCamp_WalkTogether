@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,10 +19,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
@@ -29,13 +32,18 @@ import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -61,9 +69,10 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMarkerClickListener
-{
+        GoogleMap.OnMarkerClickListener {
+
     private static final String TAG = MapActivity.class.getSimpleName();
+    private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 111;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private final LatLng mDefaultLocation = new LatLng(37.405666, 127.114268);
     private static final int DEFAULT_ZOOM = 15;
@@ -80,12 +89,12 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     private CameraPosition mCameraPosition;
     // 처음 맵을 불렀을때만 현재 위치로 이동하고 다시 부를땐 그 자리에 있도록 하기 위함
     private boolean isFisrtMapLoad = true;
-    private Button mLocationNextButton;
-    private TextView mLocationTitleTextView;
+
     private ImageButton mMyLocationButton;
     private Intent mIntent;
     private double searchLatitude;
     private double searchLongtitude;
+    private TextView mLocationSearchTextView;
 
 
     @Override
@@ -107,13 +116,12 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         mIntent = new Intent(this, LocationActivity.class);
         mContext = this;
 
-        mLocationNextButton = (Button)findViewById(R.id.map_next_button);
-        mLocationTitleTextView = (TextView)findViewById(R.id.map_title_textView);
-        mMyLocationButton = (ImageButton)findViewById(R.id.map_current_location);
 
-        mLocationNextButton.setOnClickListener(onClickNextButton);
+        mMyLocationButton = (ImageButton)findViewById(R.id.map_current_location);
+        mLocationSearchTextView = (TextView)findViewById(R.id.location_search_textView);
+
         mMyLocationButton.setOnClickListener(onClickMyLocationButton);
-        mLocationNextButton.setEnabled(false);
+        mLocationSearchTextView.setOnClickListener(onClickLocationSearchListener);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this,
@@ -125,11 +133,11 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
                 .build();
         mGoogleApiClient.connect();
 
+        getUserProfileAndSetHeader();
 
         searchLatitude = getIntent().getDoubleExtra(StringKeys.SEARCH_LATITUDE,0);
         searchLongtitude = getIntent().getDoubleExtra(StringKeys.SEARCH_LONGITUDE,0);
-        Log.d("latitudeSearchInMap",searchLatitude +"");
-        Log.d("longitudeSearchInMap",searchLongtitude +"");
+
     }
 
     @Override
@@ -161,6 +169,24 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
         Log.d(TAG, "Play services connection suspended");
     }
 
+    @Override
+    public void onBackPressed() {
+
+        // 네비게이션 드로워가 열려 있을때
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+        }
+        else {
+           super.onBackPressed();
+
+        }
+
+    }
+
+
+
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
@@ -188,20 +214,34 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
 
     }
 
-
-    View.OnClickListener onClickNextButton = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-            startActivity(mIntent);
-        }
-    };
-
     View.OnClickListener onClickMyLocationButton = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
+            Log.d("mylocation","yes");
            getDeviceLocation();
+
+        }
+    };
+
+    View.OnClickListener onClickLocationSearchListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d("onClickSearch","yes");
+            try {
+                Intent intentDetail =
+                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                .build((Activity) mContext);
+                startActivityForResult(intentDetail, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                Log.d("onClickSearchIntent","yes");
+
+            } catch (GooglePlayServicesRepairableException e) {
+                Log.d("Exception",e.getMessage());
+                // TODO: Handle the error.
+            } catch (GooglePlayServicesNotAvailableException e) {
+                // TODO: Handle the error.
+                Log.d("Exception",e.getMessage());
+            }
 
         }
     };
@@ -350,6 +390,21 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
     };
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // autoCompletePlace를 통한 검색 후 위치 이동
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                double latitude = place.getLatLng().latitude;
+                double longtitude = place.getLatLng().longitude;
+                getCurrentLocation(latitude,longtitude);
+
+            }
+        }
+
+    }
+
     // 마커 선택 후에 title을 클릭시
     @Override
     public void onInfoWindowClick(Marker marker) {
@@ -377,7 +432,10 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
                         LatLng latLng = new LatLng(parkRowData.getLatitude(), parkRowData.getLongitude());
                         Log.d("checklocation1km", String.valueOf(parkRowData.getLatitude()) + parkRowData.getLongitude());
                         // 맵에 마커를 추가하고 마커에 해당 공원정보에 대한 객체를 넣어준다.
-                        Marker marker = mMap.addMarker(new MarkerOptions().title(parkRowData.getName()).position(latLng));
+                        Marker marker = mMap.addMarker(new MarkerOptions()
+                                .title(parkRowData.getName())
+                                .position(latLng)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bone)));
 
                         marker.setTag(parkRowData);
 
@@ -409,9 +467,7 @@ public class MapActivity extends DrawerBaseActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        mLocationNextButton.setEnabled(true);
         ParkRowDTO data = (ParkRowDTO) marker.getTag();
-        mLocationTitleTextView.setText(data.getName());
         Parcels.wrap(data);
         //Intent intent = new Intent(this, LocationActivity.class);
         mIntent.putExtra(StringKeys.LOCATION_INTENT_KEY,Parcels.wrap(data));

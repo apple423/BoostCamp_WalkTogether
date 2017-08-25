@@ -83,6 +83,7 @@ public class FreeboardCommentAddActivity extends BackButtonActionBarActivity {
 
     }
 
+    // 모든 댓글을 가져오는 함수
     private void getFreeboardComment() {
         Call<ArrayList<FreeboardCommentDTO>> getFreeboardComment = mRetrofitUtil.getFreeboardComment(mFreeboardKey);
         getFreeboardComment.enqueue(getFreeboardCommentCallback);
@@ -163,12 +164,7 @@ public class FreeboardCommentAddActivity extends BackButtonActionBarActivity {
 
     @Override
     public void onBackPressed() {
-/*
-        Call<FreeboardCommentDTO> getFreeboardCommentCountCall = mRetrofitUtil.getFreeboardCommentCount(mFreeboardKey);
-        getFreeboardCommentCountCall.enqueue(getFreeboardCommentCountCallback);
 
-        Call<ArrayList<FreeboardCommentDTO>> getFreeboardCommentFiveCall = mRetrofitUtil.getFreeboardCommentFive(mFreeboardKey);
-        getFreeboardCommentFiveCall.enqueue(getFiveFreeboardCommentCallback);*/
         new AsyncCommentForResult().execute();
 
     }

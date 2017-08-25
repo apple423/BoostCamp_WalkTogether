@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
+import com.example.han.boostcamp_walktogether.data.ParkListDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
@@ -68,26 +69,55 @@ public class LocationActivity extends BackButtonActionBarActivity {
         Parcelable passedParcelLocationData = getIntent()
                 .getParcelableExtra(StringKeys.LOCATION_INTENT_KEY);
 
-        ParkRowDTO data = Parcels.unwrap(passedParcelLocationData);
+        Parcelable passedListLocationData = getIntent().getParcelableExtra(StringKeys.LOCATION_INTENT_LIST_KEY);
 
-        Log.d("chkPassedData",data.getName() + " "+data.getAddress());
-        mLocationTextView.setText(data.getName());
+        if(passedParcelLocationData !=null) {
+            ParkRowDTO data = Parcels.unwrap(passedParcelLocationData);
+            Log.d("chkPassedData",data.getName() + " "+data.getAddress());
+            mLocationTextView.setText(data.getName());
 
-        if(data.getImage_url().length()==0){
-            //mLocationImageView.setImageResource(R.drawable.park_default_picture);
-            Glide.with(this).load(R.drawable.park_default_picture).into(mLocationImageView);
-        }else{
-            Glide.with(this).load(data.getImage_url()).into(mLocationImageView);
+            if(data.getImage_url().length()==0){
+                //mLocationImageView.setImageResource(R.drawable.park_default_picture);
+                Glide.with(this).load(R.drawable.park_default_picture).into(mLocationImageView);
+            }else{
+                Glide.with(this).load(data.getImage_url()).into(mLocationImageView);
 
+
+            }
+
+            mLocationAddressTextView.setText(data.getAddress());
+
+            mParkKey = data.getPark_key();
+            mLocationName = data.getName();
+            Call<CommentAveragePointDTO> commentAveragePointDTOCall = retrofitUtil.getAveragePoint(mParkKey);
+            commentAveragePointDTOCall.enqueue(commentAvaragePointCallback);
+
+
+        }else if(passedListLocationData !=null){
+            ParkListDTO data = Parcels.unwrap(passedListLocationData);
+
+            Log.d("chkPassedData",data.getName() + " "+data.getAddress());
+            mLocationTextView.setText(data.getName());
+
+            if(data.getImage_url().length()==0){
+                //mLocationImageView.setImageResource(R.drawable.park_default_picture);
+                Glide.with(this).load(R.drawable.park_default_picture).into(mLocationImageView);
+            }else{
+                Glide.with(this).load(data.getImage_url()).into(mLocationImageView);
+
+
+            }
+
+            mLocationAddressTextView.setText(data.getAddress());
+
+            mParkKey = data.getPark_key();
+            mLocationName = data.getName();
+            Call<CommentAveragePointDTO> commentAveragePointDTOCall = retrofitUtil.getAveragePoint(mParkKey);
+            commentAveragePointDTOCall.enqueue(commentAvaragePointCallback);
 
         }
 
-        mLocationAddressTextView.setText(data.getAddress());
 
-        mParkKey = data.getPark_key();
-        mLocationName = data.getName();
-        Call<CommentAveragePointDTO> commentAveragePointDTOCall = retrofitUtil.getAveragePoint(mParkKey);
-        commentAveragePointDTOCall.enqueue(commentAvaragePointCallback);
 
     }
 
@@ -118,19 +148,6 @@ public class LocationActivity extends BackButtonActionBarActivity {
         }
     };
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id){
-            case android.R.id.home :
-                onBackPressed();
-                return true;
-
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     Callback<CommentAveragePointDTO> commentAvaragePointCallback =  new Callback<CommentAveragePointDTO>() {
         @Override

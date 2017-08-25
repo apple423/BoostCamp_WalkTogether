@@ -15,12 +15,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.han.boostcamp_walktogether.ActionBar.BackButtonActionBarActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationFreeboardAddPictureAdapter;
@@ -59,6 +62,7 @@ import static com.example.han.boostcamp_walktogether.util.StringKeys.USER_PROFIL
 
 public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
+    private static final int DEFAULT_TEXT_VALUE = 0;
     private static final int PICK_IMAGE_MULTIPLE = 100;
     private static final int PUSH_ADD_BUTTON = 101;
     RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
@@ -70,6 +74,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
     private int mParkKey;
     private EditText mLocationFreeboardAddTitleEditText;
     private EditText mLocationFreeboardAddContentEditText;
+    private TextView mLocationFreeboardAddTextLength;
     private ImageView mLocationFreeboardAddPicutreImageView;
     private Button mLocationFreeboardAddButton;
     private boolean isFirstAddPicture = true;
@@ -107,6 +112,10 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         mLocationFreeboardAddPicutreImageView = (ImageView)findViewById(R.id.location_freeboard_add_picture_imageView);
         mLocationFreeboardAddButton = (Button) findViewById(R.id.location_freeboard_add_button);
         pictureRecyclerView = (RecyclerView)findViewById(R.id.location_freeboard_add_picture_recyclerView);
+        mLocationFreeboardAddTextLength = (TextView)findViewById(R.id.location_freeboard_add_textLength);
+
+        String defaultString = String.format(getResources().getString(R.string.zero_to_200),DEFAULT_TEXT_VALUE);
+        mLocationFreeboardAddTextLength.setText(defaultString);
 
         linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         locationFreeboardAddPictureAdapter = new LocationFreeboardAddPictureAdapter();
@@ -117,6 +126,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         mUserMail = getIntent().getStringExtra(StringKeys.USER_EMAIL);
         mLocationFreeboardAddPicutreImageView.setOnClickListener(onClickAddImageViewListener);
         mLocationFreeboardAddButton.setOnClickListener(onClickAddButton);
+        mLocationFreeboardAddContentEditText.addTextChangedListener(textWatcher);
 
 
     }
@@ -187,6 +197,36 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
             //게시글 등록
             Call<FreeboardDTO> freeboardAddCall  = retrofitUtil.postFreeboard(mParkKey,dto);
             freeboardAddCall.enqueue(addFreeboardCallback);
+
+        }
+    };
+
+    TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+            if(s.length()==0){
+                mLocationFreeboardAddButton.setEnabled(false);
+                String textLengthString = String.format(getResources().getString(R.string.zero_to_200),s.length());
+                mLocationFreeboardAddTextLength.setText(textLengthString);
+            }
+            else if(s.length()>0){
+                mLocationFreeboardAddButton.setEnabled(true);
+                String textLengthString = String.format(getResources().getString(R.string.zero_to_200),s.length());
+                mLocationFreeboardAddTextLength.setText(textLengthString);
+
+            }
 
         }
     };

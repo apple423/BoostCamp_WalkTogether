@@ -70,7 +70,7 @@
     <View
         android:layout_width="0dp"
         android:layout_height="2dp"
-        android:background="@color/transparent_grey"
+        android:background="@color/colorPrimaryDark"
         android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="16dp"
@@ -103,12 +103,12 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/location_freeboard_viewPager"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="250dp"
         android:layout_marginEnd="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -130,11 +130,22 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp" />
 
+    <ImageView
+        android:id="@+id/location_freeboard_select_comment_imageView"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/comment"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintRight_toLeftOf="@+id/location_freeboard_select_like"
+        app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_content" />
+
     <com.ldoublem.thumbUplib.ThumbUpView
         android:id="@+id/location_freeboard_select_like"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:cracksColor="@color/transparent_grey"
+        app:bgColor="@color/background_grey"
         app:edgeColor="@android:color/holo_red_dark"
         app:fillColor="@android:color/holo_red_dark"
         app:unlikeType="1"
@@ -153,7 +164,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:background="@color/transparent_grey"
+        android:background="@color/colorPrimaryDark"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/location_freeboard_select_comment_textView"/>
@@ -184,7 +195,7 @@
         android:text="@string/show_all_comment"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:padding="16dp"
+        android:paddingBottom="8dp"
         app:layout_constraintTop_toBottomOf="@+id/location_freeboard_comment_recyclerView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

@@ -4,23 +4,23 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_diary"
-            android:icon="@drawable/ic_menu_send"
-            android:title="산책일지"
+            android:icon="@drawable/dog_title"
+            android:title="@string/pet_diary"
 
             />
 
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
+            android:id="@+id/nav_location_list"
+            android:icon="@mipmap/ic_search"
             android:title="@string/search_location_with_list" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/pet_favorite" />
+            android:id="@+id/nav_location_map"
+            android:icon="@mipmap/ic_search"
+            android:title="@string/search_location_with_map" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/location_recommend" />
+            android:id="@+id/nav_location_auto"
+            android:icon="@mipmap/ic_search"
+            android:title="@string/search_location_with_autoComplete" />
 
     </group>
 

@@ -21,6 +21,7 @@ public class CommentDTO {
     float pet_point;
     String comment;
     Date date;
+    int statusCode;
 
     
     public int getComment_key() {
@@ -94,5 +95,13 @@ public class CommentDTO {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 }

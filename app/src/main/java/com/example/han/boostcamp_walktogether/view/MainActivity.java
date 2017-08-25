@@ -10,17 +10,20 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationRecentCommentAdapter;
 import com.example.han.boostcamp_walktogether.R;
@@ -28,6 +31,7 @@ import com.example.han.boostcamp_walktogether.data.RecentCommentDTO;
 import com.example.han.boostcamp_walktogether.helper.FirebaseHelper;
 import com.example.han.boostcamp_walktogether.interfaces.OnClickRecentCommentInterface;
 import com.example.han.boostcamp_walktogether.util.RetrofitUtil;
+import com.example.han.boostcamp_walktogether.util.SharedPreferenceUtil;
 import com.example.han.boostcamp_walktogether.util.StringKeys;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -51,7 +55,7 @@ import retrofit2.Response;
 
 public class MainActivity extends DrawerBaseActivity implements View.OnClickListener, OnClickRecentCommentInterface{
 
-    private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 111;
     private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 2;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION =3;
     private CardView mCardViewMap;
@@ -95,32 +99,45 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
         mRefreshComment.setOnClickListener(this);
         //FirebaseCrash.report(new Exception("My first Android non-fatal error"));
 
+        getUserProfileAndSetHeader();
+
         Call<ArrayList<RecentCommentDTO>> recentCommentDTOCall = retrofitUtil.getRecentComment();
         recentCommentDTOCall.enqueue(recentCommentDTOCallback);
         writePermissionCheckAndRequest();
+        locationPermissionCheckAndRequest();
 
     }
+
 
     @Override
     public void onBackPressed() {
 
-        AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.finish_prefer))
-                .setPositiveButton(getResources().getString(R.string.finish_yes), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .setNegativeButton(getResources().getString(R.string.finish_no), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+        // 네비게이션 드로워가 열려 있을때
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
 
-        AlertDialog alertDialog = alterDialogBuilder.create();
-        alertDialog.show();
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+        }
+        else {
+            AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle(getResources().getString(R.string.finish_prefer))
+                    .setPositiveButton(getResources().getString(R.string.finish_yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton(getResources().getString(R.string.finish_no), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alertDialog = alterDialogBuilder.create();
+            alertDialog.show();
+
+        }
 
     }
 
@@ -252,6 +269,7 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
         }
     };
 
+    // autocompletePlace로 부터 결과를 얻어 온 후 맵 엑티비티로 전환
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
@@ -304,6 +322,7 @@ public class MainActivity extends DrawerBaseActivity implements View.OnClickList
         }
     }
 
+    // 최근 장소리뷰를 눌렀을시 해당 장소 리뷰 액티비티로 전환
     @Override
     public void onClickRecentComment(int position) {
         Intent intent = new Intent(mContext,LocationCommentActivity.class);

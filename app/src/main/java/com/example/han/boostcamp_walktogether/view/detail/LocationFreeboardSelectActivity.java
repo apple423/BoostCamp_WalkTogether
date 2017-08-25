@@ -67,6 +67,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
     private TextView mShowCommentTextView;
     private FreeboardDTO mFreeboardDTO;
     private ImageView mUserProfileImageView;
+    private ImageView mCommentImageView;
     private RecyclerView mFreeboardCommentRecyclerview;
     private ThumbUpView mThumbUpView;
     private String mUserEmail;
@@ -98,6 +99,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
         mCommentTextView = (TextView)findViewById(R.id.location_freeboard_select_comment_textView);
         mThumbUpView = (ThumbUpView)findViewById(R.id.location_freeboard_select_like);
         mShowCommentTextView = (TextView) findViewById(R.id.location_freeboard_comment_show_textView);
+        mCommentImageView = (ImageView)findViewById(R.id.location_freeboard_select_comment_imageView);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         mLocationFreeboardCommentAdapter = new LocationFreeboardCommentAdapter(this,getResources());
@@ -123,6 +125,7 @@ public class LocationFreeboardSelectActivity extends BackButtonActionBarActivity
 
         mCommentTextView.setOnClickListener(onClickCommentListener);
         mShowCommentTextView.setOnClickListener(onClickCommentListener);
+        mCommentImageView.setOnClickListener(onClickCommentListener);
         mThumbUpView.setOnThumbUp(onClickLike);
 
 

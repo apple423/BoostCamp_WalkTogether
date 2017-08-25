@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">BoostCamp_WalkTogether</string>
+    <string name="app_name">함께가요</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">설정</string>
+    <string name="action_library">오픈소스 라이브러리</string>
     <string name="toolbar_main_title">함께가요</string>
     <string name="email">이메일</string>
     <string name="password">비밀번호</string>
@@ -13,8 +13,8 @@
     <string name="or">또는</string>
     <string name="google_maps_key">AIzaSyD33CZy68KFJnxEYrverS9pZ6MwsrhVjgM</string>
     <string name="search_location_with_list">산책장소 목록으로 보기</string>
-    <string name="pet_favorite">반려동물 자랑하기</string>
-    <string name="location_recommend">산책장소 추천하기</string>
+    <string name="search_location_with_map">산책장소 맵으로 보기</string>
+    <string name="search_location_with_autoComplete">산책장소 검색으로 보기</string>
     <string name="pet_diary">산책일지</string>
         <string name="location_open_time">개방시간 : </string>
     <string name="location_address">주소 : </string>
@@ -27,6 +27,7 @@
     <string name="content_hint">내용을 입력해주세요.</string>
     <string name="content">내용</string>
     <string name="zero_to_500">0/500</string>
+    <string name="zero_to_200">%1$d / 200</string>
     <string name="add_picture">사진추가</string>
     <string name="location_freeboard_time_detail">time</string>
     <string name="location_freeboard_posted_time">작성시간 : </string>
@@ -129,13 +130,20 @@
     <string name="walk_diary_walking_distance_format">%1$.1f km</string>
     <string name="walk_diary_time_title_format">yyyy-MM-dd , HH시 mm분의 산책</string>
     <string name="walk_diary_content">산책일지</string>
+    <string name="walk_diary_content_hint">산책일지를 작성해주세요</string>
 
     <!--NoDataFragment-->
     <string name="no_data">데이터가 없습니다. 등록해주세요.</string>
+    <string name="no_location_list">주변에 장소가 없습니다.</string>
 
     <!--location_freeboard_comment-->
     <string name="submit">등록</string>
     <string name="location_freeboard_comment_title">댓글</string>
     <string name="comment_submit_time">yyyy-MM-dd , HH시 mm분</string>
+
+    <!--location_list_top_recycler-->
+    <string name="location_top_near">거리순</string>
+    <string name="location_top_fav">인기순</string>
+    <string name="location_top_animal">반려동물 순</string>
 
 </resources>

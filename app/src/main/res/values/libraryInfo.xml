@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="library_titles">
+        <item> Firebase : auth , database, storage, crash </item>
+        <item> Google Play Services API : maps,location,places</item>
+        <item> Glide</item>
+        <item> Glide transformations</item>
+        <item> Facebook-android-sdk </item>
+        <item> KaKao : usermgmt , kakaolink</item>
+        <item> Retrofit2 </item>
+        <item> OkHttp3 : Okhttp3 , logging-Interceptor</item>
+        <item> Parceler</item>
+        <item> ThumbUplib</item>
+        <item> Circleimageview</item>
+        <item> FlipShare </item>
+
+    </string-array>
+
+    <string-array name="library_url">
+        <item> https://firebase.google.com/?hl=ko </item>
+        <item> https://developers.google.com/android/guides/setup</item>
+        <item> https://github.com/bumptech/glide</item>
+        <item> https://github.com/wasabeef/glide-transformations </item>
+        <item> https://github.com/facebook/facebook-android-sdk </item>
+        <item> https://developers.kakao.com/docs/android </item>
+        <item> https://github.com/square/retrofit </item>
+        <item> http://square.github.io/okhttp/</item>
+        <item> https://github.com/johncarl81/parceler</item>
+        <item> https://github.com/ldoublem/ThumbUp</item>
+        <item> https://github.com/hdodenhof/CircleImageView</item>
+        <item> https://github.com/JeasonWong/FlipShare</item>
+
+
+    </string-array>
+    
+    <string-array name="library_copyright">
+        <item> Copyright 2017 Google.Inc </item>
+        <item> Copyright 2017 Google.Inc </item>
+        <item> Copyright 2014 Google.Inc </item>
+        <item> Copyright 2017 Wasabeef </item>
+        <item> Copyright (c) 2014-present, Facebook,Inc</item>
+        <item> Copyright 2014-2016 Kakao Corp.</item>
+        <item> Copyright 2013 Square, Inc.</item>
+        <item> Copyright 2016 Square, Inc.</item>
+        <item> Copyright 2011-2015 John Ericksen</item>
+        <item> Copyright (c) 2016 ldoublem</item>
+        <item> Copyright 2014 - 2017 Henning Dodenhof</item>
+        <item> Copyright [2016] [JeasonWong of copyright owner]</item>
+
+    </string-array>
+
+    <string-array name="library_license">
+        <item> Apache License 2.0</item>
+        <item> Apache License 2.0</item>
+        <item> BSD, part MIT and Apache 2.0</item>
+        <item> Apache License 2.0</item>
+        <item> Facebook Platform License </item>
+        <item> Apache License 2.0 </item>
+        <item> Apache License 2.0 </item>
+        <item> Apache License 2.0 </item>
+        <item> Apache License 2.0 </item>
+        <item> The MIT License </item>
+        <item> Apache License 2.0 </item>
+        <item> Apache License 2.0 </item>
+
+    </string-array>
+
+
+
+</resources>

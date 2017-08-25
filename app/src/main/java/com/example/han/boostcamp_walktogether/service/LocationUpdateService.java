@@ -83,7 +83,7 @@ public class LocationUpdateService {
 
     public void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000);  // 5초에 한번
+        mLocationRequest.setInterval(2000);  // 5초에 한번
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 

@@ -58,6 +58,8 @@ public class LocationFreeboardViewPagerAdapter extends PagerAdapter {
         }
 
         imageView = (ImageView)view.findViewById(R.id.location_freeboard_picture_imageView_viewPager);
+        imageView.setAdjustViewBounds(true);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         //imageView.setImageResource(R.mipmap.ic_launcher);
 
         Glide.with(mContext).load("http://"+imageURL).placeholder(R.drawable.placeholder).into(imageView);

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,11 +38,13 @@ import retrofit2.Response;
 public class LocationCommentAddActivity extends BackButtonActionBarActivity implements RatingBar.OnRatingBarChangeListener{
 
     private final static float DEFAULT_RATING_VALUE = 0;
+    private final static int DEFAULT_TEXT_VALUE = 0;
     private RatingBar mLocationStarRatingBar;
     private RatingBar mLocationPetRatingBar;
     private TextView mLocationCommentTitleTextView;
     private TextView mLocationCommentStarScoreTextView;
     private TextView mLocationCommentPetScoreTextView;
+    private TextView mLocationCommentTextLengthTextView;
     private EditText mLocationCommentEditText;
     private Button mCommentAddButton;
 
@@ -73,6 +77,7 @@ public class LocationCommentAddActivity extends BackButtonActionBarActivity impl
         mLocationPetRatingBar = (RatingBar)findViewById(R.id.pet_ratingBar);
         mLocationCommentEditText = (EditText)findViewById(R.id.location_comment_add_editText);
         mCommentAddButton = (Button)findViewById(R.id.location_comment_add_button);
+        mLocationCommentTextLengthTextView = (TextView)findViewById(R.id.location_comment_add_textLength_textView);
 
         mParkKey = getIntent().getIntExtra(StringKeys.LOCATION_ID_KEY,0);
         mLocationName = getIntent().getStringExtra(StringKeys.LOCATION_NAME);
@@ -85,14 +90,19 @@ public class LocationCommentAddActivity extends BackButtonActionBarActivity impl
         mLocationStarRatingBar.setOnRatingBarChangeListener(this);
         mLocationPetRatingBar.setOnRatingBarChangeListener(this);
         mCommentAddButton.setOnClickListener(onClickAddButton);
+        mLocationCommentEditText.addTextChangedListener(textWatcher);
 
         ratingString = String.format(getResources().getString(R.string.zero_to_five),DEFAULT_RATING_VALUE);
+        String defaultString = String.format(getResources().getString(R.string.zero_to_200),DEFAULT_TEXT_VALUE);
+
+        mLocationCommentTextLengthTextView.setText(defaultString);
         mLocationCommentStarScoreTextView.setText(ratingString);
         mLocationCommentPetScoreTextView.setText(ratingString);
         mLocationCommentTitleTextView.setText(mLocationName);
 
     }
 
+    // 레이팅바가 바뀔때 옆에 텍스트의 점수를 반영하기 위한 콜백
     @Override
     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 
@@ -121,6 +131,36 @@ public class LocationCommentAddActivity extends BackButtonActionBarActivity impl
             CommentDTO commentDTO = setCommentDTO();
             Call<CommentDTO> commentDTOCall = retrofitUtil.postComment(mParkKey,commentDTO);
             commentDTOCall.enqueue(commentDTOCallback);
+
+        }
+    };
+
+    TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+            if(s.length()==0){
+                mCommentAddButton.setEnabled(false);
+                String textLengthString = String.format(getResources().getString(R.string.zero_to_200),s.length());
+                mLocationCommentTextLengthTextView.setText(textLengthString);
+            }
+            else if(s.length()>0){
+                mCommentAddButton.setEnabled(true);
+                String textLengthString = String.format(getResources().getString(R.string.zero_to_200),s.length());
+                mLocationCommentTextLengthTextView.setText(textLengthString);
+
+            }
 
         }
     };
@@ -163,6 +203,7 @@ public class LocationCommentAddActivity extends BackButtonActionBarActivity impl
         public void onResponse(Call<ArrayList<CommentDTO>> call, Response<ArrayList<CommentDTO>> response) {
             if(response.isSuccessful()){
 
+                // 이전 장소리뷰 액티비티로 모든 리뷰를 전달
                 Log.d("SuccessCommentList","yes");
                 ArrayList<CommentDTO> commentArrayList = response.body();
                 Intent intent = new Intent();

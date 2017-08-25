@@ -9,9 +9,11 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -19,6 +21,7 @@ import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationListAdapter;
 import com.example.han.boostcamp_walktogether.R;
 import com.example.han.boostcamp_walktogether.data.CommentAveragePointDTO;
+import com.example.han.boostcamp_walktogether.data.ParkListDTO;
 import com.example.han.boostcamp_walktogether.data.ParkRowDTO;
 import com.example.han.boostcamp_walktogether.interfaces.OnClickLocationListInterface;
 import com.example.han.boostcamp_walktogether.util.ComparatorUtil;
@@ -61,6 +64,7 @@ public class LocationListActivity extends DrawerBaseActivity implements
     private RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
     private ArrayList<ParkRowDTO> mParkRowDTOArrayList;
     private ArrayList<CommentAveragePointDTO> mAveragePointDTOArrayList;
+    private ArrayList<ParkListDTO> mParkListDTOArrayList;
     private LinearLayoutManager linearLayoutManager;
     private LocationListAdapter locationListAdapter;
     private RecyclerView recyclerView;
@@ -90,6 +94,7 @@ public class LocationListActivity extends DrawerBaseActivity implements
                 .build();
         mGoogleApiClient.connect();
 
+        getUserProfileAndSetHeader();
     }
 
     private void getDeviceLocation() {
@@ -120,9 +125,12 @@ public class LocationListActivity extends DrawerBaseActivity implements
 
             // 현재 위치를 기반으로 서버에 주변 공원정보들을 요청한다.
             showProgressBar();
-            Call<ArrayList<ParkRowDTO>> parkRowDTOListCall =
+            /*Call<ArrayList<ParkRowDTO>> parkRowDTOListCall =
                     retrofitUtil.getNearestPark(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
-            parkRowDTOListCall.enqueue(parkRowDataListCallback);
+            parkRowDTOListCall.enqueue(parkRowDataListCallback);*/
+           Call<ArrayList<ParkListDTO>> parkListDTOCall = retrofitUtil.getNearestParkList(mLastKnownLocation.getLatitude()
+                   ,mLastKnownLocation.getLongitude());
+            parkListDTOCall.enqueue(getParkListDTOCallback);
 
 
         } else {
@@ -193,6 +201,27 @@ public class LocationListActivity extends DrawerBaseActivity implements
         }
     };
 
+    Callback<ArrayList<ParkListDTO>> getParkListDTOCallback = new Callback<ArrayList<ParkListDTO>>() {
+        @Override
+        public void onResponse(Call<ArrayList<ParkListDTO>> call, Response<ArrayList<ParkListDTO>> response) {
+            if(response.isSuccessful()){
+
+                hideProgressBar();
+                mParkListDTOArrayList = response.body();
+                Collections.sort(mParkListDTOArrayList,ComparatorUtil.sortByDistanceLocationList);
+                locationListAdapter.setParkArrayList(mParkListDTOArrayList);
+
+
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<ArrayList<ParkListDTO>> call, Throwable t) {
+
+        }
+    };
+
     @Override
     public void onConnected(Bundle connectionHint) {
         // Build the map.
@@ -205,10 +234,26 @@ public class LocationListActivity extends DrawerBaseActivity implements
     }
 
     @Override
+    public void onBackPressed() {
+
+        // 네비게이션 드로워가 열려 있을때
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+        }
+        else {
+            super.onBackPressed();
+
+        }
+
+    }
+
+    @Override
     public void onClickList(int position) {
         Intent intent = new Intent(mContext,LocationActivity.class);
-        Parcelable parcelableParkRowData = Parcels.wrap(mParkRowDTOArrayList.get(position));
-        intent.putExtra(StringKeys.LOCATION_INTENT_KEY,parcelableParkRowData);
+        Parcelable parcelableParkRowData = Parcels.wrap(mParkListDTOArrayList.get(position-1));
+        intent.putExtra(StringKeys.LOCATION_INTENT_LIST_KEY,parcelableParkRowData);
         startActivity(intent);
 
     }
