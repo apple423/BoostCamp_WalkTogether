@@ -88,6 +88,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
     private ArrayList<FreeboardDTO> mFreeboardUserLikeList;
     private ArrayList<FreeboardCommentDTO> mFreeboardCommentCountList;
     private String mUserMail;
+    private AsyncPostArrayList mAsyncPostArrayList;
 
 
     @Override
@@ -118,7 +119,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         mLocationFreeboardAddTextLength.setText(defaultString);
 
         linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        locationFreeboardAddPictureAdapter = new LocationFreeboardAddPictureAdapter();
+        locationFreeboardAddPictureAdapter = new LocationFreeboardAddPictureAdapter(this);
         pictureRecyclerView.setLayoutManager(linearLayoutManager);
         pictureRecyclerView.setAdapter(locationFreeboardAddPictureAdapter);
 
@@ -127,6 +128,8 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         mLocationFreeboardAddPicutreImageView.setOnClickListener(onClickAddImageViewListener);
         mLocationFreeboardAddButton.setOnClickListener(onClickAddButton);
         mLocationFreeboardAddContentEditText.addTextChangedListener(textWatcher);
+
+        mAsyncPostArrayList = new AsyncPostArrayList();
 
 
     }
@@ -368,7 +371,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
 
                 mParkFreeboardList = freeboardList;
                 Log.d("send_freeboard", "gogogogoo");
-                new AsyncArrayList().execute();
+                mAsyncPostArrayList.execute();
                 //mLocationFreeboardAdapter.setParkList(mParkFreeboardList);
                 for(FreeboardDTO data : freeboardList){
                     int freeboardKey = data.getFreeboard_key();
@@ -481,7 +484,7 @@ public class LocationFreeboardAddActivity extends BackButtonActionBarActivity{
         finish();
     }
 
-    public class AsyncArrayList extends AsyncTask<Void, Void, Void> {
+    public class AsyncPostArrayList extends AsyncTask<Void, Void, Void> {
 
 
         @Override

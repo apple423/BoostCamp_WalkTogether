@@ -80,7 +80,7 @@ public class LocationActivity extends BackButtonActionBarActivity {
                 //mLocationImageView.setImageResource(R.drawable.park_default_picture);
                 Glide.with(this).load(R.drawable.park_default_picture).into(mLocationImageView);
             }else{
-                Glide.with(this).load(data.getImage_url()).into(mLocationImageView);
+                Glide.with(this).load(data.getImage_url()).placeholder(R.drawable.placeholder).into(mLocationImageView);
 
 
             }

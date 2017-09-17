@@ -83,7 +83,7 @@ public class LocationUpdateService {
 
     public void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(2000);  // 5초에 한번
+        mLocationRequest.setInterval(2000);  // 2초에 한번
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -117,7 +117,6 @@ public class LocationUpdateService {
 
             }
 
-            Log.d("locationResult","yes");
             LatLng latLng = new LatLng(locationResult.getLastLocation().getLatitude(),
                     locationResult.getLastLocation().getLongitude());
             mPolylineOptions.add(latLng);

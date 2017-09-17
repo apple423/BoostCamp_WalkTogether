@@ -1,5 +1,6 @@
 package com.example.han.boostcamp_walktogether.Adapters;
 
+import android.content.Context;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.han.boostcamp_walktogether.interfaces.LocationFreeboardAddInterface;
 import com.example.han.boostcamp_walktogether.R;
 
@@ -22,6 +24,12 @@ public class LocationFreeboardAddPictureAdapter extends RecyclerView.Adapter {
 
     private LocationFreeboardAddInterface locationFreeboardAddInterface;
     private ArrayList<Uri> mImageUriArrayList;
+    private Context mContext;
+
+
+    public LocationFreeboardAddPictureAdapter(Context mContext) {
+        this.mContext = mContext;
+    }
 
     ImageView mLocationFreeboardAddPicutreImageView;
     @Override
@@ -37,7 +45,8 @@ public class LocationFreeboardAddPictureAdapter extends RecyclerView.Adapter {
 
         Uri imageUri = mImageUriArrayList.get(position);
         Log.d("count item",Integer.toString(getItemCount()));
-        mLocationFreeboardAddPicutreImageView.setImageURI(imageUri);
+        //mLocationFreeboardAddPicutreImageView.setImageURI(imageUri);
+        Glide.with(mContext).load(imageUri).into(mLocationFreeboardAddPicutreImageView);
 
     }
 

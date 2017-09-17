@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.example.han.boostcamp_walktogether.ActionBar.DrawerBaseActivity;
 import com.example.han.boostcamp_walktogether.Adapters.LocationListAdapter;
@@ -67,6 +68,7 @@ public class LocationListActivity extends DrawerBaseActivity implements
     private ArrayList<ParkListDTO> mParkListDTOArrayList;
     private LinearLayoutManager linearLayoutManager;
     private LocationListAdapter locationListAdapter;
+    private LinearLayout noDataLinear;
     private RecyclerView recyclerView;
 
     @Override
@@ -80,6 +82,7 @@ public class LocationListActivity extends DrawerBaseActivity implements
         mContext = this;
         mAveragePointDTOArrayList = new ArrayList<>();
         recyclerView = (RecyclerView)findViewById(R.id.location_list_recyclerView);
+        noDataLinear = (LinearLayout)findViewById(R.id.location_list_noData);
         linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         locationListAdapter = new LocationListAdapter(this, this);
 
@@ -149,6 +152,13 @@ public class LocationListActivity extends DrawerBaseActivity implements
                 Collections.sort(mParkListDTOArrayList,ComparatorUtil.sortByDistanceLocationList);
                 locationListAdapter.setParkArrayList(mParkListDTOArrayList);
 
+                recyclerView.setVisibility(View.VISIBLE);
+                noDataLinear.setVisibility(View.GONE);
+
+
+            }else{
+                recyclerView.setVisibility(View.GONE);
+                noDataLinear.setVisibility(View.VISIBLE);
 
             }
 

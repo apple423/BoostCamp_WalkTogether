@@ -89,7 +89,9 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
                 Glide.with(mContext).load(data.getUser_profile()).into(holder.mProfileImageView);
             }
             else{
-                holder.mProfileImageView.setImageResource(R.mipmap.ic_launcher);
+
+                Glide.with(mContext).load(R.mipmap.ic_launcher).into(holder.mPicutreImageView);
+
             }
 
 
@@ -100,7 +102,7 @@ public class LocationFreeboardAdapter extends RecyclerView.Adapter<LocationFreeb
             }
             else{
 
-                Glide.with(mContext).load(R.drawable.park_default_picture)
+                Glide.with(mContext).load(R.drawable.default_picture)
                         .placeholder(R.drawable.placeholder)
                         .into(holder.mPicutreImageView);
 

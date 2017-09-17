@@ -35,6 +35,7 @@ import com.kakao.network.response.ResponseBody;
 
 import org.parceler.Parcels;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -64,6 +65,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
     private ArrayList<FreeboardDTO> mFreeboardUserLikeList;
     private ArrayList<FreeboardCommentDTO> mCommentCountList;
     private FreeboardDTO mFreeboardUserLikeSendDTO;
+    private AsyncArrayList mAsyncArrayList;
 
     private final RetrofitUtil retrofitUtil = RetrofitUtil.retrofit.create(RetrofitUtil.class);
 
@@ -99,7 +101,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         Call<ArrayList<FreeboardDTO>> getfreeboardInParkCall = retrofitUtil.getAllFreeboard(mParKey);
         getfreeboardInParkCall.enqueue(getFreeboardInParkCallback);
 
-
+       mAsyncArrayList  = new AsyncArrayList();
     }
 
     @Override
@@ -207,7 +209,6 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         if (like) {
             String countString = textView.getText().toString();
             int count = Integer.valueOf(countString);
-            Log.d("countValue", count + "");
             textView.setText(String.valueOf(count + 1));
             textView.setTextColor(getResources().getColor(R.color.redText));
             Call<FreeboardDTO> freeboardLikeDTOCall = retrofitUtil.postLike(mParkFreeboardList.get(position)
@@ -232,7 +233,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
 
             String countString = textView.getText().toString();
             int count = Integer.valueOf(countString);
-            Log.d("countValue", count + "");
+            //Log.d("countValue", count + "");
             textView.setText(String.valueOf(count - 1));
             textView.setTextColor(Color.BLACK);
             Call<com.kakao.network.response.ResponseBody> freeboardLikeDeleteCall = retrofitUtil.deleteLike(mParkFreeboardList.get(position)
@@ -242,7 +243,7 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     if (response.isSuccessful()) {
 
-                        Log.d("DeleteLikeSuccess", "gsasga");
+                        //Log.d("DeleteLikeSuccess", "gsasga");
 
                     }
                 }
@@ -280,8 +281,8 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
 
                 mParkFreeboardList = freeboardList;
 
-                new AsyncArrayList().execute();
 
+             mAsyncArrayList.execute();
                 for (FreeboardDTO data : mParkFreeboardList) {
                     int freeboardKey = data.getFreeboard_key();
 
@@ -354,20 +355,20 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
             if (response.isSuccessful()) {
 
                 FreeboardImageDTO freeboardImageData = response.body();
-                Log.d("send_Image_adapter", freeboardImageData.getImage());
+               /* Log.d("send_Image_adapter", freeboardImageData.getImage());*/
                 mParkFreeboardImageList.add(freeboardImageData);
 
             } else {
 
-                Log.d("send_Image_adapter", "fail");
+              /*  Log.d("send_Image_adapter", "fail");*/
             }
         }
 
         @Override
         public void onFailure(Call<FreeboardImageDTO> call, Throwable t) {
 
-            Log.d("send_Image_adapter", t.getMessage());
-            Log.d("send_Image_adapter", "gogogogoofail");
+          /*  Log.d("send_Image_adapter", t.getMessage());
+            Log.d("send_Image_adapter", "gogogogoofail");*/
 
         }
     };
@@ -390,14 +391,14 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
         }
     };
 
-    public class AsyncArrayList extends AsyncTask<Void, Void, Void> {
+    private class AsyncArrayList extends AsyncTask<Void, Void, Void> {
 
 
         @Override
         protected Void doInBackground(Void... params) {
 
             while(true) {
-               // Log.d("asynctaskGo","yes");
+
                 if (mParkFreeboardImageList.size() == mParkFreeboardList.size()
                         && mParkFreeboardImageList.size() == mFreeboardLikeList.size()
                         && mFreeboardLikeList.size() == mFreeboardUserLikeList.size()
@@ -421,6 +422,8 @@ public class LocationFreeboardActivity extends BackButtonActionBarActivity
             Log.d("asynctaskPostFinish","yes");
             mLocationFreeboardAdapter.setParkListAndImage(mParkFreeboardList, mParkFreeboardImageList
                     , mFreeboardLikeList, mFreeboardUserLikeList, mCommentCountList);
+            int size = mLocationFreeboardAdapter.getItemCount();
+            Log.d("asynctaskSize",size+"");
 
             mLocationFreeboardRecycelerView.setVisibility(View.VISIBLE);
             mLinearLayoutNodata.setVisibility(View.GONE);

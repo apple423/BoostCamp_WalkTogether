@@ -117,7 +117,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public int getItemCount() {
         if(parkListDTOArrayList ==null) return 0;
 
-        return parkListDTOArrayList.size();
+        return parkListDTOArrayList.size()+1;
     }
 
     public class LocationListViewHolder extends RecyclerView.ViewHolder{

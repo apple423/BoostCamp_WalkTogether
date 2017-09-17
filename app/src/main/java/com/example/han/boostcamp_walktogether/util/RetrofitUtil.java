@@ -19,8 +19,7 @@ import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
+
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -40,8 +39,6 @@ public interface RetrofitUtil {
 
 
     Retrofit retrofit = new Retrofit.Builder()
-            .client(new OkHttpClient().newBuilder().
-            addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build())
             .baseUrl("http://52.79.111.22:3000")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
